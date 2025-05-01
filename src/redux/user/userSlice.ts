@@ -75,7 +75,7 @@ const userSlice = createSlice({
         deleteUserPending(state) {
             state.loading = true
         },
-        deleteUserSuccess(state, action: PayloadAction<string>) {
+        deleteUserSuccess(state) {
             state.currentUser = null
             state.loading = false;
             state.error = false ;

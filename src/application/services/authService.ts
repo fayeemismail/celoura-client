@@ -25,6 +25,7 @@ interface ErrorResponse {
     message: string;
 };
 
+//loginUser service frontend
 export const loginUser = async ( email: string, password: string ): Promise< AuthResponse > => {
     try {
         const response = await fetch(`${API_BASE_URL}/auth/login`, {

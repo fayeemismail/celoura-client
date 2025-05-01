@@ -7,6 +7,8 @@ import { AppDispatch, RootState } from "../../redux/store";
 import { clearError, signInFailure, signInPending, signInSuccess } from "../../redux/user/userSlice";
 import axios from "axios";
 import { API_BASE_URL } from "../../infrastructure/config/constants";
+import { login } from "../../infrastructure/api/auth";
+import { handleLogin } from "../../redux/user/authThunks";
 
 
 
@@ -37,17 +39,9 @@ export default function LoginPage() {
     setFormData({ ...formData, [name]: value })
   };
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    try {
-      dispatch(signInPending());
-      const response = await axios.post(`${API_BASE_URL}/auth/login`, formData);
-      console.log('this is response', response);
-      dispatch(signInSuccess(response.data))
-    } catch (error: any) {
-      console.log(error.response.data.error);
-      dispatch(signInFailure(error.response?.data?.error || "Login failed" ))
-    }
+    dispatch(handleLogin(formData))
   };
 
   return (
@@ -62,7 +56,7 @@ export default function LoginPage() {
           <h2 style={{ color: COLORS.text }} className="mb-6 text-center text-2xl font-semibold">Welcome Back</h2>
           {error && <div className="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700">{error}</div>}
 
-          <form onSubmit={handleLogin}>
+          <form onSubmit={onSubmit}>
             <div className="mb-4">
               <div className="relative">
                 <Mail style={{ color: COLORS.secondaryText }} className="absolute left-3 top-3 h-5 w-5" />

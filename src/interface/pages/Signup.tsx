@@ -79,7 +79,8 @@ export default function Signup() {
         // Continue signup process
         const response = await axios.post(`${API_BASE_URL}/auth/signup`, formData);
         console.log(response.data);
-        navigate('/login')
+        navigate(`/verify-otp?email=${formData.email}`)
+        
       } catch (error: any) {
         console.log(error.response?.data?.error);
         dispatch(signInFailure(error.response?.data?.error || 'Registration failed'))
