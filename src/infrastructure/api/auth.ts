@@ -7,7 +7,7 @@ const API = axios.create({
     withCredentials: true
 });
 
-//login auth
+//login auth admin
 export const login = async (formData: {email: string; password: string}) => {
     const response = await API.post('/auth/login', formData);
     return response.data;

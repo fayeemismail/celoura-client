@@ -1,14 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import COLORS from "../styles/theme";
+import COLORS from "../../styles/theme";
 import { ArrowRight, Lock, Mail } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../redux/store";
-import { clearError, signInFailure, signInPending, signInSuccess } from "../../redux/user/userSlice";
-import axios from "axios";
-import { API_BASE_URL } from "../../infrastructure/config/constants";
-import { login } from "../../infrastructure/api/auth";
-import { handleLogin } from "../../redux/user/authThunks";
+import { AppDispatch, RootState } from "../../../redux/store";
+import { clearError } from "../../../redux/user/userSlice";
+import { handleLogin } from "../../../redux/user/authThunks";
 
 
 

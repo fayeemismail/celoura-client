@@ -7,7 +7,7 @@ import userReducer from '../user/userSlice'
 const userPersistConfig = {
     key: 'user',
     storage,
-    whitelist: ['currentUser']
+    whitelist: ['currentUser', 'isAuthenticated']
 };
 
 export default persistReducer(userPersistConfig, userReducer)

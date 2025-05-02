@@ -1,7 +1,7 @@
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AppDispatch, RootState } from "../../../redux/store";
+import { AppDispatch } from "../../../redux/store";
 import axios from "axios";
 import { API_BASE_URL } from "../../../infrastructure/config/constants";
 import { clearError } from "../../../redux/user/userSlice";
