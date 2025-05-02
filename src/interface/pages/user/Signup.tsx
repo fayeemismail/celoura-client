@@ -1,11 +1,11 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import COLORS from "../styles/theme";
+import COLORS from "../../styles/theme";
 import { ArrowRight, Lock, Mail, UserPlus } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../redux/store";
-import { clearError, signInFailure } from "../../redux/user/userSlice";
-import { API_BASE_URL } from "../../infrastructure/config/constants";
+import { AppDispatch, RootState } from "../../../redux/store";
+import { clearError, signInFailure } from "../../../redux/user/userSlice";
+import { API_BASE_URL } from "../../../infrastructure/config/constants";
 import axios from "axios";
 
 
@@ -77,8 +77,7 @@ export default function Signup() {
         if (!isValid) return; // Stop if not valid
 
         // Continue signup process
-        const response = await axios.post(`${API_BASE_URL}/auth/signup`, formData);
-        console.log(response.data);
+        await axios.post(`${API_BASE_URL}/auth/signup`, formData);
         navigate(`/verify-otp?email=${formData.email}`)
         
       } catch (error: any) {

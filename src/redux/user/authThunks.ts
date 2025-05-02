@@ -1,5 +1,5 @@
 import { login } from "../../infrastructure/api/auth";
-import { signInFailure, signInPending, signInSuccess } from "./userSlice";
+import { signInFailure, signInPending, signInSuccess, signOut } from "./userSlice";
 
 
 // handleLogin function authThunks
@@ -19,6 +19,20 @@ export const handleLogin = ( formData: { email: string; password: string } ) => 
         } catch (error: any) {
             console.log(error.response?.data?.error);
             dispatch(signInFailure(error.response?.data?.error || "Login failed" ));
+        }
+    }
+}
+
+
+export const handleSignout = () => {
+    return async (dispatch: any) => {
+        try {
+            
+            dispatch(signOut());
+            localStorage.removeItem('accessToken');
+
+        } catch (error: any) {
+            console.log(error)
         }
     }
 }

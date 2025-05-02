@@ -47,8 +47,9 @@ const userSlice = createSlice({
         signInPending(state) {
             state.loading = true
         },
-        signInSuccess(state, action: PayloadAction<CurrentUser>) {
-            state.currentUser = action.payload;
+        signInSuccess(state, action: PayloadAction<{user: any; token : string}>) {
+            const { user, token } = action.payload;
+            state.currentUser = { ...user, token };
             state.loading = false;
             state.error = false;
             state.isAuthenticated = true;
@@ -60,7 +61,7 @@ const userSlice = createSlice({
         },
 
         updateUserPending(state) {
-            state.loading = true
+            state.loading = true;           
         },
         updateUserSuccess(state, action: PayloadAction<CurrentUser>) {
             state.currentUser = action.payload;
