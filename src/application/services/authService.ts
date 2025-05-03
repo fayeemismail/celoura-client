@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../../infrastructure/config/constants";
+import { API_BASE_URL } from "../../config/constants";
 
 
 interface User {

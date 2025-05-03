@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { AppDispatch } from "../../../redux/store";
+import { AppDispatch } from "../../redux/store";
 import axios from "axios";
-import { API_BASE_URL } from "../../../infrastructure/config/constants";
-import { clearError } from "../../../redux/user/userSlice";
+import { API_BASE_URL } from "../../config/constants";
+import { clearError } from "../../redux/user/userSlice";
 import COLORS from "../../styles/theme";
 
 

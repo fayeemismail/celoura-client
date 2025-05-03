@@ -23,7 +23,7 @@ interface CurrentUser {
     id: string,
     name: string,
     email: string,
-    token: string
+    role: string
 }
 
 interface UserState {
@@ -47,9 +47,8 @@ const userSlice = createSlice({
         signInPending(state) {
             state.loading = true
         },
-        signInSuccess(state, action: PayloadAction<{user: any; token : string}>) {
-            const { user, token } = action.payload;
-            state.currentUser = { ...user, token };
+        signInSuccess(state, action: PayloadAction<CurrentUser>) {
+            state.currentUser = action.payload;
             state.loading = false;
             state.error = false;
             state.isAuthenticated = true;

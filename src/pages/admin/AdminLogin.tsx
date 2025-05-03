@@ -1,14 +1,35 @@
 import { ArrowRight, Lock, Mail } from "lucide-react";
 import { ADMIN_COLORS } from "../../styles/theme";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import axios from "axios";
-import { API_BASE_URL } from "../../../infrastructure/config/constants";
+import { API_BASE_URL } from "../../config/constants";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
+import { handleAdminLogin } from "../../redux/admin/authThunks";
+import { useNavigate } from "react-router-dom";
+import { clearError } from "../../redux/user/userSlice";
 
 
 
 export default function AdminLogin() {
 
   const [ formData, setFormData ] = useState({ email: '', password: '' });
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if(isAuthenticated) {
+      navigate('/admin/home');
+    }
+  }, [isAuthenticated, navigate]);
+
+  //clearing the error after the component unmounts
+  useEffect(() => {
+    return () => {
+      dispatch(clearError())
+    }
+  }, [dispatch]);
   
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
@@ -17,9 +38,7 @@ export default function AdminLogin() {
 
   const onSubmit = async(e: React.FormEvent) => {
     e.preventDefault();
-    const response = await axios.post(`${API_BASE_URL}/auth/admin/login`, formData);
-    console.log(response.data, 'this is response');
-    console.log(formData)
+    dispatch(handleAdminLogin(formData));
   }
 
     return (
@@ -32,7 +51,7 @@ export default function AdminLogin() {
     
             <div className="p-6">
               <h2 style={{ color: ADMIN_COLORS.text }} className="mb-6 text-center text-2xl font-semibold">Welcome Back</h2>
-              {/* {error && <div className="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700">{error}</div>} */}
+              {error && <div className="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700">{error}</div>}
     
               <form  onSubmit={onSubmit} >
                 <div className="mb-4">
@@ -69,11 +88,11 @@ export default function AdminLogin() {
     
                 <button
                   type="submit"
-                //   disabled={loading}
+                  disabled={loading}
                   style={{ backgroundColor: ADMIN_COLORS.accent, color: ADMIN_COLORS.cardBg }}
                   className="flex w-full items-center justify-center rounded-lg py-3 font-medium transition-colors duration-300 hover:opacity-90"
                 >
-                  {/* {loading ? (
+                  {loading ? (
                     <span className="flex items-center">
                       <svg className="mr-2 h-4 w-4 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
                         <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -81,20 +100,15 @@ export default function AdminLogin() {
                       </svg>
                       Loading...
                     </span>
-                  ) : ( */}
+                  ) : (
                     <span className="flex items-center">
                       Log In <ArrowRight className="ml-2 h-4 w-4" />
                     </span>
-                  {/* )} */}
+                  )}
                 </button>
               </form>
     
-              {/* <div className="mt-6 text-center">
-                <p style={{ color: ADMIN_COLORS.secondaryText }}>Don't have an account?</p>
-                <a style={{ color: ADMIN_COLORS.accent }} className="cursor-pointer font-medium hover:underline" onClick={() => navigate('/signup')}>
-                  Sign up now
-                </a>
-              </div> */}
+              
             </div>
           </div>
         </div>

@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import COLORS from "../../styles/theme";
 import { ArrowRight, Lock, Mail } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../redux/store";
-import { clearError } from "../../../redux/user/userSlice";
-import { handleLogin } from "../../../redux/user/authThunks";
+import { AppDispatch, RootState } from "../../redux/store";
+import { clearError } from "../../redux/user/userSlice";
+import { handleLogin } from "../../redux/user/authThunks";
 
 
 
@@ -45,7 +45,7 @@ export default function LoginPage() {
     <div style={{ backgroundColor: COLORS.bg, minHeight: "100vh" }} className="flex w-full items-center justify-center p-4">
       <div style={{ backgroundColor: COLORS.cardBg, borderColor: COLORS.border }} className="w-full max-w-md overflow-hidden rounded-lg shadow-xl border">
         <div style={{ backgroundColor: COLORS.accent }} className="p-6 text-center">
-          <h1 style={{ color: COLORS.cardBg }} className="mt-2 text-3xl font-bold">Travel Guide</h1>
+          <h1 style={{ color: COLORS.cardBg }} className="mt-2 text-3xl font-bold">Celoura Travels</h1>
           <p style={{ color: COLORS.inputBg }} className="mt-1">Your journey begins here</p>
         </div>
 

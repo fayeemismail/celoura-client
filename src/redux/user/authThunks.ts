@@ -1,4 +1,4 @@
-import { login } from "../../infrastructure/api/auth";
+import { login } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./userSlice";
 
 
@@ -9,10 +9,8 @@ export const handleLogin = ( formData: { email: string; password: string } ) => 
             dispatch(signInPending());
 
             const response = await login(formData);
-            console.log(response.user, 'THIS IS CURRENTuSER')
+            console.log(response, 'this is response signIn')
 
-            //access token setting
-            localStorage.setItem('accessToken', response.token);
 
             dispatch(signInSuccess(response));
 
