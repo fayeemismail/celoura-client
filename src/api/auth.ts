@@ -17,3 +17,16 @@ export const adminLogin = async ( formData: { email: string; password: string } 
     const response = await API.post('auth/admin/login', formData);
     return response.data;
 }
+
+export const refreshAccessToken = async () => {
+    const response = await API.post('/auth/refresh-token');
+    return response.data;
+}
+
+export const getCurrentUser = async () => {
+    return API.get('/auth/me');
+};
+
+export const logoutUser = async () => {
+    return API.post('/auth/logout')
+}

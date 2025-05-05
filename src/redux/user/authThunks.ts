@@ -1,4 +1,4 @@
-import { login } from "../../api/auth";
+import { login, logoutUser, refreshAccessToken } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./userSlice";
 
 
@@ -9,7 +9,8 @@ export const handleLogin = ( formData: { email: string; password: string } ) => 
             dispatch(signInPending());
 
             const response = await login(formData);
-            console.log(response, 'this is response signIn')
+            console.log(response, 'THIS IS CURRENTuSER')
+
 
 
             dispatch(signInSuccess(response));
@@ -25,12 +26,37 @@ export const handleLogin = ( formData: { email: string; password: string } ) => 
 export const handleSignout = () => {
     return async (dispatch: any) => {
         try {
+
+            await logoutUser();
             
             dispatch(signOut());
-            localStorage.removeItem('accessToken');
 
         } catch (error: any) {
             console.log(error)
         }
     }
 }
+
+
+export const handleTokenRefresh = (): any => {
+    return async (dispatch: any, getState: any) => {
+        try {
+
+            const state = getState();
+            const currentUser = state.auth?.user || state.user?.currentUser;
+
+            if (!currentUser) {
+                console.warn('No current user found in Redux. Logging out...');
+                await logoutUser()
+                dispatch(signOut());
+                return;
+            }
+            await refreshAccessToken();
+        } catch (error: any) {
+            console.error('Refresh token failed', error.response?.data?.error);
+            dispatch(signOut());
+        }
+    }
+}
+
+
