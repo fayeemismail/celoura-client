@@ -3,10 +3,11 @@ import Login from '../pages/user/Login';
 import Signup from '../pages/user/Signup';
 import { ProtectedRoute } from './ProtectedRoute';
 import { Provider } from 'react-redux';
-import { store } from '../../redux/store';
+import { store } from '../redux/store';
 import Home from '../pages/user/Home';
 import Otp from '../components/user/Otp';
 import AdminLogin from '../pages/admin/AdminLogin';
+import HomeAdmin from '../pages/admin/Home';
 
 
 export default function AppRoutes() {
@@ -33,6 +34,8 @@ export default function AppRoutes() {
 
                     {/* adminPage */}
                     <Route path='/adminLogin' element={ <AdminLogin /> } />
+                    <Route path='/admin/home' element={ <HomeAdmin /> } />
+
 
                 </Routes>
             </BrowserRouter>

@@ -3,9 +3,9 @@ import { useNavigate } from "react-router-dom";
 import COLORS from "../../styles/theme";
 import { ArrowRight, Lock, Mail, UserPlus } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../redux/store";
-import { clearError, signInFailure } from "../../../redux/user/userSlice";
-import { API_BASE_URL } from "../../../infrastructure/config/constants";
+import { AppDispatch, RootState } from "../../redux/store";
+import { clearError, signInFailure } from "../../redux/user/userSlice";
+import { API_BASE_URL } from "../../config/constants";
 import axios from "axios";
 
 
