@@ -10,8 +10,9 @@ import HeroSection from "../../components/user/HeroSection";
 import CategoriesSection from "../../components/user/Category";
 import FeaturedDestinations from "../../components/user/FeaturedDestination";
 import TravelTips from "../../components/user/TravelTips";
-import Newsletter from "../../components/user/NewsLetter";
 import Footer from "../../components/user/Footer";
+import axios from "axios";
+import instance from "../../api/axiosInstance";
 
 
 
@@ -25,6 +26,10 @@ export default function HomePage() {
       navigate("/login");
     }
   }, [isAuthenticated, navigate]);
+
+  const handleBackendCall = async () => {
+    await instance('/auth/getUser');
+  }
 
   
   return (
@@ -45,9 +50,6 @@ export default function HomePage() {
 
         {/* Travel Tips Section */}
         <TravelTips />
-
-        {/* Newsletter Section */}
-        <Newsletter />
       </main>
 
       {/* Footer */}

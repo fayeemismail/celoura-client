@@ -18,6 +18,10 @@ export default function Navbar() {
     navigate("/login");
   };
 
+  const handleProfilePage = () => {
+    navigate('/Profile')
+  }
+
   return (
     <header style={{ backgroundColor: COLORS.cardBg, borderColor: COLORS.border }} className="sticky top-0 z-10 border-b shadow-sm">
       <div className="container mx-auto flex items-center justify-between p-4">
@@ -39,7 +43,7 @@ export default function Navbar() {
           {isAuthenticated ? (
             <div className="flex items-center">
               <div className="mr-4">
-                <p style={{ color: COLORS.text }} className="font-medium">
+                <p style={{ color: COLORS.text }} onClick={handleProfilePage} className="font-medium cursor-pointer">
                   {currentUser?.name || "User"}
                 </p>
               </div>
