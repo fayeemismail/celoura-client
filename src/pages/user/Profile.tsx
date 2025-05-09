@@ -1,334 +1,274 @@
-import React, { useState } from 'react';
-import { User, Edit, LogOut, Key, Eye, EyeOff, Check, X } from 'lucide-react';
-import COLORS from '../../styles/theme';
-import Navbar from '../../components/user/Navbar';
-import { useSelector } from 'react-redux';
-import { RootState } from '../../redux/store';
+import { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
+import { useNavigate } from "react-router-dom";
+import COLORS from "../../styles/theme";
+import { Mail, User, Lock, Save, Eye, EyeOff } from "lucide-react";
+import { handleSignout, handleUpdateProfile } from "../../redux/user/authThunks";
+import ProfileNavbar from "../../components/user/Profile/ProfileNavbar";
+import { validatePasswords } from "../../validator/PasswordValidator";
 
+export default function Profile() {
+  const { currentUser, error, loading } = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
 
-
-
-const mockUser = {
-  name: "John Smith",
-  email: "john.smith@example.com"
-};
-
-const ProfilePage = () => {
-  const [isEditing, setIsEditing] = useState(false);
-  const [isChangingPassword, setIsChangingPassword] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
-//   const { currentUser, error, loading } = useSelector((state: RootState) => state.user);
-  
-  const [formData, setFormData] = useState({
-    name: mockUser.name,
-    email: mockUser.email,
-    password: '',
-    confirmPassword: ''
+  const [name, setName] = useState(currentUser?.name || "");
+  const [showPasswordFields, setShowPasswordFields] = useState(false);
+  const [formError, setFormError] = useState("");
+  const [passwordData, setPasswordData] = useState({
+    current: "",
+    new: "",
+    confirm: "",
+    showCurrent: false,
+    showNew: false,
+    showConfirm: false,
   });
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
-    const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+  useEffect(() => {
+    if (!currentUser) {
+      dispatch(handleSignout());
+      navigate("/login");
+    }
+  }, [currentUser, dispatch, navigate]);
+
+  const handlePasswordChange = (field: string, value: string) => {
+    setPasswordData(prev => ({ ...prev, [field]: value }));
   };
 
-  const handleEditProfile = () => {
-    setIsEditing(true);
-    setIsChangingPassword(false);
+  const toggleVisibility = (field: string) => {
+    setPasswordData(prev => ({
+      ...prev,
+      [field]: !prev[field as keyof typeof prev]
+    }));
   };
+  
 
-  const handleSubmitEdit = () => {
-    // Here you would submit the updated profile data to your API
-    console.log("Saving profile:", formData);
-    setIsEditing(false);
-  };
-
-  const handleCancelEdit = () => {
-    setFormData({
-      ...formData,
-      name: mockUser.name,
-      email: mockUser.email
+  const cancelPasswordChange = () => {
+    setShowPasswordFields(false);
+    setPasswordData({
+      current: "",
+      new: "",
+      confirm: "",
+      showCurrent: false,
+      showNew: false,
+      showConfirm: false,
     });
-    setIsEditing(false);
   };
 
-  const handleTogglePassword = () => {
-    setIsChangingPassword(!isChangingPassword);
-    if (!isChangingPassword) {
-      setIsEditing(false);
-    } else {
-      setFormData({
-        ...formData,
-        password: '',
-        confirmPassword: ''
-      });
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const payload: {
+      id: string;
+      name?: string;
+      currentPassword?: string;
+      newPassword?: string;
+      confirmPassword?: string;
+    } = { id: currentUser!.id };
+
+    if(currentUser?.id) payload.id = currentUser.id 
+    
+    //Password Logic
+    if (name !== currentUser?.name) payload.name = name;
+
+    if (showPasswordFields) {
+      const { current, new: newPass, confirm } = passwordData;
+      
+      //Validating with Zod
+      const result = validatePasswords({ current, new: newPass, confirm });
+
+      if(!result.success){
+        setFormError(result.message || "Something went wrong");
+        return 
+      }
+
+      payload.currentPassword = current;
+      payload.newPassword = newPass;
+      payload.confirmPassword = confirm;
     }
-  };
-
-  const handleSubmitPassword = () => {
-    // Here you would validate and submit the new password to your API
-    if (formData.password === formData.confirmPassword && formData.password.length >= 6) {
-      console.log("Changing password");
-      setIsChangingPassword(false);
-      setFormData({
-        ...formData,
-        password: '',
-        confirmPassword: ''
-      });
-    } else {
-      alert("Passwords must match and be at least 6 characters long");
+      setFormError('');
+    if (Object.keys(payload).length > 1) {
+      dispatch(handleUpdateProfile(payload));
     }
-  };
-
-  const handleLogout = () => {
-    // Here you would implement your logout logic
-    console.log("Logging out");
   };
 
   return (
-    <div className="flex flex-col min-h-screen" style={{ backgroundColor: COLORS.bg }}>
-      {/* Include your Navbar component here */}
-      <Navbar />
-      
-      <div className="flex flex-col items-center pt-8 pb-16 px-4 max-w-3xl mx-auto w-full">
-        <div className="w-full mb-8 flex justify-end">
-          <button 
-            onClick={handleLogout} 
-            className="flex items-center gap-2 px-4 py-2 rounded"
-            style={{ 
-              backgroundColor: COLORS.accent, 
-              color: '#FFFFFF'
-            }}
-          >
-            <LogOut size={16} />
-            Logout
-          </button>
-        </div>
-
-        <div 
-          className="w-full p-6 rounded-lg shadow-md"
-          style={{ 
-            backgroundColor: COLORS.cardBg,
-            borderColor: COLORS.border,
-            borderWidth: '1px'
-          }}
-        >
-          {/* Profile Header with Avatar */}
-          <div className="flex flex-col items-center mb-8">
-            <div 
-              className="w-32 h-32 rounded-full flex items-center justify-center mb-4"
-              style={{ 
-                backgroundColor: COLORS.border,
-                color: COLORS.text
-              }}
-            >
-              <User size={64} />
+    <div
+      style={{ backgroundColor: COLORS.bg, minHeight: "100vh", paddingTop: "80px" }}
+      className="flex items-center justify-center p-4"
+    >
+      <div
+        style={{ backgroundColor: COLORS.cardBg, borderColor: COLORS.border }}
+        className="w-full max-w-md rounded-lg border shadow-xl"
+      >
+        <ProfileNavbar />
+        
+        <div className="p-6">
+          <form onSubmit={handleSubmit}>
+            <div>
+            {formError && <div className="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700">{formError}</div>}
+            {error && <div className="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700">{error}</div>}
             </div>
-            
-            {!isEditing ? (
-              <div className="text-center">
-                <h1 className="text-2xl font-bold" style={{ color: COLORS.text }}>{mockUser.name}</h1>
-                <p className="text-lg" style={{ color: COLORS.secondaryText }}>{mockUser.email}</p>
+            {/* Name */}
+            <div className="mb-4">
+              <div className="relative">
+                <User style={{ color: COLORS.secondaryText }} className="absolute left-3 top-3 h-5 w-5" />
+                <input
+                  type="text"
+                  name="name"
+                  placeholder="Full Name"
+                  value={name}
+                  onChange={(e) => setName(e.target.value)}
+                  style={{ backgroundColor: COLORS.inputBg, borderColor: COLORS.border, color: COLORS.text }}
+                  className="w-full rounded-lg border p-3 pl-10 focus:outline-none focus:ring-2"
+                />
               </div>
-            ) : (
-              <div className="text-center w-full max-w-md">
-                <div className="mb-4">
-                  <label 
-                    className="block mb-2 text-sm font-medium text-left"
-                    style={{ color: COLORS.secondaryText }}
-                  >
-                    Name
-                  </label>
-                  <input
-                    type="text"
-                    name="name"
-                    value={formData.name}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 rounded"
-                    style={{ 
-                      backgroundColor: COLORS.inputBg,
-                      borderColor: COLORS.border,
-                      borderWidth: '1px',
-                      color: COLORS.text
-                    }}
-                  />
-                </div>
-                <div className="mb-4">
-                  <label 
-                    className="block mb-2 text-sm font-medium text-left"
-                    style={{ color: COLORS.secondaryText }}
-                  >
-                    Email
-                  </label>
-                  <input
-                    type="email"
-                    name="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    className="w-full px-4 py-2 rounded"
-                    style={{ 
-                      backgroundColor: COLORS.inputBg,
-                      borderColor: COLORS.border,
-                      borderWidth: '1px',
-                      color: COLORS.text
-                    }}
-                  />
-                </div>
-              </div>
-            )}
-          </div>
+            </div>
 
-          {/* Profile Actions */}
-          <div className="flex flex-col space-y-4 max-w-md mx-auto">
-            {!isEditing && !isChangingPassword ? (
-              <button 
-                onClick={handleEditProfile}
-                className="flex items-center justify-center gap-2 px-4 py-2 w-full rounded"
-                style={{ 
-                  backgroundColor: COLORS.accent, 
-                  color: '#FFFFFF'
-                }}
-              >
-                <Edit size={16} />
-                Edit Profile
-              </button>
-            ) : isEditing ? (
-              <div className="flex gap-3">
-                <button 
-                  onClick={handleSubmitEdit}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded"
-                  style={{ 
-                    backgroundColor: COLORS.accent, 
-                    color: '#FFFFFF'
+            {/* Email - Read only */}
+            <div className="mb-4">
+              <div className="relative">
+                <Mail style={{ color: COLORS.secondaryText }} className="absolute left-3 top-3 h-5 w-5" />
+                <input
+                  type="email"
+                  value={currentUser?.email || ""}
+                  disabled
+                  style={{
+                    backgroundColor: COLORS.inputBg,
+                    borderColor: COLORS.border,
+                    color: COLORS.secondaryText,
+                    cursor: "not-allowed",
                   }}
-                >
-                  <Check size={16} />
-                  Save
-                </button>
-                <button 
-                  onClick={handleCancelEdit}
-                  className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded"
-                  style={{ 
-                    backgroundColor: '#F5F5F5', 
-                    color: '#333333'
-                  }}
-                >
-                  <X size={16} />
-                  Cancel
-                </button>
+                  className="w-full rounded-lg border p-3 pl-10"
+                />
               </div>
-            ) : null}
+            </div>
 
-            {!isChangingPassword ? (
-              <button 
-                onClick={handleTogglePassword}
-                className={`flex items-center justify-center gap-2 px-4 py-2 w-full rounded ${isEditing ? 'opacity-50 cursor-not-allowed' : ''}`}
-                disabled={isEditing}
-                style={{ 
-                  backgroundColor: isEditing ? '#CCCCCC' : COLORS.inputBg,
-                  borderColor: COLORS.border,
-                  borderWidth: '1px',
-                  color: COLORS.text
-                }}
+            {/* Toggle Password Fields */}
+            {!showPasswordFields ? (
+              <button
+                type="button"
+                onClick={() => setShowPasswordFields(true)}
+                className="mb-4 text-sm font-medium underline"
+                style={{ color: COLORS.accent }}
               >
-                <Key size={16} />
-                Change Password
+                Change Password?
               </button>
             ) : (
-              <div className="w-full">
+              <>
+                {/* Current Password */}
                 <div className="mb-4">
-                  <label 
-                    className="block mb-2 text-sm font-medium"
-                    style={{ color: COLORS.secondaryText }}
-                  >
-                    New Password
-                  </label>
                   <div className="relative">
+                    <Lock style={{ color: COLORS.secondaryText }} className="absolute left-3 top-3 h-5 w-5" />
                     <input
-                      type={showPassword ? "text" : "password"}
-                      name="password"
-                      value={formData.password}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 pr-10 rounded"
-                      style={{ 
-                        backgroundColor: COLORS.inputBg,
-                        borderColor: COLORS.border,
-                        borderWidth: '1px',
-                        color: COLORS.text
-                      }}
+                      type={passwordData.showCurrent ? "text" : "password"}
+                      placeholder="Current Password"
+                      value={passwordData.current}
+                      onChange={(e) => handlePasswordChange("current", e.target.value)}
+                      required
+                      style={{ backgroundColor: COLORS.inputBg, borderColor: COLORS.border, color: COLORS.text }}
+                      className="w-full rounded-lg border p-3 pl-10 pr-10 focus:outline-none focus:ring-2"
                     />
-                    <button 
-                      type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                      onClick={() => setShowPassword(!showPassword)}
-                      style={{ color: COLORS.secondaryText }}
+                    <div
+                      onClick={() => toggleVisibility("showCurrent")}
+                      className="absolute right-3 top-3 cursor-pointer"
                     >
-                      {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
+                      {passwordData.showCurrent ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </div>
                   </div>
                 </div>
+
+                {/* New Password */}
                 <div className="mb-4">
-                  <label 
-                    className="block mb-2 text-sm font-medium"
-                    style={{ color: COLORS.secondaryText }}
-                  >
-                    Confirm Password
-                  </label>
                   <div className="relative">
+                    <Lock style={{ color: COLORS.secondaryText }} className="absolute left-3 top-3 h-5 w-5" />
                     <input
-                      type={showConfirmPassword ? "text" : "password"}
-                      name="confirmPassword"
-                      value={formData.confirmPassword}
-                      onChange={handleInputChange}
-                      className="w-full px-4 py-2 pr-10 rounded"
-                      style={{ 
-                        backgroundColor: COLORS.inputBg,
-                        borderColor: COLORS.border,
-                        borderWidth: '1px',
-                        color: COLORS.text
-                      }}
+                      type={passwordData.showNew ? "text" : "password"}
+                      placeholder="New Password"
+                      value={passwordData.new}
+                      onChange={(e) => handlePasswordChange("new", e.target.value)}
+                      required
+                      style={{ backgroundColor: COLORS.inputBg, borderColor: COLORS.border, color: COLORS.text }}
+                      className="w-full rounded-lg border p-3 pl-10 pr-10 focus:outline-none focus:ring-2"
                     />
-                    <button 
-                      type="button"
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2"
-                      onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      style={{ color: COLORS.secondaryText }}
+                    <div
+                      onClick={() => toggleVisibility("showNew")}
+                      className="absolute right-3 top-3 cursor-pointer"
                     >
-                      {showConfirmPassword ? <EyeOff size={16} /> : <Eye size={16} />}
-                    </button>
+                      {passwordData.showNew ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </div>
                   </div>
                 </div>
-                <div className="flex gap-3">
-                  <button 
-                    onClick={handleSubmitPassword}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded"
-                    style={{ 
-                      backgroundColor: COLORS.accent, 
-                      color: '#FFFFFF'
-                    }}
+
+                {/* Confirm Password */}
+                <div className="mb-4">
+                  <div className="relative">
+                    <Lock style={{ color: COLORS.secondaryText }} className="absolute left-3 top-3 h-5 w-5" />
+                    <input
+                      type={passwordData.showConfirm ? "text" : "password"}
+                      placeholder="Confirm New Password"
+                      value={passwordData.confirm}
+                      onChange={(e) => handlePasswordChange("confirm", e.target.value)}
+                      required
+                      style={{ backgroundColor: COLORS.inputBg, borderColor: COLORS.border, color: COLORS.text }}
+                      className="w-full rounded-lg border p-3 pl-10 pr-10 focus:outline-none focus:ring-2"
+                    />
+                    <div
+                      onClick={() => toggleVisibility("showConfirm")}
+                      className="absolute right-3 top-3 cursor-pointer"
+                    >
+                      {passwordData.showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
+                    </div>
+                  </div>
+                </div>
+
+                {/* Cancel password change */}
+                <div className="mb-4 text-right">
+                  <button
+                    type="button"
+                    onClick={cancelPasswordChange}
+                    className="text-sm font-medium underline"
+                    style={{ color: COLORS.accent }}
                   >
-                    <Check size={16} />
-                    Update Password
-                  </button>
-                  <button 
-                    onClick={handleTogglePassword}
-                    className="flex-1 flex items-center justify-center gap-2 px-4 py-2 rounded"
-                    style={{ 
-                      backgroundColor: '#F5F5F5', 
-                      color: '#333333'
-                    }}
-                  >
-                    <X size={16} />
                     Cancel
                   </button>
                 </div>
-              </div>
+              </>
             )}
-          </div>
+
+            <button
+              type="submit"
+              disabled={loading}
+              style={{ backgroundColor: COLORS.accent, color: COLORS.cardBg }}
+              className="flex w-full items-center justify-center rounded-lg py-3 font-medium transition-colors duration-300 hover:opacity-90"
+            >
+              {loading ? (
+                <span className="flex items-center">
+                  <svg
+                    className="mr-2 h-4 w-4 animate-spin"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                    />
+                  </svg>
+                  Saving...
+                </span>
+              ) : (
+                <span className="flex items-center">
+                  Save Changes <Save className="ml-2 h-4 w-4" />
+                </span>
+              )}
+            </button>
+          </form>
         </div>
       </div>
     </div>
   );
-};
-
-export default ProfilePage;
+}

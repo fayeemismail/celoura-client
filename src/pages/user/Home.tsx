@@ -11,8 +11,6 @@ import CategoriesSection from "../../components/user/Category";
 import FeaturedDestinations from "../../components/user/FeaturedDestination";
 import TravelTips from "../../components/user/TravelTips";
 import Footer from "../../components/user/Footer";
-import axios from "axios";
-import instance from "../../api/axiosInstance";
 
 
 
@@ -27,9 +25,6 @@ export default function HomePage() {
     }
   }, [isAuthenticated, navigate]);
 
-  const handleBackendCall = async () => {
-    await instance('/auth/getUser');
-  }
 
   
   return (

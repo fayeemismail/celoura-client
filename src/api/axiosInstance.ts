@@ -3,7 +3,7 @@ import { API_BASE_URL } from "../config/constants";
 import { handleTokenRefresh } from "../redux/user/authThunks";
 import { store } from "../redux/store";
 
-const instance = axios.create({ 
+const axiosInstance = axios.create({ 
     baseURL : API_BASE_URL || 'http://localhost:3000/api',
     withCredentials: true
 });
@@ -12,7 +12,7 @@ const instance = axios.create({
 // Flag to avoid infinite loops
 let isRefreshing = false;
 
-instance.interceptors.response.use(
+axiosInstance.interceptors.response.use(
     response => response,
     async error => {
         const originalRequest = error.config;
@@ -30,7 +30,7 @@ instance.interceptors.response.use(
                     isRefreshing = false;
           
                     // Retry original request after refreshing token
-                    return instance(originalRequest);
+                    return axiosInstance(originalRequest);
                   } catch (refreshError) {
                     isRefreshing = false;
                     // Optional: logout or redirect to login
@@ -43,4 +43,4 @@ instance.interceptors.response.use(
 );
 
 
-export default instance;
+export default axiosInstance;

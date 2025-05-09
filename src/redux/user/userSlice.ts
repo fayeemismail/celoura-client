@@ -67,7 +67,7 @@ const userSlice = createSlice({
             state.loading = false;
             state.error = false
         },
-        updatUserFailure(state, action: PayloadAction<string>) {
+        updateUserFailure(state, action: PayloadAction<string>) {
             state.loading = false;
             state.error = action.payload;
         },
@@ -123,7 +123,7 @@ export const {
     signInFailure,
     updateUserPending,
     updateUserSuccess,
-    updatUserFailure,
+    updateUserFailure,
     signOut,
     deleteUserPending,
     deletUserFailure,

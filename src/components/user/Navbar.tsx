@@ -23,7 +23,7 @@ export default function Navbar() {
   }
 
   return (
-    <header style={{ backgroundColor: COLORS.cardBg, borderColor: COLORS.border }} className="sticky top-0 z-10 border-b shadow-sm">
+    <header style={{ backgroundColor: COLORS.cardBg, borderColor: COLORS.border }} className="fixed top-0 left-0 w-full z-50 border-b shadow-sm">
       <div className="container mx-auto flex items-center justify-between p-4">
         {/* Logo */}
         <div className="flex items-center">
