@@ -7,6 +7,7 @@ import Home from '../pages/user/Home';
 import Otp from '../components/user/Otp';
 import AdminLogin from '../pages/admin/AdminLogin';
 import HomeAdmin from '../pages/admin/Home';
+import ProfilePage from '../pages/user/Profile';
 
 export default function AppRoutes() {
   return (
@@ -20,6 +21,7 @@ export default function AppRoutes() {
         {/* Protected User Routes */}
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Home />} />
+          <Route path='/Profile' element={<ProfilePage />} />
         </Route>
 
         {/* Admin Routes */}

@@ -42,8 +42,8 @@ export default function Otp() {
             const response = await axios.post(`${API_BASE_URL}/auth/resend-otp`, { email });
             console.log(response)
         } catch (error: any) {
-            console.log(error);
-            // setErrors(error)
+            console.log(error.response?.data?.message);
+            setErrors(error.response?.data?.message)
         } finally {
             setLoading(false);
             dispatch(clearError());
@@ -54,7 +54,8 @@ export default function Otp() {
         <div style={{ backgroundColor: COLORS.bg }} className="min-h-screen flex items-center justify-center p-4">
         <div style={{ backgroundColor: COLORS.cardBg, borderColor: COLORS.border }} className="w-full max-w-md p-6 rounded-lg border shadow-xl">
             <h2 style={{ color: COLORS.text }} className="text-2xl font-semibold mb-4 text-center">Verify OTP</h2>
-            <p style={{ color: COLORS.secondaryText }} className="text-center mb-4">An OTP has been sent to <span className="font-medium">{email}</span></p>
+            <p style={{ color: COLORS.secondaryText }} className="text-center">An OTP has been sent to <span className="font-medium">{email}</span></p>
+            <p style={{ color: COLORS.secondaryText }} className="text-center mb-4">If You didn't get any please check your spam</p>
             
             <input
                 type="text"

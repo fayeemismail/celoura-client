@@ -6,10 +6,10 @@ import AppRoutes from "./routes/AppRoutes";
 export default function App() {
   const dispatch = useDispatch();
 
-  // Refresh token once when the app mounts
-  useEffect(() => {
-    dispatch(handleTokenRefresh());
-  }, [dispatch]);
+  // // Refresh token once when the app mounts
+  // useEffect(() => {
+  //   dispatch(handleTokenRefresh());
+  // }, [dispatch]);
 
   return <AppRoutes />;
 }

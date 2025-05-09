@@ -10,7 +10,6 @@ import HeroSection from "../../components/user/HeroSection";
 import CategoriesSection from "../../components/user/Category";
 import FeaturedDestinations from "../../components/user/FeaturedDestination";
 import TravelTips from "../../components/user/TravelTips";
-import Newsletter from "../../components/user/NewsLetter";
 import Footer from "../../components/user/Footer";
 
 
@@ -25,6 +24,7 @@ export default function HomePage() {
       navigate("/login");
     }
   }, [isAuthenticated, navigate]);
+
 
   
   return (
@@ -45,9 +45,6 @@ export default function HomePage() {
 
         {/* Travel Tips Section */}
         <TravelTips />
-
-        {/* Newsletter Section */}
-        <Newsletter />
       </main>
 
       {/* Footer */}
