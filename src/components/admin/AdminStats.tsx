@@ -1,4 +1,4 @@
-import React, { ReactNode } from "react";
+import  { ReactNode } from "react";
 import { ADMIN_COLORS } from "../../styles/theme";
 import { TrendingUp, TrendingDown } from "lucide-react";
 

@@ -1,8 +1,6 @@
 import { ArrowRight, Lock, Mail } from "lucide-react";
 import { ADMIN_COLORS } from "../../styles/theme";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { API_BASE_URL } from "../../config/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { handleAdminLogin } from "../../redux/admin/authThunks";
@@ -14,7 +12,7 @@ import { clearError } from "../../redux/user/userSlice";
 export default function AdminLogin() {
 
   const [ formData, setFormData ] = useState({ email: '', password: '' });
-  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.user);
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.admin);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 

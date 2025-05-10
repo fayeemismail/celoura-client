@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
 import { ADMIN_COLORS } from "../../styles/theme";
 import { 
   LayoutGrid, 
@@ -19,8 +19,20 @@ import {
   Calendar
 } from "lucide-react";
 
+interface User {
+  _id?: string;
+  name?: string;
+  email?: string
+  password?: string;
+  role?: string;
+  createdAt?: string;
+  is_verified?: string;
+  updateAt?: string
+}
+
 // Import admin components
 import AdminStats from "../../components/admin/AdminStats";
+import { GetAllUsersData, handleAdminLogout } from "../../redux/admin/authThunks";
 // import RecentBookings from "../../components/admin/RecentBookings";
 // import PopularDestinations from "../../components/admin/PopularDestinations";
 // import AdminCalendar from "../../components/admin/AdminCalender";
@@ -28,20 +40,50 @@ import AdminStats from "../../components/admin/AdminStats";
 
 export default function HomeAdmin() {
   const navigate = useNavigate();
-  const { isAuthenticated, currentUser } = useSelector((state: RootState) => state.user);
+  const { isAuthenticated, currentAdmin } = useSelector((state: RootState) => state.admin);
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const dispatch = useDispatch<AppDispatch>();
+  const [users, setUsers] = useState<User[]>();
+
+  const fetchAllUsers = async () => {
+    try {
+      const response = await dispatch(GetAllUsersData());
+      setUsers(response.data)
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
+  // const fetchAllGuides = async () => {
+  //   try {
+      
+  //   } catch (error) {
+      
+  //   }
+  // }
 
 
   // Redirect to admin login if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/adminLogin");
+
     }
+
+    
+    fetchAllUsers()
   }, [isAuthenticated, navigate]);
+
 
   const toggleSidebar = () => {
     setSidebarOpen(!sidebarOpen);
   };
+
+  const handleLogout = () => {
+    dispatch(handleAdminLogout());
+
+    navigate('/adminLogin');
+  }
 
   return (
     <div style={{ backgroundColor: ADMIN_COLORS.bg }} className="flex min-h-screen">
@@ -145,22 +187,23 @@ export default function HomeAdmin() {
               className="h-8 w-8 rounded-full flex items-center justify-center"
             >
               <span style={{ color: ADMIN_COLORS.cardBg }} className="text-sm font-medium">
-                {currentUser?.name ? currentUser.name.charAt(0) : 'A'}
+                {currentAdmin?.name ? currentAdmin.name.charAt(0) : 'A'}
               </span>
             </div>
             {sidebarOpen && (
               <div className="ml-3">
                 <p style={{ color: ADMIN_COLORS.text }} className="text-sm font-medium">
-                  {currentUser?.name || 'Admin User'}
+                  {currentAdmin?.name || 'Admin User'}
                 </p>
-                <p className="text-xs">{currentUser?.email || 'admin@example.com'}</p>
+                <p className="text-xs">{currentAdmin?.email || 'admin@example.com'}</p>
               </div>
             )}
           </div>
           
           {sidebarOpen && (
             <button 
-              className="mt-4 flex w-full items-center justify-center rounded-lg py-2 text-sm font-medium"
+              onClick={handleLogout}
+              className="mt-4 flex w-full items-center justify-center cursor-pointer rounded-lg py-2 text-sm font-medium"
               style={{ 
                 backgroundColor: 'transparent', 
                 color: ADMIN_COLORS.secondaryText,
@@ -238,14 +281,14 @@ export default function HomeAdmin() {
             <AdminStats 
               icon={<TrendingUp className="h-6 w-6" />}
               title="Total Bookings"
-              value="1,248"
+              value={"1,248"}
               trend="+12.5%"
               trendUp={true}
             />
             <AdminStats 
               icon={<UserCheck className="h-6 w-6" />}
               title="Active Users"
-              value="3,427"
+              value={users?.length ? users.length.toString() : '0'}
               trend="+8.1%"
               trendUp={true}
             />
@@ -260,8 +303,8 @@ export default function HomeAdmin() {
               icon={<Calendar className="h-6 w-6" />}
               title="This Month"
               value="$48,289"
-              trend="-4.3%"
-              trendUp={false}
+              trend="+14.3%"
+              trendUp={true}
             />
           </div>
 
