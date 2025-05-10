@@ -14,7 +14,7 @@ import { clearError } from "../../redux/user/userSlice";
 export default function AdminLogin() {
 
   const [ formData, setFormData ] = useState({ email: '', password: '' });
-  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.user);
+  const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.admin);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
 

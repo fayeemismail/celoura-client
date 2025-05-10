@@ -26,8 +26,13 @@ export const getCurrentUser = async () => {
 export const editProfile = async (payload: Object) => {
     const response = await axiosInstance.put('/user/editProfile', payload);
     return response
-}
+};
 
 export const logoutUser = async () => {
     return axiosInstance.post('/auth/logout')
-}
+};
+
+
+export const logoutAdmin = async () => {
+    return axiosInstance.post('/auth/adminLogout');
+};
