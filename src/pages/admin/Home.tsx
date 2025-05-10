@@ -54,13 +54,13 @@ export default function HomeAdmin() {
     }
   }
 
-  const fetchAllGuides = async () => {
-    try {
+  // const fetchAllGuides = async () => {
+  //   try {
       
-    } catch (error) {
+  //   } catch (error) {
       
-    }
-  }
+  //   }
+  // }
 
 
   // Redirect to admin login if not authenticated

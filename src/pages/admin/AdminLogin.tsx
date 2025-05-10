@@ -1,8 +1,6 @@
 import { ArrowRight, Lock, Mail } from "lucide-react";
 import { ADMIN_COLORS } from "../../styles/theme";
 import { useEffect, useState } from "react";
-import axios from "axios";
-import { API_BASE_URL } from "../../config/constants";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { handleAdminLogin } from "../../redux/admin/authThunks";
