@@ -5,12 +5,12 @@ import { RootState } from "../../redux/store";
 import COLORS from "../../styles/theme";
 
 // Import components
-import Navbar from "../../components/user/Navbar";
-import HeroSection from "../../components/user/HeroSection";
-import CategoriesSection from "../../components/user/Category";
-import FeaturedDestinations from "../../components/user/FeaturedDestination";
-import TravelTips from "../../components/user/TravelTips";
-import Footer from "../../components/user/Footer";
+import Navbar from "../../components/user/home/Navbar";
+import HeroSection from "../../components/user/home/HeroSection";
+import CategoriesSection from "../../components/user/home/Category";
+import FeaturedDestinations from "../../components/user/home/FeaturedDestination";
+import TravelTips from "../../components/user/home/TravelTips";
+import Footer from "../../components/user/home/Footer";
 
 
 

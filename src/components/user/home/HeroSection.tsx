@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Search } from "lucide-react";
-import COLORS from "../../styles/theme";
+import COLORS from "../../../styles/theme";
 
 export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState("");

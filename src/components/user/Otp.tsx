@@ -40,7 +40,6 @@ export default function Otp() {
         setErrors('');
         try {
             const response = await axios.post(`${API_BASE_URL}/auth/verify-otp`, { email, otp });
-            console.log(response.data, 'This is response for otp');
             navigate('/login');
         } catch (error: any) {
             console.log(error.response?.data?.message);
@@ -55,8 +54,7 @@ export default function Otp() {
         setLoading(true);
         setErrors('');
         try {
-            const response = await axios.post(`${API_BASE_URL}/auth/resend-otp`, { email });
-            console.log(response);
+            await axios.post(`${API_BASE_URL}/auth/resend-otp`, { email });
             setTimeLeft(90); // Reset timer
         } catch (error: any) {
             console.log(error.response?.data?.message);

@@ -2,9 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { LogOut, Menu, X } from "lucide-react";
-import { AppDispatch, RootState } from "../../redux/store";
-import COLORS from "../../styles/theme";
-import { handleSignout } from "../../redux/user/authThunks";
+import { AppDispatch, RootState } from "../../../redux/store";
+import COLORS from "../../../styles/theme";
+import { handleSignout } from "../../../redux/user/authThunks";
 
 export default function Navbar() {
   const navigate = useNavigate();
