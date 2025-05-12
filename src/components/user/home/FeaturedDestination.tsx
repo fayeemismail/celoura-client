@@ -1,5 +1,5 @@
 import { MapPin, Heart } from "lucide-react";
-import COLORS from "../../styles/theme";
+import COLORS from "../../../styles/theme";
 
 // Mock data for featured destinations
 const featuredDestinations = [

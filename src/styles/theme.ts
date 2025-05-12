@@ -32,4 +32,19 @@ export const ADMIN_COLORS: ColorScheme = {
     hoverBg: '#2F374A',     // Subtle hover state
 };
 
+
+export const GUIDE_COLORS = {
+  bg: '#0A322E',          // Deep forest green background
+  border: '#1E4542',      // Subtle darker border
+  text: '#FFFFFF',        // Crisp white text
+  secondaryText: '#A9C6C3', // Soft teal for secondary text
+  accent: '#4CAF50',      // Vibrant emerald accent
+  inputBg: '#144541',     // Slightly lighter than bg for inputs
+  cardBg: '#144541',      // Matching input background for cards
+  hoverBg: '#1C524E',     // Subtle hover state
+};
+
+
+
+
 export default COLORS;

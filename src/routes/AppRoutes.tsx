@@ -8,6 +8,8 @@ import Otp from '../components/user/Otp';
 import AdminLogin from '../pages/admin/AdminLogin';
 import HomeAdmin from '../pages/admin/Home';
 import ProfilePage from '../pages/user/Profile';
+import GuideLogin from '../pages/Guide/LoginGuide';
+import GuideHome from '../pages/Guide/Home';
 
 export default function AppRoutes() {
   return (
@@ -25,8 +27,13 @@ export default function AppRoutes() {
         </Route>
 
         {/* Admin Routes */}
-        <Route path="/adminLogin" element={<AdminLogin />} />
+        <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/home" element={<HomeAdmin />} />
+
+        {/* guide side */}
+        <Route path='/guide/login' element={ <GuideLogin /> } />
+        <Route path='/guide/home' element={ <GuideHome /> } />
+
       </Routes>
     </BrowserRouter>
   );

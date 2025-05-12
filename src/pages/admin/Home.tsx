@@ -13,7 +13,6 @@ import {
   ChevronDown, 
   Bell, 
   Search,
-  TrendingUp,
   UserCheck,
   MapPin,
   Calendar
@@ -44,34 +43,30 @@ export default function HomeAdmin() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
   const [users, setUsers] = useState<User[]>();
+  const [ guide, setGuide] = useState<User[]>();
 
-  const fetchAllUsers = async () => {
+  const fetchAllUsersAndGuides = async () => {
     try {
       const response = await dispatch(GetAllUsersData());
-      setUsers(response.data)
+      if(response.data){
+        setUsers(response.data.users);
+        setGuide(response.data.guide);
+      }
     } catch (error) {
       console.log(error)
     }
   }
 
-  // const fetchAllGuides = async () => {
-  //   try {
-      
-  //   } catch (error) {
-      
-  //   }
-  // }
-
 
   // Redirect to admin login if not authenticated
   useEffect(() => {
     if (!isAuthenticated) {
-      navigate("/adminLogin");
+      navigate("/admin/login");
 
     }
 
     
-    fetchAllUsers()
+    fetchAllUsersAndGuides()
   }, [isAuthenticated, navigate]);
 
 
@@ -82,7 +77,7 @@ export default function HomeAdmin() {
   const handleLogout = () => {
     dispatch(handleAdminLogout());
 
-    navigate('/adminLogin');
+    navigate('/admin/login');
   }
 
   return (
@@ -279,10 +274,10 @@ export default function HomeAdmin() {
         <div className="p-6">
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
             <AdminStats 
-              icon={<TrendingUp className="h-6 w-6" />}
-              title="Total Bookings"
-              value={"1,248"}
-              trend="+12.5%"
+              icon={<UserCheck className="h-6 w-6" />}
+              title="Active Guides"
+              value={guide?.length ? guide.length.toString() : '0'}
+              trend="+2.5%"
               trendUp={true}
             />
             <AdminStats 
