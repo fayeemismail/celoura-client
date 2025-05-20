@@ -1,30 +1,28 @@
-import { Navigate, Outlet } from "react-router-dom";
-import { RootState, } from "../redux/store";
+import { Navigate, Outlet, useLocation, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
+import { RootState } from "../redux/store";
 
-
-interface ProtectedRouteProps {
-    redirectedPath?: string;
-};
-
-export const ProtectedRoute = ({ redirectedPath = '/login' }: ProtectedRouteProps) => {
-    
+export const ProtectedRoute = ({ redirectedPath = '/login' }) => {
     const { isAuthenticated, loading } = useSelector((state: RootState) => state.user);
+    const [searchParams] = useSearchParams();
+    const location = useLocation();
 
-    //show loaiding while checking authentication status
-    if( loading ) {
+    const hasOAuthParam = Boolean(searchParams.get("email"));
+
+    // still loading
+    if (loading) {
         return (
-            <div className="flex h-screen w-full items-center justify-center" >
-                <div className="animate-spin rounded-full border-b-2 border-t-2 border-gray-900 h-8 w-8" ></div>
+            <div className="flex h-screen w-full items-center justify-center">
+                <div className="animate-spin rounded-full border-b-2 border-t-2 border-gray-900 h-8 w-8" />
             </div>
         );
     }
 
-    // redirect if not authenticated
-    if ( !isAuthenticated ) {
-        return <Navigate to={redirectedPath} replace />;
+    // not authenticated, and no oauth param
+    if (!isAuthenticated && !hasOAuthParam) {
+        return <Navigate to={redirectedPath} replace state={{ from: location }} />;
     }
 
-    // render children if authenicated
+    // either authenticated or OAuth redirect in progress
     return <Outlet />;
 };

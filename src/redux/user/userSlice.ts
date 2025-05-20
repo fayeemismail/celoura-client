@@ -44,6 +44,10 @@ const userSlice = createSlice({
     name: 'user',
     initialState,
     reducers: {
+        setUser(state, action) {
+            state.currentUser = action.payload;
+            state.isAuthenticated = true
+        },
         signInPending(state) {
             state.loading = true
         },
@@ -118,6 +122,7 @@ const userSlice = createSlice({
 
 
 export const {
+    setUser,
     signInPending,
     signInSuccess,
     signInFailure,

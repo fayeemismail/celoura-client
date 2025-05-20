@@ -124,10 +124,10 @@ export default function GuideLogin() {
           </form>
 
           <div className="mt-6 text-center">
-            <p style={{ color: GUIDE_COLORS.secondaryText }}>Trouble logging in?</p>
+            {/* <p style={{ color: GUIDE_COLORS.secondaryText }}>Trouble logging in?</p>
             <a style={{ color: GUIDE_COLORS.accent }} className="cursor-pointer font-medium hover:underline" onClick={() => navigate('/guide/forgot-password')}>
               Reset password
-            </a>
+            </a> */}
           </div>
         </div>
       </div>
