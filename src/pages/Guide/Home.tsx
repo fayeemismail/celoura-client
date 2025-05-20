@@ -49,7 +49,7 @@ const GuideHome = () => {
             className="text-3xl font-bold mb-6"
             style={{ color: GUIDE_COLORS.text }}
           >
-            Welcome, Guide Name
+            Welcome, {currentGuide? currentGuide.name : 'User'}
           </h1>
           
           <div className="grid grid-cols-3 gap-6 mb-8">

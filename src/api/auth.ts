@@ -1,6 +1,8 @@
 import adminInstance from "./admin/axiosAdminInstance";
 import guideInstance from "./guide/axiosGuideInstance";
 import axiosInstance from "./axiosInstance";
+import axios from "axios";
+import { API_BASE_URL } from "../config/constants";
 
 
 
@@ -10,6 +12,25 @@ export const login = async (formData: {email: string; password: string}) => {
     const response = await axiosInstance.post('/auth/login', formData);
     return response.data;
 };
+
+export const googleLogin = async(email: string, name: string) => {
+        try {
+            const result = await axios.post(
+                `${API_BASE_URL}/auth/google-login`,
+                {email, name},
+                {
+                    withCredentials: true
+                }
+            )
+            .then((response) => {
+                return response
+            });
+            return result;
+        } catch (error: any) {
+            console.log(error, 'Error on the Google Login Api');
+            return error.response;
+        }
+}
 
 export const adminLogin = async ( formData: { email: string; password: string } ) => {
     const response = await adminInstance.post('/auth/admin/login', formData);
@@ -52,4 +73,4 @@ export const logoutAdmin = async () => {
 
 export const logoutGuide = async () => {
     return axiosInstance.post('/auth/guide/logout')
-}
+} 
