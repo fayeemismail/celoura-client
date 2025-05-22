@@ -97,7 +97,7 @@ export default function LoginPage() {
   }
 
   const handleGoogleError = () => {
-    
+
   }
 
   return (
@@ -176,22 +176,42 @@ export default function LoginPage() {
             </button>
           </form>
 
-          {/* <div className="my-6 text-center">
-            <p style={{ color: COLORS.secondaryText }} className="mb-2">or</p>
-            <button
-              onClick={() => window.location.href = `${API_BASE_URL}/auth/google`}
-              style={{ backgroundColor: COLORS.inputBg, color: COLORS.text, borderColor: COLORS.border }}
-              className="w-full flex items-center justify-center cursor-pointer gap-2 border rounded-lg py-3 hover:opacity-90 transition"
-            >
-              <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="h-5 w-5" />
-              Continue with Google
-            </button>
-          </div> */}
 
-          <GoogleLogin
-            onSuccess={handleGoogleSuccess}
-            onError={handleGoogleError}
-          />
+          <div className="mt-4">
+            <div className="relative">
+              <div className="absolute inset-0 flex items-center">
+                <div
+                  style={{ borderColor: COLORS.border }}
+                  className="w-full border-t"
+                ></div>
+              </div>
+              <div className="relative flex justify-center">
+                <span
+                  style={{
+                    backgroundColor: COLORS.cardBg,
+                    color: COLORS.secondaryText
+                  }}
+                  className="px-2 text-sm"
+                >
+                  Or continue with
+                </span>
+              </div>
+            </div>
+
+            <div className="mt-6">
+              <GoogleLogin
+                onSuccess={handleGoogleSuccess}
+                onError={handleGoogleError}
+                theme="outline"
+                size="large"
+                shape="pill"
+                text="continue_with"
+                width="100%"
+                logo_alignment="left"
+                ux_mode="popup"
+              />
+            </div>
+          </div>
 
 
           <div className="mt-6 text-center">
