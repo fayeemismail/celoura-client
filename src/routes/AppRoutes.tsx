@@ -10,6 +10,7 @@ import HomeAdmin from '../pages/admin/Home';
 import ProfilePage from '../pages/user/Profile';
 import GuideLogin from '../pages/Guide/LoginGuide';
 import GuideHome from '../pages/Guide/Home';
+import BecomeAGuide from '../pages/user/BecomeAGuide';
 
 export default function AppRoutes() {
   return (
@@ -24,6 +25,7 @@ export default function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route path="/" element={<Home />} />
           <Route path='/Profile' element={<ProfilePage />} />
+          <Route path='/become-a-guide' element={ <BecomeAGuide /> } />
         </Route>
 
         {/* Admin Routes */}
