@@ -1,4 +1,4 @@
-import { adminRefreshAccessToken, getAllUsers } from "../../api/admin/adminApi";
+import { adminRefreshAccessToken, blockOrUnBlockUser, getAllUsers } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
@@ -58,6 +58,20 @@ export const handleAdminLogout = () => {
         }
     }
 };
+
+
+export const handleUserBlockUnblock = (userId: string) => {
+    return async (dispatch: any) => {
+        try {
+            const response = await blockOrUnBlockUser(userId);
+            await adminRefreshAccessToken();
+            return response
+        } catch (error) {
+            console.error('Something went wrong with user block un block', error);
+            dispatch()
+        }
+    }
+}
 
 
 export const GetAllUsersData = () => {

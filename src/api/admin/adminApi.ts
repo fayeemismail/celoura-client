@@ -13,3 +13,9 @@ export const adminRefreshAccessToken = async () => {
 export const getAllUsers = async () => {
     return adminInstance.get('/admin/adminHome-Users');
 };
+
+
+export const blockOrUnBlockUser = async (userId: string) => {
+    const response = await adminInstance.patch(`/admin/user-block-unblock/${userId}`);
+    return response
+}
