@@ -15,7 +15,10 @@ export const getAllUsers = async () => {
 };
 
 
-export const blockOrUnBlockUser = async (userId: string) => {
-    const response = await adminInstance.patch(`/admin/user-block-unblock/${userId}`);
-    return response
-}
+export const BlockUser = async (userId: string) => {
+    return await adminInstance.patch(`/admin/users/${userId}/block` );
+};
+
+export const unBlockUser = async (userId: string) => {
+    return await adminInstance.patch(`/admin/users/${userId}/unBlock`); 
+};

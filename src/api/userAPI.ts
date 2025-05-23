@@ -9,3 +9,10 @@ export const applyForGuide = (formData: FormData) => {
     },
   });
 };
+
+
+
+export const editProfile = async (payload: Object) => {
+    const response = await axiosInstance.put('/user/editProfile', payload);
+    return response
+};

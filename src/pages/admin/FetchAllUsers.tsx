@@ -1,9 +1,14 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../redux/store";
-import { GetAllUsersData, handleUserBlockUnblock } from "../../redux/admin/authThunks";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
+import {
+  GetAllUsersData,
+  handleUserBlockUnblock,
+} from "../../redux/admin/authThunks";
 import AdminSidebar from "../../components/admin/home/AdminSidebar";
 import AdminHeader from "../../components/admin/home/AdminHeader";
+import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 interface User {
   _id: string;
@@ -22,13 +27,15 @@ export default function AllUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [filterRole, setFilterRole] = useState<"user" | "guide">("user");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const { isAuthenticated } = useSelector((state: RootState) => state.admin);
+  const navigate = useNavigate();
 
   const fetchUsers = async () => {
     try {
       const response = await dispatch(GetAllUsersData());
       if (response.data?.users) {
-        const users = response.data?.users
-        const guide = response.data?.guide
+        const users = response.data?.users;
+        const guide = response.data?.guide;
         const userAndGuide = [...users, ...guide];
         setUsers(userAndGuide);
       }
@@ -36,26 +43,48 @@ export default function AllUsersPage() {
       console.error("Error fetching users:", error);
     }
   };
+  console.log('re render')
 
-  const UserBlockUnBlock = async (userId: string): Promise<any> => {
+  const UserBlockUnBlock = async (
+    userId: string,
+    isCurrentlyBlocked: boolean
+  ): Promise<void> => {
     try {
-        await dispatch(handleUserBlockUnblock(userId))
-    } catch (error: any) {
-        console.error('Un expected Error', error.message)
-    }
-  }
+      await dispatch(handleUserBlockUnblock(userId, isCurrentlyBlocked));
 
-  const filteredUsers = users.filter(user =>  user.role === filterRole);
+      // Update local user state immediately
+      setUsers((prevUsers) =>
+        prevUsers.map((user) =>
+          user._id === userId ? { ...user, blocked: !isCurrentlyBlocked } : user
+        )
+      );
+
+      toast.success(`User ${isCurrentlyBlocked ? "unblocked" : "blocked"} successfully`);
+    } catch (error: any) {
+      console.error("Unexpected Error", error.message);
+      toast.error("Something went wrong. Please try again.");
+    }
+  };
+
+  const filteredUsers = users.filter((user) => user.role === filterRole);
 
   useEffect(() => {
+    if (!isAuthenticated) navigate("/admin/login");
     fetchUsers();
   }, []);
 
   return (
     <div style={{ backgroundColor: "#1A1F2C" }} className="flex min-h-screen">
-      <AdminSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+      <AdminSidebar
+        sidebarOpen={sidebarOpen}
+        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+      />
 
-      <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
+      <main
+        className={`flex-1 transition-all duration-300 ${
+          sidebarOpen ? "ml-64" : "ml-20"
+        }`}
+      >
         <AdminHeader />
 
         <div className="p-6">
@@ -101,30 +130,35 @@ export default function AllUsersPage() {
                     <th className="py-3 px-4">Name</th>
                     <th className="py-3 px-4">Email</th>
                     <th className="py-3 px-4">Role</th>
-                    {/* <th className="py-3 px-4">Verified</th> */}
                     <th className="py-3 px-4">Blocked</th>
                     <th className="py-3 px-4">Google</th>
                     <th className="py-3 px-4">Joined At</th>
                     <th className="py-3 px-4">Action</th>
                   </tr>
                 </thead>
-                <tbody style={{ backgroundColor: "rgb(29 36 54)", color: "#F2F0EF" }}>
+                <tbody
+                  style={{ backgroundColor: "rgb(29 36 54)", color: "#F2F0EF" }}
+                >
                   {filteredUsers.length > 0 ? (
-                    filteredUsers.map(user => (
+                    filteredUsers.map((user) => (
                       <tr key={user._id} className="border-t border-gray-300">
                         <td className="py-3 px-4">{user.name}</td>
                         <td className="py-3 px-4">{user.email}</td>
                         <td className="py-3 px-4 capitalize">{user.role}</td>
-                        {/* <td className="py-3 px-4">{user.is_verified ? "Yes" : "No"}</td> */}
-                        <td className="py-3 px-4">{user.blocked ? "Yes" : "No"}</td>
-                        <td className="py-3 px-4">{user.googleUser ? "Yes" : "No"}</td>
                         <td className="py-3 px-4">
-                          {new Date(user.createdAt).toLocaleDateString('in')}
+                          {user.blocked ? "Yes" : "No"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {user.googleUser ? "Yes" : "No"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {new Date(user.createdAt).toLocaleDateString("in")}
                         </td>
                         <td className="py-3 px-4">
                           <button
-                            
-                            onClick={() => UserBlockUnBlock(user._id)}
+                            onClick={() =>
+                              UserBlockUnBlock(user._id, user.blocked)
+                            }
                             className={`px-3 py-1 cursor-pointer rounded text-white ${
                               user.blocked ? "bg-green-600" : "bg-red-600"
                             }`}
