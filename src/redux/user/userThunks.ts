@@ -1,8 +1,8 @@
-import { editProfile, getCurrentUser, refreshAccessToken } from "../../api/auth";
+import {  getCurrentUser, refreshAccessToken } from "../../api/auth";
+import { editProfile } from "../../api/userAPI";
 import { UpdateProfilePayload } from "../../types/user";
-import { parseAxiosError } from "../../utils/parseAxiosError";
 import { AppDispatch } from "../store";
-import { updateUserFailure, updateUserPending, updateUserSuccess } from "./userSlice";
+import { signOut, updateUserFailure, updateUserPending, updateUserSuccess } from "./userSlice";
 
 
 
@@ -15,13 +15,18 @@ export const handleUpdateProfile = (payload: UpdateProfilePayload) => {
       try {
         dispatch(updateUserPending());
         await editProfile(payload);
-        await refreshAccessToken(); // Ensure token refresh after password update
+        await refreshAccessToken(); 
         const { data: userData } = await getCurrentUser();
-        dispatch(updateUserSuccess(userData)); // Or however the response looks
-      } catch (error: unknown) {
-        const message = parseAxiosError(error);
-        console.error('Update profile failed:', error);
+        dispatch(updateUserSuccess(userData));
+      } catch (error: any) {
+        const { status } = error.response || {};
+        console.log(status)
+        const message = error.response.data?.message
+        if(status == 403 || error.response.data?.blocked){
+          dispatch(signOut())
+        }
+        console.error('Update profile failed:',error.response.data?.message );
         dispatch(updateUserFailure(message));
       }
     };
-  };
+};

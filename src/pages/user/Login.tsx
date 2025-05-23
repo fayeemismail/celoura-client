@@ -87,6 +87,18 @@ export default function LoginPage() {
               content:
                 "User not Exists...! Please Sign in",
             });
+          } else if (response.data?.message == 'Access denied') {
+            setUserLoginValidationError({
+              display: true,
+              content: 
+              'Access Denied!!!'
+            })
+          } else {
+            setUserLoginValidationError({
+              display: true,
+              content:
+              response.data?.message
+            })
           }
         }
       }

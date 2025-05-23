@@ -55,10 +55,7 @@ export const getCurrentUser = async () => {
     return axiosInstance.get('/auth/me');
 };
 
-export const editProfile = async (payload: Object) => {
-    const response = await axiosInstance.put('/user/editProfile', payload);
-    return response
-};
+
 
 
 

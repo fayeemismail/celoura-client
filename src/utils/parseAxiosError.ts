@@ -16,7 +16,7 @@ export function parseAxiosError(error: unknown): string {
 
         return errMsg || "Something went wrong with the request.";
     }
-
+    console.log(error, 'this is error')
     if(error instanceof Error) {
         return error.message;
     };
