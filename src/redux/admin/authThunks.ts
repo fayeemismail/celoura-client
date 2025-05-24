@@ -1,4 +1,4 @@
-import { adminRefreshAccessToken, BlockUser, getAllUsers, unBlockUser } from "../../api/admin/adminApi";
+import { adminRefreshAccessToken, BlockUser, getAllUsers, getAppliesGuide, guideApproveApi, unBlockUser } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
@@ -85,6 +85,35 @@ export const GetAllUsersData = () => {
         } catch (error) {
             console.error('something wrong with fetching data', error);;
             dispatch(signOut())
+        }
+    }
+}
+
+export const GetAllGuideApplications = () => {
+  return async (dispatch: any) => {
+    try {
+      const response = await getAppliesGuide();
+      await adminRefreshAccessToken();
+
+      return response.data;
+    } catch (error: any) {
+      console.error('Error on get applications', error);
+      dispatch(signOut())
+      throw error; // rethrow to handle it in the component
+    }
+  };
+};
+
+
+
+export const ApproveAsGuide = (applicationId: string, userId: string) => {
+    return async( dispatch: any ) => {
+        try {
+            const response = await guideApproveApi(applicationId, userId);
+            await adminRefreshAccessToken();
+            return response
+        } catch (error) {
+            console.log('Error On approve as guide', error)
         }
     }
 }

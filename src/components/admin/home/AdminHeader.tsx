@@ -4,7 +4,7 @@ import { Search, Bell } from "lucide-react";
 export default function AdminHeader() {
   return (
     <header 
-      style={{ backgroundColor: ADMIN_COLORS.cardBg, borderColor: ADMIN_COLORS.border }} 
+      style={{ backgroundColor: '#081028', borderColor: ADMIN_COLORS.border }} 
       className="flex h-16 items-center justify-between border-b px-6"
     >
       <h1 style={{ color: ADMIN_COLORS.text }} className="text-xl font-semibold">Dashboard</h1>
@@ -12,7 +12,7 @@ export default function AdminHeader() {
       <div className="flex items-center space-x-4">
         {/* Search */}
         <div 
-          style={{ backgroundColor: ADMIN_COLORS.inputBg, borderColor: ADMIN_COLORS.border }} 
+          style={{ backgroundColor: "#081028", borderColor: ADMIN_COLORS.border }} 
           className="relative hidden md:block"
         >
           <Search 
@@ -23,7 +23,7 @@ export default function AdminHeader() {
             type="text"
             placeholder="Search..."
             style={{ 
-              backgroundColor: ADMIN_COLORS.inputBg, 
+              backgroundColor: "#0B1739", 
               color: ADMIN_COLORS.text, 
               borderColor: ADMIN_COLORS.border 
             }}
@@ -33,7 +33,7 @@ export default function AdminHeader() {
 
         {/* Notifications */}
         <button 
-          style={{ backgroundColor: ADMIN_COLORS.inputBg, color: ADMIN_COLORS.secondaryText }}
+          style={{ backgroundColor: "#0B1739", color: ADMIN_COLORS.secondaryText }}
           className="relative rounded-full p-2"
         >
           <Bell className="h-5 w-5" />

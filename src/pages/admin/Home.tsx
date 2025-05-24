@@ -6,7 +6,6 @@ import AdminSidebar from "../../components/admin/home/AdminSidebar";
 import AdminHeader from "../../components/admin/home/AdminHeader";
 import AdminDashboardContent from "../../components/admin/home/AdminDashboard";
 import { GetAllUsersData } from "../../redux/admin/authThunks";
-import { ADMIN_COLORS } from "../../styles/theme";
 
 export default function HomeAdmin() {
   const navigate = useNavigate();
@@ -34,7 +33,7 @@ export default function HomeAdmin() {
   }, [isAuthenticated, navigate]);
 
   return (
-    <div style={{ backgroundColor: ADMIN_COLORS.bg }} className="flex min-h-screen">
+    <div style={{ backgroundColor: '#081028' }} className="flex min-h-screen">
       <AdminSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
       <main className={`flex-1 ${sidebarOpen ? "ml-64" : "ml-20"} transition-all duration-300`}>
         <AdminHeader />
