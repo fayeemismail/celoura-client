@@ -13,12 +13,12 @@ interface AdminStatsProps {
 export default function AdminStats({ icon, title, value, trend, trendUp }: AdminStatsProps) {
   return (
     <div 
-      style={{ backgroundColor: ADMIN_COLORS.cardBg, borderColor: ADMIN_COLORS.border }} 
+      style={{ backgroundColor: '#0B1739', borderColor: '#172240' }} 
       className="rounded-lg border p-6 shadow-sm"
     >
       <div className="flex items-center justify-between">
         <div 
-          style={{ backgroundColor: ADMIN_COLORS.hoverBg, color: ADMIN_COLORS.accent }} 
+          style={{ backgroundColor: '#081028', color: ADMIN_COLORS.accent }} 
           className="rounded-full p-3"
         >
           {icon}

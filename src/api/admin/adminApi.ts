@@ -22,3 +22,12 @@ export const BlockUser = async (userId: string) => {
 export const unBlockUser = async (userId: string) => {
     return await adminInstance.patch(`/admin/users/${userId}/unBlock`); 
 };
+
+export  const getAppliesGuide = async () => {
+    return await adminInstance.get('/admin/users/get-guide-applications')
+};
+
+
+export const guideApproveApi = async (applicationId: string, userId: string) => {
+    return await adminInstance.patch(`/admin/users/approveAsGuide`, { applicationId, userId })
+}

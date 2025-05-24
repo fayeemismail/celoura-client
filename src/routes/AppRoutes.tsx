@@ -12,6 +12,7 @@ import GuideLogin from '../pages/Guide/LoginGuide';
 import GuideHome from '../pages/Guide/Home';
 import BecomeAGuide from '../pages/user/BecomeAGuide';
 import FetchAllUsers from '../pages/admin/FetchAllUsers';
+import GuideRequests from '../pages/admin/GuideRequests';
 
 export default function AppRoutes() {
   return (
@@ -33,6 +34,7 @@ export default function AppRoutes() {
         <Route path="/admin/login" element={<AdminLogin />} />
         <Route path="/admin/home" element={<HomeAdmin />} />
         <Route path='/admin/all-users' element={ <FetchAllUsers /> } />
+        <Route path='/admin/guide-requests' element={< GuideRequests /> } />
 
         {/* guide side */}
         <Route path='/guide/login' element={ <GuideLogin /> } />
