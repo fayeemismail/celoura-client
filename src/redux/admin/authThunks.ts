@@ -114,6 +114,7 @@ export const ApproveAsGuide = (applicationId: string, userId: string) => {
             return response
         } catch (error) {
             console.log('Error On approve as guide', error)
+            dispatch()
         }
     }
 }
