@@ -76,8 +76,8 @@ export default function Otp() {
         setLoading(true);
         setErrors("");
         setIsDisabled(true);
-        // const now = Date.now();
-        // localStorage.setItem("otpRequestedAt", now.toString());
+        const now = Date.now();
+        localStorage.setItem("otpRequestedAt", now.toString());
 
         try {
             await axios.post(`${API_BASE_URL}/auth/resend-otp`, { email });

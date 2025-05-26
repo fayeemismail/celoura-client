@@ -1,4 +1,4 @@
-import { adminRefreshAccessToken, BlockUser, getAllUsers, getAppliesGuide, guideApproveApi, unBlockUser } from "../../api/admin/adminApi";
+import { adminRefreshAccessToken, BlockUser, getAllUsers, getAppliesGuide, guideApproveApi, guideRejectApi, unBlockUser } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
@@ -83,8 +83,8 @@ export const GetAllUsersData = () => {
             await adminRefreshAccessToken();
             return Users.data;
         } catch (error) {
-            console.error('something wrong with fetching data', error);;
-            dispatch(signOut())
+            console.error('something wrong with fetching data', error);
+            dispatch(signOut());
         }
     }
 }
@@ -98,7 +98,7 @@ export const GetAllGuideApplications = () => {
       return response.data;
     } catch (error: any) {
       console.error('Error on get applications', error);
-      dispatch(signOut())
+      dispatch(signOut());
       throw error; // rethrow to handle it in the component
     }
   };
@@ -111,9 +111,22 @@ export const ApproveAsGuide = (applicationId: string, userId: string) => {
         try {
             const response = await guideApproveApi(applicationId, userId);
             await adminRefreshAccessToken();
-            return response
+            return response;
         } catch (error) {
-            console.log('Error On approve as guide', error)
+            console.log('Error On approve as guide', error);
+            dispatch();
+        }
+    }
+};
+
+export const RejectAsGuide = (applicationId: string, userId: string) => {
+    return async(dispatch: any) => {
+        try {
+            const response = await guideRejectApi(applicationId, userId);
+            await adminRefreshAccessToken();
+            return response;
+        } catch (error: any) {
+            console.log('Error on Rejects as guide', error.message);
             dispatch()
         }
     }
