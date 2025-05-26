@@ -31,3 +31,7 @@ export  const getAppliesGuide = async () => {
 export const guideApproveApi = async (applicationId: string, userId: string) => {
     return await adminInstance.patch(`/admin/users/approveAsGuide`, { applicationId, userId })
 }
+
+export const guideRejectApi = async (applicationId: string, userId: string) => {
+    return await adminInstance.patch(`/admin/users/rejectAsGuide`, { applicationId, userId })
+}

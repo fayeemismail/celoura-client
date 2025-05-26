@@ -1,9 +1,16 @@
+// pages/admin/GuideRequests.tsx
 import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../redux/store";
-import { ApproveAsGuide, GetAllGuideApplications } from "../../redux/admin/authThunks";
+import {
+  ApproveAsGuide,
+  GetAllGuideApplications,
+  RejectAsGuide,
+} from "../../redux/admin/authThunks";
 import AdminSidebar from "../../components/admin/home/AdminSidebar";
 import AdminHeader from "../../components/admin/home/AdminHeader";
+import { toast } from "react-toastify";
+import ConfirmationDialog from "../../components/common/ConfirmationDialog";
 
 interface requests {
   _id: string;
@@ -24,6 +31,12 @@ export default function GuideRequests() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const dispatch = useDispatch<AppDispatch>();
 
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [selectedApplication, setSelectedApplication] = useState<requests | null>(null);
+
+  const [approveDialogOpen, setApproveDialogOpen] = useState(false);
+  const [approveApplication, setApproveApplication] = useState<requests | null>(null);
+
   const getGuideApplies = async () => {
     try {
       const response = await dispatch(GetAllGuideApplications());
@@ -33,14 +46,55 @@ export default function GuideRequests() {
     }
   };
 
-  const handleGuideApprove = async (requestId: string, userId: string) => {
+  const confirmReject = (application: requests) => {
+    setSelectedApplication(application);
+    setConfirmDialogOpen(true);
+  };
+
+  const confirmApprove = (application: requests) => {
+    setApproveApplication(application);
+    setApproveDialogOpen(true);
+  };
+
+  const handleRejectConfirmed = async () => {
+    if (!selectedApplication) return;
+
     try {
-      // console.log(data)
-      await dispatch(ApproveAsGuide(requestId, userId))
+      await dispatch(RejectAsGuide(selectedApplication._id, selectedApplication.userId));
+      setGuideApplies((prev) =>
+        prev?.map((app) =>
+          app._id === selectedApplication._id ? { ...app, status: "rejected" } : app
+        )
+      );
+      toast.success("Rejected Guide Application successfully");
     } catch (error) {
-      console.log(error)
+      console.error(error);
+      toast.error("Error on Rejecting the guide");
+    } finally {
+      setConfirmDialogOpen(false);
+      setSelectedApplication(null);
     }
-  }
+  };
+
+  const handleApproveConfirmed = async () => {
+    if (!approveApplication) return;
+
+    try {
+      await dispatch(ApproveAsGuide(approveApplication._id, approveApplication.userId));
+      setGuideApplies((prev) =>
+        prev?.map((app) =>
+          app._id === approveApplication._id ? { ...app, status: "approved" } : app
+        )
+      );
+      toast.success("Approved as guide successfully");
+    } catch (error) {
+      console.error(error);
+      toast.error("Error approving the guide");
+    } finally {
+      setApproveDialogOpen(false);
+      setApproveApplication(null);
+    }
+  };
 
   useEffect(() => {
     getGuideApplies();
@@ -48,18 +102,9 @@ export default function GuideRequests() {
 
   return (
     <div className="min-h-screen bg-[#1A1F2C] flex">
-      {/* Sidebar */}
-      <AdminSidebar
-        sidebarOpen={sidebarOpen}
-        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
-      />
-
-      {/* Main Content */}
-      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? 'ml-64' : 'ml-20'}`}>
-        {/* Header */}
+      <AdminSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+      <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
         <AdminHeader />
-
-        {/* Content Area */}
         <div className="flex-1 p-4 overflow-y-auto">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             {guideApplies?.map((Application) => (
@@ -67,23 +112,20 @@ export default function GuideRequests() {
                 key={Application._id}
                 className="bg-[#1D2436] border border-[#2D3345] rounded-xl shadow-sm p-6 hover:shadow-md transition flex flex-col"
               >
-                {/* ID Photo at the top */}
                 <div className="mb-4 flex justify-center">
                   <div className="w-full h-48 rounded-lg overflow-hidden border border-[#2D3345]">
-                    <img 
-                      src={Application.idFileUrl} 
+                    <img
+                      src={Application.idFileUrl}
                       alt={`${Application.fullName}'s ID`}
                       className="w-full h-full object-cover"
                       onError={(e) => {
                         const target = e.target as HTMLImageElement;
                         target.onerror = null;
-                        target.src = 'https://via.placeholder.com/300x200?text=ID+Not+Available';
+                        target.src = "https://via.placeholder.com/300x200?text=ID+Not+Available";
                       }}
                     />
                   </div>
                 </div>
-
-                {/* Application Details */}
                 <div className="space-y-2 text-sm text-gray-200 flex-grow">
                   <p><span className="font-medium text-white">Name:</span> {Application.fullName}</p>
                   <p><span className="font-medium text-white">Email:</span> {Application.email}</p>
@@ -93,38 +135,66 @@ export default function GuideRequests() {
                   <p><span className="font-medium text-white">Address:</span> {Application.address}</p>
                   <p>
                     <span className="font-medium text-white">Status:</span>{" "}
-                    <span
-                      className={`inline-block px-2 py-1 rounded-md text-xs font-semibold ${
-                        Application.status === "approved"
-                          ? "bg-green-200 text-green-800"
-                          : Application.status === "rejected"
-                          ? "bg-red-200 text-red-800"
-                          : "bg-yellow-200 text-yellow-800"
-                      }`}
-                    >
+                    <span className={`inline-block px-2 py-1 rounded-md text-xs font-semibold ${
+                      Application.status === "approved"
+                        ? "bg-green-200 text-green-800"
+                        : Application.status === "rejected"
+                        ? "bg-red-200 text-red-800"
+                        : "bg-yellow-200 text-yellow-800"
+                    }`}>
                       {Application.status.toUpperCase()}
                     </span>
                   </p>
                 </div>
-
-                {Application.status === "pending" && (
-                  <div className="flex gap-3 mt-4 justify-end">
-                    <button 
-                    onClick={() => handleGuideApprove(Application._id, Application.userId)}
-                    className="px-4 py-2 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition">
-                      Approve
-                    </button>
-                    <button 
-                    className="px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition">
+                <div className="flex gap-3 mt-4 justify-end">
+                  {Application.status === "pending" && (
+                    <>
+                      <button
+                        onClick={() => confirmApprove(Application)}
+                        className="px-4 py-2 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition"
+                      >
+                        Approve
+                      </button>
+                      <button
+                        onClick={() => confirmReject(Application)}
+                        className="px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition"
+                      >
+                        Reject
+                      </button>
+                    </>
+                  )}
+                  {Application.status === "approved" && (
+                    <button
+                      onClick={() => confirmReject(Application)}
+                      className="px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition"
+                    >
                       Reject
                     </button>
-                  </div>
-                )}
+                  )}
+                </div>
               </div>
             ))}
           </div>
         </div>
       </div>
+
+      {/* Reject Confirmation */}
+      <ConfirmationDialog
+        isOpen={confirmDialogOpen}
+        message="Are you sure you want to reject this application?"
+        color="#dc2626"
+        onConfirm={handleRejectConfirmed}
+        onCancel={() => setConfirmDialogOpen(false)}
+      />
+
+      {/* Approve Confirmation */}
+      <ConfirmationDialog
+        isOpen={approveDialogOpen}
+        message="Are you sure you want to approve this application?"
+        color="#16a34a"
+        onConfirm={handleApproveConfirmed}
+        onCancel={() => setApproveDialogOpen(false)}
+      />
     </div>
   );
 }
