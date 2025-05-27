@@ -1,4 +1,3 @@
-// /components/user/Profile/EmailField.tsx
 import { Mail } from "lucide-react";
 import COLORS from "../../../styles/theme";
 

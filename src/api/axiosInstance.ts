@@ -9,7 +9,6 @@ const axiosInstance = axios.create({
 });
 
 
-// Flag to avoid infinite loops
 let isRefreshing = false;
 
 axiosInstance.interceptors.response.use(
@@ -29,11 +28,10 @@ axiosInstance.interceptors.response.use(
                     await store.dispatch<any>(handleTokenRefresh());
                     isRefreshing = false;
           
-                    // Retry original request after refreshing token
+                    
                     return axiosInstance(originalRequest);
                   } catch (refreshError) {
                     isRefreshing = false;
-                    // Optional: logout or redirect to login
                   }
             }
 

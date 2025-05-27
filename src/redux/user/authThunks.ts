@@ -2,7 +2,7 @@ import {  login, logoutUser, refreshAccessToken } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./userSlice";
 
 
-// handleLogin function authThunks
+
 export const handleLogin = ( formData: { email: string; password: string } ) => {
     return async ( dispatch: any ) => {
         try {

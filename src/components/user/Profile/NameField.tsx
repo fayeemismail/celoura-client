@@ -1,4 +1,3 @@
-// /components/user/Profile/NameField.tsx
 import { User } from "lucide-react";
 import COLORS from "../../../styles/theme";
 
