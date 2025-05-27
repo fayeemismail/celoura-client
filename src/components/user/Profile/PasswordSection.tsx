@@ -1,4 +1,3 @@
-// /components/user/Profile/PasswordSection.tsx
 import PasswordField from "./PasswordField";
 import COLORS from "../../../styles/theme";
 

@@ -1,4 +1,3 @@
-// components/common/ConfirmationDialog.tsx
 
 interface Props {
   isOpen: boolean;

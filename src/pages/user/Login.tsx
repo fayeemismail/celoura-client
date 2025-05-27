@@ -1,15 +1,14 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import COLORS from "../../styles/theme";
-import { ArrowRight, Lock, Mail } from "lucide-react";
+import { ArrowRight, Lock, Mail, Eye, EyeOff } from "lucide-react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { clearError, setUser } from "../../redux/user/userSlice";
 import { handleLogin } from "../../redux/user/authThunks";
 import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
-import { jwtDecode } from 'jwt-decode'
+import { jwtDecode } from 'jwt-decode';
 import { googleLogin } from "../../api/auth";
-
 
 type inputPropsType = {
   display: boolean;
@@ -21,38 +20,35 @@ interface GoogleJwtPayload {
   name: string;
 }
 
-
 export default function LoginPage() {
-
   const dispatch = useDispatch<AppDispatch>();
   const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.user);
   const [formData, setFormData] = useState({ email: '', password: '' });
+  const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [userLoginValidationError, setUserLoginValidationError] =
     useState<inputPropsType>({ display: false, content: "" });
 
-  // Redirect if already authenticated
   useEffect(() => {
     if (isAuthenticated) {
-      navigate('/')
-    };
+      navigate('/');
+    }
   }, [isAuthenticated, navigate]);
 
-  //clear errors on component unmount
   useEffect(() => {
     return () => {
-      dispatch(clearError())
+      dispatch(clearError());
     };
   }, [dispatch]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>): void => {
     const { name, value } = e.target;
-    setFormData({ ...formData, [name]: value })
+    setFormData({ ...formData, [name]: value });
   };
 
   const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    dispatch(handleLogin(formData))
+    dispatch(handleLogin(formData));
   };
 
   const handleGoogleSuccess = async (
@@ -65,52 +61,39 @@ export default function LoginPage() {
         );
         const response = await googleLogin(userData.email, userData.name);
 
-        if (response.status == 200) {
+        if (response.status === 200) {
           const userData = {
             id: response.data.data.id,
             name: response.data.data.name,
             email: response.data.data.email,
-            role: response.data.data.role
+            role: response.data.data.role,
           };
 
-          dispatch(setUser(userData))
+          dispatch(setUser(userData));
         } else {
-          if (response.data?.message == 'Your account is Blocked') {
-            setUserLoginValidationError({
-              display: true,
-              content:
-                "Your Account has been Blocked..! Please contact customer service for further details",
-            });
-          } else if (response.data?.message == 'User not exists') {
-            setUserLoginValidationError({
-              display: true,
-              content:
-                "User not Exists...! Please Sign in",
-            });
-          } else if (response.data?.message == 'Access denied') {
-            setUserLoginValidationError({
-              display: true,
-              content: 
-              'Access Denied!!!'
-            })
-          } else {
-            setUserLoginValidationError({
-              display: true,
-              content:
-              response.data?.message
-            })
-          }
+          const message = response.data?.message;
+          setUserLoginValidationError({
+            display: true,
+            content:
+              message === 'Your account is Blocked'
+                ? "Your Account has been Blocked..! Please contact customer service for further details"
+                : message === 'User not exists'
+                  ? "User not Exists...! Please Sign in"
+                  : message === 'Access denied'
+                    ? 'Access Denied!!!'
+                    : message,
+          });
         }
       }
     } catch (error) {
       console.log(error);
-      handleGoogleError()
+      handleGoogleError();
     }
-  }
+  };
 
   const handleGoogleError = () => {
-
-  }
+    console.log("Google Login Failed");
+  };
 
   return (
     <div style={{ backgroundColor: COLORS.bg, minHeight: "100vh" }} className="flex w-full items-center justify-center p-4">
@@ -124,14 +107,10 @@ export default function LoginPage() {
           <h2 style={{ color: COLORS.text }} className="mb-6 text-center text-2xl font-semibold">Welcome Back</h2>
           {error && <div className="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700">{error}</div>}
           {userLoginValidationError.display && (
-            <div
-              className="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700"
-              aria-live="assertive"
-            >
+            <div className="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700" aria-live="assertive">
               {userLoginValidationError.content}
             </div>
           )}
-
 
           <form onSubmit={onSubmit}>
             <div className="mb-4">
@@ -154,15 +133,28 @@ export default function LoginPage() {
               <div className="relative">
                 <Lock style={{ color: COLORS.secondaryText }} className="absolute left-3 top-3 h-5 w-5" />
                 <input
-                  type="password"
+                  type={showPassword ? "text" : "password"}
                   name="password"
                   placeholder="Password"
                   value={formData.password}
                   onChange={handleInputChange}
                   style={{ backgroundColor: COLORS.inputBg, borderColor: COLORS.border, color: COLORS.text }}
-                  className="w-full rounded-lg border p-3 pl-10 focus:outline-none focus:ring-2"
+                  className="w-full rounded-lg border p-3 pl-10 pr-10 focus:outline-none focus:ring-2"
                   required
                 />
+                {showPassword ? (
+                  <EyeOff
+                    onClick={() => setShowPassword(false)}
+                    className="absolute right-3 top-3 h-5 w-5 cursor-pointer"
+                    style={{ color: COLORS.secondaryText }}
+                  />
+                ) : (
+                  <Eye
+                    onClick={() => setShowPassword(true)}
+                    className="absolute right-3 top-3 h-5 w-5 cursor-pointer"
+                    style={{ color: COLORS.secondaryText }}
+                  />
+                )}
               </div>
             </div>
 
@@ -188,23 +180,13 @@ export default function LoginPage() {
             </button>
           </form>
 
-
           <div className="mt-4">
             <div className="relative">
               <div className="absolute inset-0 flex items-center">
-                <div
-                  style={{ borderColor: COLORS.border }}
-                  className="w-full border-t"
-                ></div>
+                <div style={{ borderColor: COLORS.border }} className="w-full border-t"></div>
               </div>
               <div className="relative flex justify-center">
-                <span
-                  style={{
-                    backgroundColor: COLORS.cardBg,
-                    color: COLORS.secondaryText
-                  }}
-                  className="px-2 text-sm"
-                >
+                <span style={{ backgroundColor: COLORS.cardBg, color: COLORS.secondaryText }} className="px-2 text-sm">
                   Or continue with
                 </span>
               </div>
@@ -225,10 +207,13 @@ export default function LoginPage() {
             </div>
           </div>
 
-
           <div className="mt-6 text-center">
             <p style={{ color: COLORS.secondaryText }}>Don't have an account?</p>
-            <a style={{ color: COLORS.accent }} className="cursor-pointer font-medium hover:underline" onClick={() => navigate('/signup')}>
+            <a
+              style={{ color: COLORS.accent }}
+              className="cursor-pointer font-medium hover:underline"
+              onClick={() => navigate('/signup')}
+            >
               Sign up now
             </a>
           </div>
@@ -236,5 +221,4 @@ export default function LoginPage() {
       </div>
     </div>
   );
-
 }

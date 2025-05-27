@@ -99,7 +99,7 @@ export const GetAllGuideApplications = () => {
     } catch (error: any) {
       console.error('Error on get applications', error);
       dispatch(signOut());
-      throw error; // rethrow to handle it in the component
+      throw error; 
     }
   };
 };

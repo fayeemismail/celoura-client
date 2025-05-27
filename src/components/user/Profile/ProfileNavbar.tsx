@@ -11,7 +11,7 @@ const ProfileNavbar = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     const handleNavigateHome = () => {
-        navigate('/');  // Navigate to home page
+        navigate('/');  
     };
 
     const handleLogout = () => {

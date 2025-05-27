@@ -10,7 +10,7 @@ const GuideNavbar = () => {
     const dispatch = useDispatch<AppDispatch>();
 
     const handleNavigateHome = () => {
-        navigate('/guide/home');  // Navigate to guide home page
+        navigate('/guide/home');  
     };
 
     const handleLogout = () => {

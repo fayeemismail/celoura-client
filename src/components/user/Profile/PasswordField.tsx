@@ -1,4 +1,3 @@
-// /components/user/Profile/PasswordField.tsx
 import { Lock, Eye, EyeOff } from "lucide-react";
 import COLORS from "../../../styles/theme";
 

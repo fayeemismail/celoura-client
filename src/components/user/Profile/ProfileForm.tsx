@@ -1,4 +1,3 @@
-// /components/user/Profile/ProfileForm.tsx
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState, AppDispatch } from "../../../redux/store";
@@ -99,7 +98,6 @@ export default function ProfileForm() {
       <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
       <NameField value={name} onChange={setName} />
 
-      {/* Styled email display */}
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
         <p className="text-base text-gray-800 px-3 py-2 border border-gray-300 rounded-md bg-gray-100">

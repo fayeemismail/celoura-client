@@ -23,7 +23,7 @@ export default function Otp() {
     const [timeLeft, setTimeLeft] = useState<number>(OTP_VALIDITY_SECONDS);
     const [isDisabled, setIsDisabled] = useState(true);
 
-    // Load cooldown and timer from localStorage on mount
+    
     useEffect(() => {
         const lastRequested = localStorage.getItem("otpRequestedAt");
         if (lastRequested) {
@@ -38,11 +38,11 @@ export default function Otp() {
             if (remainingCooldown > 0) setIsDisabled(true);
             else setIsDisabled(false);
         } else {
-            setIsDisabled(false); // First visit
+            setIsDisabled(false); 
         }
     }, []);
 
-    // Start countdown for OTP expiration
+    
     useEffect(() => {
         if (timeLeft <= 0) return;
         const timer = setInterval(() => {
@@ -83,7 +83,7 @@ export default function Otp() {
             await axios.post(`${API_BASE_URL}/auth/resend-otp`, { email });
             setTimeLeft(OTP_VALIDITY_SECONDS);
 
-            // Automatically enable "Resend" after 30 seconds;
+            
             setTimeout(() => {
                 setIsDisabled(false);
             }, RESEND_COOLDOWN_SECONDS * 1000);

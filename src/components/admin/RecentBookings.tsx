@@ -1,4 +1,3 @@
-import React from "react";
 import { ADMIN_COLORS } from "../../styles/theme";
 import { MoreHorizontal, Check, X, AlertCircle } from "lucide-react";
 

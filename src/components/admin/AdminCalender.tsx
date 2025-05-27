@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { ADMIN_COLORS } from "../../styles/theme";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 

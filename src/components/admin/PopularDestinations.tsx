@@ -1,4 +1,3 @@
-import React from "react";
 import { ADMIN_COLORS } from "../../styles/theme";
 import { TrendingUp } from "lucide-react";
 
