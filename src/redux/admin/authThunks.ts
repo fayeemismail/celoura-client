@@ -102,10 +102,10 @@ export const GetUserGuideCount = () => {
     } 
 }
 
-export const GetAllGuideApplications = () => {
+export const GetAllGuideApplications = (page: number, limit: number) => {
   return async (dispatch: any) => {
     try {
-      const response = await getAppliesGuide();
+      const response = await getAppliesGuide(page, limit);
       await adminRefreshAccessToken();
 
       return response.data;

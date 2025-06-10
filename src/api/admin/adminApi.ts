@@ -27,8 +27,8 @@ export const unBlockUser = async (userId: string) => {
     return await adminInstance.patch(`/admin/users/${userId}/unBlock`); 
 };
 
-export  const getAppliesGuide = async () => {
-    return await adminInstance.get('/admin/users/get-guide-applications')
+export  const getAppliesGuide = async (page: number, limit: number) => {
+    return await adminInstance.get(`/admin/users/get-guide-applications?page=${page}&limit=${limit}`)
 };
 
 
