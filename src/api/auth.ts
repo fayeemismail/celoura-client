@@ -30,6 +30,25 @@ export const googleLogin = async(email: string, name: string) => {
             console.log(error, 'Error on the Google Login Api');
             return error.response;
         }
+};
+
+export const guideGoogleLogin = async(email: string, name: string) => {
+    try {
+        const result = await axios.post(
+            `${API_BASE_URL}/auth/guide-google-login`,
+            {email, name},
+            {
+                withCredentials: true
+            }
+        )
+        .then((response) => {
+            return response
+        });
+        return result;
+    } catch (error: any) {
+        console.log(error, 'Error On Guide Google Login');
+        return error.response;
+    }
 }
 
 export const adminLogin = async ( formData: { email: string; password: string } ) => {

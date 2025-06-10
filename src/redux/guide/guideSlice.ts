@@ -27,6 +27,10 @@ const guideSlice = createSlice({
     name: 'guide',
     initialState, 
     reducers: {
+        setGuide(state, action) {
+            state.currentGuide = action.payload;
+            state.isAuthenticated = true
+        },
         signInPending(state) {
             state.loading = true
         },
@@ -59,7 +63,8 @@ export const {
     signInSuccess,
     signInFailure,
     signOut,
-    clearError
+    clearError,
+    setGuide
 } = guideSlice.actions;
 
 export default guideSlice.reducer;

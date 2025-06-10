@@ -5,7 +5,7 @@ import { AppDispatch, RootState } from "../../redux/store";
 import AdminSidebar from "../../components/admin/home/AdminSidebar";
 import AdminHeader from "../../components/admin/home/AdminHeader";
 import AdminDashboardContent from "../../components/admin/home/AdminDashboard";
-import { GetAllUsersData } from "../../redux/admin/authThunks";
+import { GetUserGuideCount } from "../../redux/admin/authThunks";
 
 export default function HomeAdmin() {
   const navigate = useNavigate();
@@ -17,7 +17,7 @@ export default function HomeAdmin() {
 
   const fetchAllUsersAndGuides = async () => {
     try {
-      const response = await dispatch(GetAllUsersData());
+      const response = await dispatch(GetUserGuideCount());
       if (response.data) {
         setUsers(response.data.users);
         setGuide(response.data.guide);

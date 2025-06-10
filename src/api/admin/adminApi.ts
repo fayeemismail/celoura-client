@@ -10,10 +10,14 @@ export const adminRefreshAccessToken = async () => {
 };
 
 
-export const getAllUsers = async () => {
-    return adminInstance.get('/admin/adminHome-Users');
+export const getAllUsers = async (page: number, limit: number, role: 'user' | 'guide') => {
+  return adminInstance.get(`/admin/adminHome-Users?page=${page}&limit=${limit}&role=${role}`);
 };
 
+
+export const getAllCount = async () => {
+    return adminInstance.get('/admin/users/total-count');
+};
 
 export const BlockUser = async (userId: string) => {
     return await adminInstance.patch(`/admin/users/${userId}/block` );
