@@ -1,4 +1,4 @@
-import { adminRefreshAccessToken, BlockUser, getAllUsers, getAppliesGuide, guideApproveApi, guideRejectApi, unBlockUser } from "../../api/admin/adminApi";
+import { adminRefreshAccessToken, BlockUser, getAllCount, getAllUsers, getAppliesGuide, guideApproveApi, guideRejectApi, unBlockUser } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
@@ -76,17 +76,30 @@ export const handleUserBlockUnblock = (userId: string, isCurrentlyBlocked: boole
 }
 
 
-export const GetAllUsersData = () => {
+export const GetAllUsersData = (page = 1, limit = 10, role: 'user' | 'guide' = 'user') => {
+  return async (dispatch: any) => {
+    try {
+      const response = await getAllUsers(page, limit, role);
+      await adminRefreshAccessToken();
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching users:', error);
+      dispatch();
+    }
+  };
+};
+
+export const GetUserGuideCount = () => {
     return async (dispatch: any) => {
         try {
-            const Users = await getAllUsers();
+            const response = await getAllCount();
             await adminRefreshAccessToken();
-            return Users.data;
+            return response.data;
         } catch (error) {
-            console.error('something wrong with fetching data', error);
-            dispatch(signOut());
+            console.error('Error fetching users count: ', error);
+            dispatch()
         }
-    }
+    } 
 }
 
 export const GetAllGuideApplications = () => {

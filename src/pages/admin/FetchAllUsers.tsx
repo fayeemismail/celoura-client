@@ -27,23 +27,23 @@ export default function AllUsersPage() {
   const [users, setUsers] = useState<User[]>([]);
   const [filterRole, setFilterRole] = useState<"user" | "guide">("user");
   const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
   const { isAuthenticated } = useSelector((state: RootState) => state.admin);
   const navigate = useNavigate();
 
   const fetchUsers = async () => {
     try {
-      const response = await dispatch(GetAllUsersData());
-      if (response.data?.users) {
-        const users = response.data?.users;
-        const guide = response.data?.guide;
-        const userAndGuide = [...users, ...guide];
-        setUsers(userAndGuide);
-      }
+      const response = await dispatch(GetAllUsersData(page, limit, filterRole));
+      const data = response?.data || [];
+      const pagination = response?.pagination;
+      setUsers(data);
+      setTotalPages(pagination?.totalPages || 1);
     } catch (error) {
       console.error("Error fetching users:", error);
     }
   };
-  console.log('re render')
 
   const UserBlockUnBlock = async (
     userId: string,
@@ -52,7 +52,6 @@ export default function AllUsersPage() {
     try {
       await dispatch(handleUserBlockUnblock(userId, isCurrentlyBlocked));
 
-      // Update local user state immediately
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
           user._id === userId ? { ...user, blocked: !isCurrentlyBlocked } : user
@@ -66,12 +65,10 @@ export default function AllUsersPage() {
     }
   };
 
-  const filteredUsers = users.filter((user) => user.role === filterRole);
-
   useEffect(() => {
     if (!isAuthenticated) navigate("/admin/login");
     fetchUsers();
-  }, []);
+  }, [filterRole, page]);
 
   return (
     <div style={{ backgroundColor: "#1A1F2C" }} className="flex min-h-screen">
@@ -98,7 +95,10 @@ export default function AllUsersPage() {
               </h2>
               <div className="space-x-2">
                 <button
-                  onClick={() => setFilterRole("user")}
+                  onClick={() => {
+                    setFilterRole("user");
+                    setPage(1); // reset to first page
+                  }}
                   className={`px-4 py-2 rounded ${
                     filterRole === "user"
                       ? "bg-blue-600 text-white"
@@ -108,7 +108,10 @@ export default function AllUsersPage() {
                   All Users
                 </button>
                 <button
-                  onClick={() => setFilterRole("guide")}
+                  onClick={() => {
+                    setFilterRole("guide");
+                    setPage(1); // reset to first page
+                  }}
                   className={`px-4 py-2 rounded ${
                     filterRole === "guide"
                       ? "bg-blue-600 text-white"
@@ -139,8 +142,8 @@ export default function AllUsersPage() {
                 <tbody
                   style={{ backgroundColor: "rgb(29 36 54)", color: "#F2F0EF" }}
                 >
-                  {filteredUsers.length > 0 ? (
-                    filteredUsers.map((user) => (
+                  {users.length > 0 ? (
+                    users.map((user) => (
                       <tr key={user._id} className="border-t border-gray-300">
                         <td className="py-3 px-4">{user.name}</td>
                         <td className="py-3 px-4">{user.email}</td>
@@ -177,6 +180,25 @@ export default function AllUsersPage() {
                   )}
                 </tbody>
               </table>
+            </div>
+
+            {/* Pagination Buttons */}
+            <div className="flex justify-center mt-6 space-x-4">
+              <button
+                onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
+                disabled={page === 1}
+                className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="text-white">{`Page ${page} of ${totalPages}`}</span>
+              <button
+                onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
+                disabled={page === totalPages}
+                className="px-4 py-2 bg-gray-600 text-white rounded disabled:opacity-50"
+              >
+                Next
+              </button>
             </div>
           </div>
         </div>
