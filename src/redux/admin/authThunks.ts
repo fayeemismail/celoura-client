@@ -76,10 +76,10 @@ export const handleUserBlockUnblock = (userId: string, isCurrentlyBlocked: boole
 }
 
 
-export const GetAllUsersData = (page = 1, limit = 10, role: 'user' | 'guide' = 'user') => {
+export const GetAllUsersData = (page = 1, limit = 10, role: 'user' | 'guide' = 'user', search: string) => {
   return async (dispatch: any) => {
     try {
-      const response = await getAllUsers(page, limit, role);
+      const response = await getAllUsers(page, limit, role, search);
       await adminRefreshAccessToken();
       return response.data;
     } catch (error) {

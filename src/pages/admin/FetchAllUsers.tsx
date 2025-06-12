@@ -30,12 +30,13 @@ export default function AllUsersPage() {
   const [page, setPage] = useState(1);
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
+  const [search, setSearch] = useState("");
   const { isAuthenticated } = useSelector((state: RootState) => state.admin);
   const navigate = useNavigate();
 
   const fetchUsers = async () => {
     try {
-      const response = await dispatch(GetAllUsersData(page, limit, filterRole));
+      const response = await dispatch(GetAllUsersData(page, limit, filterRole, search));
       const data = response?.data || [];
       const pagination = response?.pagination;
       setUsers(data);
@@ -68,7 +69,7 @@ export default function AllUsersPage() {
   useEffect(() => {
     if (!isAuthenticated) navigate("/admin/login");
     fetchUsers();
-  }, [filterRole, page]);
+  }, [filterRole, page, search]);
 
   return (
     <div style={{ backgroundColor: "#1A1F2C" }} className="flex min-h-screen">
@@ -78,26 +79,19 @@ export default function AllUsersPage() {
       />
 
       <main
-        className={`flex-1 transition-all duration-300 ${
-          sidebarOpen ? "ml-64" : "ml-20"
-        }`}
+        className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}
       >
         <AdminHeader />
 
         <div className="p-6">
-          <div
-            style={{ backgroundColor: "#242A38" }}
-            className="rounded-lg shadow-md p-6"
-          >
+          <div style={{ backgroundColor: "#242A38" }} className="rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-[#fff]">
-                User Management
-              </h2>
+              <h2 className="text-xl font-semibold text-[#fff]">User Management</h2>
               <div className="space-x-2">
                 <button
                   onClick={() => {
                     setFilterRole("user");
-                    setPage(1); // reset to first page
+                    setPage(1);
                   }}
                   className={`px-4 py-2 rounded ${
                     filterRole === "user"
@@ -110,7 +104,7 @@ export default function AllUsersPage() {
                 <button
                   onClick={() => {
                     setFilterRole("guide");
-                    setPage(1); // reset to first page
+                    setPage(1);
                   }}
                   className={`px-4 py-2 rounded ${
                     filterRole === "guide"
@@ -121,6 +115,20 @@ export default function AllUsersPage() {
                   All Guides
                 </button>
               </div>
+            </div>
+
+            {/* 🔍 Search Input */}
+            <div className="mb-4">
+              <input
+                type="text"
+                placeholder="Search by name or email..."
+                value={search}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setPage(1); // reset page on new search
+                }}
+                className="w-full md:w-1/3 px-4 py-2 rounded border border-gray-500 text-white bg-[#1A1F2C] focus:outline-none"
+              />
             </div>
 
             <div className="overflow-x-auto">
@@ -139,29 +147,21 @@ export default function AllUsersPage() {
                     <th className="py-3 px-4">Action</th>
                   </tr>
                 </thead>
-                <tbody
-                  style={{ backgroundColor: "rgb(29 36 54)", color: "#F2F0EF" }}
-                >
+                <tbody style={{ backgroundColor: "rgb(29 36 54)", color: "#F2F0EF" }}>
                   {users.length > 0 ? (
                     users.map((user) => (
                       <tr key={user._id} className="border-t border-gray-300">
                         <td className="py-3 px-4">{user.name}</td>
                         <td className="py-3 px-4">{user.email}</td>
                         <td className="py-3 px-4 capitalize">{user.role}</td>
-                        <td className="py-3 px-4">
-                          {user.blocked ? "Yes" : "No"}
-                        </td>
-                        <td className="py-3 px-4">
-                          {user.googleUser ? "Yes" : "No"}
-                        </td>
+                        <td className="py-3 px-4">{user.blocked ? "Yes" : "No"}</td>
+                        <td className="py-3 px-4">{user.googleUser ? "Yes" : "No"}</td>
                         <td className="py-3 px-4">
                           {new Date(user.createdAt).toLocaleDateString("in")}
                         </td>
                         <td className="py-3 px-4">
                           <button
-                            onClick={() =>
-                              UserBlockUnBlock(user._id, user.blocked)
-                            }
+                            onClick={() => UserBlockUnBlock(user._id, user.blocked)}
                             className={`px-3 py-1 cursor-pointer rounded text-white ${
                               user.blocked ? "bg-green-600" : "bg-red-600"
                             }`}
@@ -182,7 +182,7 @@ export default function AllUsersPage() {
               </table>
             </div>
 
-            {/* Pagination Buttons */}
+            {/* Pagination */}
             <div className="flex justify-center mt-6 space-x-4">
               <button
                 onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
