@@ -1,4 +1,4 @@
-import { adminRefreshAccessToken, BlockUser, getAllCount, getAllUsers, getAppliesGuide, guideApproveApi, guideRejectApi, unBlockUser } from "../../api/admin/adminApi";
+import { adminRefreshAccessToken, BlockUser, createDestinationApi, getAllCount, getAllUsers, getAppliesGuide, guideApproveApi, guideRejectApi, unBlockUser } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
@@ -144,3 +144,15 @@ export const RejectAsGuide = (applicationId: string, userId: string) => {
         }
     }
 }
+
+export const createDestination = (formData: FormData) => {
+  return async () => {
+    try {
+      const response = await createDestinationApi(formData);
+      return response;
+    } catch (error: any) {
+      console.error('Error On Create Destination:', error.response?.data?.message || error.message);
+      throw error;
+    }
+  };
+};

@@ -38,4 +38,10 @@ export const guideApproveApi = async (applicationId: string, userId: string) => 
 
 export const guideRejectApi = async (applicationId: string, userId: string) => {
     return await adminInstance.patch(`/admin/users/rejectAsGuide`, { applicationId, userId })
-}
+};
+
+export const createDestinationApi = async( 
+    formData: FormData
+  ) => {
+    return await adminInstance.post('/admin/destination/create-destination', formData)
+  }
