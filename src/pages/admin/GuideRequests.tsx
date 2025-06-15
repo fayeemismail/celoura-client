@@ -27,22 +27,34 @@ interface requests {
 }
 
 export default function GuideRequests() {
-  const [guideApplies, setGuideApplies] = useState<requests[]>();
+  const [guideApplies, setGuideApplies] = useState<requests[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
-  const dispatch = useDispatch<AppDispatch>();
-
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
   const [selectedApplication, setSelectedApplication] = useState<requests | null>(null);
-
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [approveApplication, setApproveApplication] = useState<requests | null>(null);
 
-  const getGuideApplies = async () => {
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const limit = 10;
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  const getGuideApplies = async (page: number) => {
     try {
-      const response = await dispatch(GetAllGuideApplications());
+      const response = await dispatch(GetAllGuideApplications( page, limit ))
+      console.log(response)
       setGuideApplies(response.data);
+      setTotalPages(response.totalPages);
+      setCurrentPage(response.page);
     } catch (error) {
       console.error("Error fetching guide applications", error);
+    }
+  };
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      getGuideApplies(page);
     }
   };
 
@@ -58,7 +70,6 @@ export default function GuideRequests() {
 
   const handleRejectConfirmed = async () => {
     if (!selectedApplication) return;
-
     try {
       await dispatch(RejectAsGuide(selectedApplication._id, selectedApplication.userId));
       setGuideApplies((prev) =>
@@ -78,7 +89,6 @@ export default function GuideRequests() {
 
   const handleApproveConfirmed = async () => {
     if (!approveApplication) return;
-
     try {
       await dispatch(ApproveAsGuide(approveApplication._id, approveApplication.userId));
       setGuideApplies((prev) =>
@@ -97,7 +107,7 @@ export default function GuideRequests() {
   };
 
   useEffect(() => {
-    getGuideApplies();
+    getGuideApplies(1);
   }, []);
 
   return (
@@ -174,6 +184,35 @@ export default function GuideRequests() {
                 </div>
               </div>
             ))}
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="flex justify-center mt-8 space-x-2 text-white">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={currentPage === 1}
+              className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+            >
+              Prev
+            </button>
+            {[...Array(totalPages)].map((_, index) => (
+              <button
+                key={index}
+                onClick={() => handlePageChange(index + 1)}
+                className={`px-3 py-1 rounded ${
+                  currentPage === index + 1 ? "bg-blue-600" : "bg-gray-700"
+                } hover:bg-gray-600`}
+              >
+                {index + 1}
+              </button>
+            ))}
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={currentPage === totalPages}
+              className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>

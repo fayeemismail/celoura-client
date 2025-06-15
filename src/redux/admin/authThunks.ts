@@ -1,4 +1,4 @@
-import { adminRefreshAccessToken, BlockUser, getAllCount, getAllUsers, getAppliesGuide, guideApproveApi, guideRejectApi, unBlockUser } from "../../api/admin/adminApi";
+import { adminRefreshAccessToken, BlockUser, createDestinationApi, getAllCount, getAllUsers, getAppliesGuide, guideApproveApi, guideRejectApi, unBlockUser } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
@@ -76,10 +76,10 @@ export const handleUserBlockUnblock = (userId: string, isCurrentlyBlocked: boole
 }
 
 
-export const GetAllUsersData = (page = 1, limit = 10, role: 'user' | 'guide' = 'user') => {
+export const GetAllUsersData = (page = 1, limit = 10, role: 'user' | 'guide' = 'user', search: string) => {
   return async (dispatch: any) => {
     try {
-      const response = await getAllUsers(page, limit, role);
+      const response = await getAllUsers(page, limit, role, search);
       await adminRefreshAccessToken();
       return response.data;
     } catch (error) {
@@ -102,10 +102,10 @@ export const GetUserGuideCount = () => {
     } 
 }
 
-export const GetAllGuideApplications = () => {
+export const GetAllGuideApplications = (page: number, limit: number) => {
   return async (dispatch: any) => {
     try {
-      const response = await getAppliesGuide();
+      const response = await getAppliesGuide(page, limit);
       await adminRefreshAccessToken();
 
       return response.data;
@@ -144,3 +144,15 @@ export const RejectAsGuide = (applicationId: string, userId: string) => {
         }
     }
 }
+
+export const createDestination = (formData: FormData) => {
+  return async () => {
+    try {
+      const response = await createDestinationApi(formData);
+      return response;
+    } catch (error: any) {
+      console.error('Error On Create Destination:', error.response?.data?.message || error.message);
+      throw error;
+    }
+  };
+};
