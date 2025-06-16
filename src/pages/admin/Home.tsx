@@ -22,7 +22,7 @@ export default function HomeAdmin() {
         setUsers(response.data.users);
         setGuide(response.data.guide);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error(error);
     }
   };

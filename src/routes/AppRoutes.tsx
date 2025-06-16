@@ -15,6 +15,8 @@ import FetchAllUsers from '../pages/admin/FetchAllUsers';
 import GuideRequests from '../pages/admin/GuideRequests';
 import DestinationPage from '../pages/admin/Destination';
 import CreateDestination from '../pages/admin/CreateDestination';
+import UserDestinations from '../pages/user/Destinations';
+import DestinationDetailPage from '../components/user/Destination/DetailedDestination';
 
 export default function AppRoutes() {
   return (
@@ -30,6 +32,8 @@ export default function AppRoutes() {
           <Route path="/" element={<Home />} />
           <Route path='/Profile' element={<ProfilePage />} />
           <Route path='/become-a-guide' element={ <BecomeAGuide /> } />
+          <Route path='/destinations' element={ <UserDestinations /> } />
+          <Route path='/destination/:id' element={ <DestinationDetailPage /> } />
         </Route>
 
         {/* Admin Routes */}

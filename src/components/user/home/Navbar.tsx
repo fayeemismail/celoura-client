@@ -27,15 +27,15 @@ export default function Navbar() {
       <div className="container mx-auto flex items-center justify-between p-4">
         {/* Logo */}
         <div className="flex items-center">
-          <h1 style={{ color: COLORS.accent }} className="text-2xl font-bold">Celoura Travels</h1>
+          <h1 style={{ color: COLORS.accent }} onClick={(() => navigate('/'))} className="text-2xl cursor-pointer font-bold">Celoura Travels</h1>
         </div>
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-6">
-          <a href="#" style={{ color: COLORS.accent }} className="font-medium">Home</a>
-          <a href="#" style={{ color: COLORS.secondaryText }} className="font-medium hover:text-accent">Destinations</a>
-          <a href="#" style={{ color: COLORS.secondaryText }} className="font-medium hover:text-accent">Guides</a>
-          <a href="#" style={{ color: COLORS.secondaryText }} className="font-medium hover:text-accent">Saved</a>
+          <a  style={{ color: COLORS.accent }} onClick={() => navigate('/')} className="font-medium cursor-pointer">Home</a>
+          <a  style={{ color: COLORS.secondaryText }} onClick={() => navigate('/destinations')} className="font-medium cursor-pointer hover:text-accent">Destinations</a>
+          <a  style={{ color: COLORS.secondaryText }} onClick={() => navigate('/guides')} className="font-medium cursor-pointer hover:text-accent">Guides</a>
+          <a  style={{ color: COLORS.secondaryText }} className="font-medium cursor-pointer hover:text-accent">Saved</a>
         </nav>
 
         {/* User Profile/Actions */}
@@ -52,7 +52,7 @@ export default function Navbar() {
                 style={{ color: COLORS.secondaryText }}
                 className="flex items-center hover:text-accent"
               >
-                <LogOut className="h-5 w-5" /> { 'Logout' }
+                <LogOut className="h-5 cursor-pointer w-5" /> { 'Logout' }
               </button>
             </div>
           ) : (
@@ -80,10 +80,10 @@ export default function Navbar() {
       {mobileMenuOpen && (
         <div style={{ backgroundColor: COLORS.cardBg }} className="md:hidden border-t border-gray-200 p-4">
           <nav className="flex flex-col space-y-4">
-            <a href="#" style={{ color: COLORS.accent }} className="font-medium">Home</a>
-            <a href="#" style={{ color: COLORS.secondaryText }} className="font-medium">Destinations</a>
-            <a href="#" style={{ color: COLORS.secondaryText }} className="font-medium">Guides</a>
-            <a href="#" style={{ color: COLORS.secondaryText }} className="font-medium">Saved</a>
+            <a  style={{ color: COLORS.accent }} onClick={()=> navigate('/')}  className="font-medium">Home</a>
+            <a  style={{ color: COLORS.secondaryText }} onClick={()=> navigate('/destinations')} className="font-medium">Destinations</a>
+            <a  style={{ color: COLORS.secondaryText }} onClick={()=> navigate('/guides')} className="font-medium">Guides</a>
+            <a  style={{ color: COLORS.secondaryText }} onClick={()=> navigate('/')} className="font-medium">Saved</a>
             {isAuthenticated && (
               <button
                 onClick={handleLogout}

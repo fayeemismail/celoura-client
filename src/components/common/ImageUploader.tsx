@@ -1,5 +1,6 @@
 // components/common/ImageUploader.tsx
 import { useRef } from "react";
+import { toast } from "react-toastify";
 
 interface Props {
   index: number;
@@ -12,7 +13,7 @@ export default function ImageUploader({ index, file, onChange }: Props) {
 
   const handleFile = (file: File) => {
     if (!file.type.startsWith("image/")) return;
-    if (file.size > 5 * 1024 * 1024) return alert("Image size must be under 5MB");
+    if (file.size > 5 * 1024 * 1024) return toast.error("Image size must be under 5MB");
     onChange(file, index);
   };
 

@@ -1,6 +1,8 @@
 // /redux/user/userThunks.ts
-import { getCurrentUser, refreshAccessToken } from "../../api/auth";
-import { editProfile } from "../../api/userAPI";
+import { 
+  getCurrentUser, 
+} from "../../api/auth";
+import { editProfile, getDestinationsApi, singleSpotApi } from "../../api/userAPI";
 import { UpdateProfilePayload } from "../../types/user";
 import { AppDispatch } from "../store";
 import {
@@ -16,7 +18,6 @@ export const handleUpdateProfile = (payload: UpdateProfilePayload) => {
 
     try {
       await editProfile(payload);
-      await refreshAccessToken();
       const { data: userData } = await getCurrentUser();
       dispatch(updateUserSuccess(userData));
     } catch (error: any) {
@@ -32,3 +33,29 @@ export const handleUpdateProfile = (payload: UpdateProfilePayload) => {
     }
   };
 };
+
+
+export const GetAllDestinations = () => {
+  return async () => {
+    try {
+      const data = await getDestinationsApi();
+      return data
+    } catch (error: any) {
+      console.log(error.message);
+      throw error.message
+    }
+  }
+}
+
+
+export const GetSingleDestination = (id: string) => {
+  return async() => {
+    try {
+      const response = await singleSpotApi(id);
+      return response.data
+    } catch (error: any) {
+      console.log(error.message);
+      throw error
+    }
+  }
+}

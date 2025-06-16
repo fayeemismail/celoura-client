@@ -10,11 +10,12 @@ import axios from "axios";
 
 export default function Signup() {
     const dispatch = useDispatch<AppDispatch>();
-    const { loading, error, isAuthenticated } = useSelector((state: RootState) => state.user);
+    const { error, isAuthenticated } = useSelector((state: RootState) => state.user);
     const [formData, setFormData] = useState({ name: '', email: '', password: '', confirmPassword: '', role: 'user' });
     const [formErrors, setFormErrors] = useState<{ [key: string]: string }>({});
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    const [loading, setLoading] = useState(false)
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -65,6 +66,7 @@ export default function Signup() {
 
     const handleSignup = async (e: React.FormEvent): Promise<void> => {
         e.preventDefault();
+        setLoading(true)
 
         try {
             const isValid = validateForm();
@@ -75,6 +77,8 @@ export default function Signup() {
         } catch (error: any) {
             console.log(error.response?.data?.error);
             dispatch(signInFailure(error.response?.data?.error || 'Registration failed'));
+        } finally {
+            setLoading(false);
         }
     };
 

@@ -1,4 +1,4 @@
-import { adminRefreshAccessToken, BlockUser, createDestinationApi, getAllCount, getAllUsers, getAppliesGuide, guideApproveApi, guideRejectApi, unBlockUser } from "../../api/admin/adminApi";
+import { adminRefreshAccessToken, BlockUser, createDestinationApi, getAllCount, getAllUsers, getAppliesGuide, getDestinationsApi, guideApproveApi, guideRejectApi, unBlockUser } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
@@ -61,43 +61,37 @@ export const handleAdminLogout = () => {
 
 
 export const handleUserBlockUnblock = (userId: string, isCurrentlyBlocked: boolean) => {
-    return async (dispatch: any) => {
+    return async () => {
         try {
             const response = isCurrentlyBlocked ?
             await unBlockUser(userId) :
             await BlockUser(userId)
-            await adminRefreshAccessToken();
             return response
         } catch (error) {
             console.error('Something went wrong with user block un block', error);
-            dispatch()
         }
     }
 }
 
 
 export const GetAllUsersData = (page = 1, limit = 10, role: 'user' | 'guide' = 'user', search: string) => {
-  return async (dispatch: any) => {
+  return async () => {
     try {
       const response = await getAllUsers(page, limit, role, search);
-      await adminRefreshAccessToken();
       return response.data;
     } catch (error) {
       console.error('Error fetching users:', error);
-      dispatch();
     }
   };
 };
 
 export const GetUserGuideCount = () => {
-    return async (dispatch: any) => {
+    return async () => {
         try {
             const response = await getAllCount();
-            await adminRefreshAccessToken();
             return response.data;
         } catch (error) {
             console.error('Error fetching users count: ', error);
-            dispatch()
         }
     } 
 }
@@ -106,7 +100,6 @@ export const GetAllGuideApplications = (page: number, limit: number) => {
   return async (dispatch: any) => {
     try {
       const response = await getAppliesGuide(page, limit);
-      await adminRefreshAccessToken();
 
       return response.data;
     } catch (error: any) {
@@ -120,27 +113,25 @@ export const GetAllGuideApplications = (page: number, limit: number) => {
 
 
 export const ApproveAsGuide = (applicationId: string, userId: string) => {
-    return async( dispatch: any ) => {
+    return async( ) => {
         try {
             const response = await guideApproveApi(applicationId, userId);
-            await adminRefreshAccessToken();
             return response;
         } catch (error) {
             console.log('Error On approve as guide', error);
-            dispatch();
+            throw error;
         }
     }
 };
 
 export const RejectAsGuide = (applicationId: string, userId: string) => {
-    return async(dispatch: any) => {
+    return async() => {
         try {
             const response = await guideRejectApi(applicationId, userId);
-            await adminRefreshAccessToken();
             return response;
         } catch (error: any) {
             console.log('Error on Rejects as guide', error.message);
-            dispatch()
+            throw error
         }
     }
 }
@@ -156,3 +147,15 @@ export const createDestination = (formData: FormData) => {
     }
   };
 };
+
+export const getAllDestinations = () => {
+    return async () => {
+        try {
+            const response = await getDestinationsApi();
+            return response.data
+        } catch (error: any) {
+            console.error('Error on Getting Destinations: ', error.response);
+            throw error
+        }
+    }
+}
