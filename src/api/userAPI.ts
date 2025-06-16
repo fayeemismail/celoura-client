@@ -16,3 +16,11 @@ export const editProfile = async (payload: Object) => {
     const response = await axiosInstance.put('/user/editProfile', payload);
     return response
 };
+
+export const getDestinationsApi = async () => {
+  return await axiosInstance.get('/user/destinations');
+}
+
+export const singleSpotApi = async (id: string) => {
+  return await axiosInstance.get(`/user/destinations/${id}`)
+}

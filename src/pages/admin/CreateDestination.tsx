@@ -12,7 +12,7 @@ export default function CreateDestination() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-  const [loading, setLoading] = useState(false)
+  const [loading, setLoading] = useState(false);
 
   const [formData, setFormData] = useState({
     name: "",
@@ -36,79 +36,81 @@ export default function CreateDestination() {
     });
   };
 
- const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  setLoading(true);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoading(true);
 
-  // Trimmed values
-  const name = formData.name.trim();
-  const description = formData.description.trim();
-  const location = formData.location.trim();
-  const country = formData.country.trim();
-  const features = formData.featureInput
-    .split(",")
-    .map(f => f.trim())
-    .filter(Boolean);
+    const name = formData.name.trim();
+    const description = formData.description.trim();
+    const location = formData.location.trim();
+    const country = formData.country.trim();
+    const features = formData.featureInput
+      .split(",")
+      .map(f => f.trim())
+      .filter(Boolean);
 
-  const validPhotos = formData.photos.filter((file): file is File => file !== null);
+    const validPhotos = formData.photos.filter((file): file is File => file !== null);
 
-  // Frontend validation
-  if (!name) {
-    toast.error("Name cannot be empty.");
-    setLoading(false);
-    return;
-  }
-  if (!description) {
-    toast.error("Description cannot be empty.");
-    setLoading(false);
-    return;
-  }
-  if (!location) {
-    toast.error("Location cannot be empty.");
-    setLoading(false);
-    return;
-  }
-  if (!country) {
-    toast.error("Country cannot be empty.");
-    setLoading(false);
-    return;
-  }
-  if (validPhotos.length === 0) {
-    toast.error("At least one photo is required.");
-    setLoading(false);
-    return;
-  }
-  if (features.length === 0) {
-    toast.error("Please add at least one feature.");
-    setLoading(false);
-    return;
-  }
+    if (!name) {
+      toast.error("Name cannot be empty.");
+      setLoading(false);
+      return;
+    }
+    if (!description) {
+      toast.error("Description cannot be empty.");
+      setLoading(false);
+      return;
+    }
+    if (!location) {
+      toast.error("Location cannot be empty.");
+      setLoading(false);
+      return;
+    }
+    if (!country) {
+      toast.error("Country cannot be empty.");
+      setLoading(false);
+      return;
+    }
+    if (validPhotos.length === 0) {
+      toast.error("At least one photo is required.");
+      setLoading(false);
+      return;
+    }
+    if (features.length === 0) {
+      toast.error("Please add at least one feature.");
+      setLoading(false);
+      return;
+    }
 
-  // Prepare FormData
-  const formPayload = new FormData();
-  formPayload.append("name", name);
-  formPayload.append("description", description);
-  formPayload.append("location", location);
-  formPayload.append("country", country);
-  formPayload.append("features", JSON.stringify(features));
-  validPhotos.forEach(photo => formPayload.append("photos", photo));
+    const formPayload = new FormData();
+    formPayload.append("name", name);
+    formPayload.append("description", description);
+    formPayload.append("location", location);
+    formPayload.append("country", country);
+    formPayload.append("features", JSON.stringify(features));
+    validPhotos.forEach(photo => formPayload.append("photos", photo));
 
-  try {
-    await dispatch(createDestination(formPayload));
-    toast.success("Destination created!");
-    navigate("/admin/destinations");
-  } catch (err: any) {
-    const backendMessage = err.response?.data?.message || err.message || "Something went wrong!";
-    toast.error(backendMessage);
-  } finally {
-    setLoading(false);
-  }
-};
-
-
+    try {
+      await dispatch(createDestination(formPayload));
+      toast.success("Destination created!");
+      navigate("/admin/destinations");
+    } catch (err: any) {
+      const backendMessage = err.response?.data?.message || err.message || "Something went wrong!";
+      toast.error(backendMessage);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <div style={{ backgroundColor: "#1A1F2C" }} className="flex min-h-screen">
+      {/* Loader Overlay */}
+      {loading && (
+        <div className="fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center">
+          <div className="w-16 h-16 border-4 border-t-transparent border-blue-500 rounded-full animate-spin"></div>
+        </div>
+      )}
+
       <AdminSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
       <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
         <AdminHeader />
