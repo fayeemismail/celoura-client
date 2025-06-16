@@ -1,11 +1,26 @@
 import { useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import AdminSidebar from "../../components/admin/home/AdminSidebar";
 import AdminHeader from "../../components/admin/home/AdminHeader";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
 
 export default function DestinationPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state: RootState) => state.admin)
+
+  // const getDestinations = async () => {
+  //   try {
+      
+  //   } catch (error) {
+      
+  //   }
+  // }
+
+  useEffect(() => {
+    if(!isAuthenticated) navigate('/admin/login')
+  }, [isAuthenticated])
 
   return (
     <div style={{ backgroundColor: "rgb(8 16 40)" }} className="flex min-h-screen">

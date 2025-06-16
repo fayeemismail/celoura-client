@@ -12,32 +12,37 @@ const axiosInstance = axios.create({
 let isRefreshing = false;
 
 axiosInstance.interceptors.response.use(
-    response => response,
-    async error => {
-        const originalRequest = error.config;
+  response => response,
+  async error => {
+    const originalRequest = error.config;
 
-        if(
-            error.response?.status == 401 && 
-            !originalRequest._retry
-        ) {
-            originalRequest._retry = true;
+    console.warn("🔁 Axios Interceptor Triggered"); 
 
-            if(!isRefreshing) {
-                isRefreshing = true;
-                try {
-                    await store.dispatch<any>(handleTokenRefresh());
-                    isRefreshing = false;
-          
-                    
-                    return axiosInstance(originalRequest);
-                  } catch (refreshError) {
-                    isRefreshing = false;
-                  }
-            }
+    if (
+      error.response?.status === 401 &&
+      !originalRequest._retry
+    ) {
+      console.warn("⛔ 401 Detected, trying to refresh token..."); 
 
+      originalRequest._retry = true;
+
+      if (!isRefreshing) {
+        isRefreshing = true;
+        try {
+          await store.dispatch<any>(handleTokenRefresh());
+          isRefreshing = false;
+
+          console.log("✅ Token refreshed. Retrying original request...");
+          return axiosInstance(originalRequest); 
+        } catch (refreshError) {
+          console.error("❌ Refresh token failed", refreshError);
+          isRefreshing = false;
         }
-        return Promise.reject(error);
+      }
     }
+
+    return Promise.reject(error);
+  }
 );
 
 

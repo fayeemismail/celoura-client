@@ -1,5 +1,7 @@
 // /redux/user/userThunks.ts
-import { getCurrentUser, refreshAccessToken } from "../../api/auth";
+import { 
+  getCurrentUser, 
+} from "../../api/auth";
 import { editProfile } from "../../api/userAPI";
 import { UpdateProfilePayload } from "../../types/user";
 import { AppDispatch } from "../store";
@@ -16,7 +18,6 @@ export const handleUpdateProfile = (payload: UpdateProfilePayload) => {
 
     try {
       await editProfile(payload);
-      await refreshAccessToken();
       const { data: userData } = await getCurrentUser();
       dispatch(updateUserSuccess(userData));
     } catch (error: any) {
