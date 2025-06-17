@@ -1,5 +1,4 @@
 import { useNavigate } from 'react-router-dom';
-import { GUIDE_COLORS } from '../../styles/theme';
 
 const QuickActions = () => {
   const navigate = useNavigate();
@@ -20,29 +19,16 @@ const QuickActions = () => {
   ];
 
   return (
-    <div 
-      style={{ 
-        backgroundColor: GUIDE_COLORS.inputBg,
-        borderColor: GUIDE_COLORS.border
-      }} 
-      className="p-6 rounded-lg border"
-    >
-      <h2 
-        style={{ color: GUIDE_COLORS.text }} 
-        className="text-xl font-semibold mb-4"
-      >
+    <div className="p-6 rounded-lg border border-gray-200 bg-white">
+      <h2 className="text-xl font-semibold mb-4 text-gray-800">
         Quick Actions
       </h2>
       <div className="space-y-3">
         {quickActionButtons.map((action, index) => (
-          <button 
+          <button
             key={index}
             onClick={action.onClick}
-            style={{ 
-              backgroundColor: GUIDE_COLORS.accent + '20', 
-              color: GUIDE_COLORS.accent 
-            }} 
-            className="w-full p-3 rounded-lg text-left hover:bg-opacity-30 transition-colors"
+            className="w-full p-3 rounded-lg text-left bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors"
           >
             {action.label}
           </button>

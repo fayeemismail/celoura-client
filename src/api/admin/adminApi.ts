@@ -46,4 +46,9 @@ export const createDestinationApi = async(formData: FormData) => {
 
 export const getDestinationsApi = async () => {
     return await adminInstance.get('/admin/destinations');
+};
+
+
+export const pageinatedDestinations = async (page: number, limit: number, search: string, attraction: string) => {
+    return await adminInstance.get(`/admin/destination?page=${page}&limit=${limit}&search=${search}&attraction=${attraction}`)
 }

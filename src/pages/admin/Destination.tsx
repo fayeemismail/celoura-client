@@ -4,31 +4,36 @@ import AdminSidebar from "../../components/admin/home/AdminSidebar";
 import AdminHeader from "../../components/admin/home/AdminHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { getAllDestinations } from "../../redux/admin/authThunks";
+import { getAllPaginatedDesti } from "../../redux/admin/authThunks";
 
 export default function DestinationPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [destinations, setDestinations] = useState([]);
+  const [search, setSearch] = useState("");
+  const [AttractionFilter, setAttractionFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit] = useState(9);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state: RootState) => state.admin);
   const dispatch = useDispatch<AppDispatch>();
 
   const getDestinations = async () => {
+    setLoading(true);
     try {
-      const response = await dispatch(getAllDestinations());
-      setDestinations(response.data);
+      const response = await dispatch(
+        getAllPaginatedDesti(page, limit, search, AttractionFilter)
+      );
+      setDestinations(response.data || []);
+      setTotalPages(response.pagination?.totalPages || 1);
     } catch (error: any) {
       console.log(error.message);
+    } finally {
+      setLoading(false);
     }
   };
-
-  // const singleDestination = async(destinaionId: string) => {
-  //   try {
-      
-  //   } catch (error) {
-      
-  //   }
-  // }
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -36,11 +41,14 @@ export default function DestinationPage() {
     } else {
       getDestinations();
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, page, search, AttractionFilter]);
 
   return (
     <div className="flex min-h-screen text-white bg-[rgb(8,16,40)]">
-      <AdminSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+      <AdminSidebar
+        sidebarOpen={sidebarOpen}
+        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+      />
       <main
         className={`flex-1 transition-all duration-300 min-w-0 ${
           sidebarOpen ? "pl-64" : "pl-20"
@@ -59,7 +67,48 @@ export default function DestinationPage() {
             </button>
           </div>
 
-          {destinations.length === 0 ? (
+          {/* Search & Filter */}
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+            <input
+              type="text"
+              placeholder="Search destinations..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              className="w-full sm:w-1/2 px-4 py-2 rounded bg-[#1a1f2e] border border-gray-600 text-white"
+            />
+
+            <div className="relative inline-block w-64">
+              <select
+                value={AttractionFilter}
+                onChange={(e) => {
+                  setAttractionFilter(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full appearance-none px-4 py-2 pr-10 rounded bg-[#1a1f2e] border border-gray-600 text-white"
+              >
+                <option value="">All Attractions</option>
+                <option value="Historical">Historical</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Camping">Camping</option>
+                <option value="Spiritual">Spiritual</option>
+                <option value="Beaches">Beaches</option>
+                <option value="Religious">Religious</option>
+                <option value="Architecture">Architecture</option>
+              </select>
+
+              <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 h-2 w-2 rotate-45 border-r-2 border-b-2 border-white"></div>
+            </div>
+          </div>
+
+          {/* Destination Content */}
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : destinations.length === 0 ? (
             <div className="text-center py-20 text-gray-400 text-lg border border-gray-700 rounded-lg bg-[#1a1f2e]">
               No destinations available. Add one to get started.
             </div>
@@ -84,7 +133,9 @@ export default function DestinationPage() {
 
                   <div className="p-5 flex-1 flex flex-col justify-between">
                     <div className="mb-3">
-                      <h3 className="text-xl font-semibold mb-1">{destination.name}</h3>
+                      <h3 className="text-xl font-semibold mb-1">
+                        {destination.name}
+                      </h3>
                       <p className="text-sm text-gray-400 mb-2">
                         {destination.location} — {destination.country}
                       </p>
@@ -99,19 +150,43 @@ export default function DestinationPage() {
 
                     {destination.features?.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-3">
-                        {destination.features.slice(0, 3).map((feat: string, idx: number) => (
-                          <span
-                            key={idx}
-                            className="text-xs px-2 py-1 rounded-full bg-gray-600 text-gray-100"
-                          >
-                            {feat}
-                          </span>
-                        ))}
+                        {destination.features
+                          .slice(0, 3)
+                          .map((feat: string, idx: number) => (
+                            <span
+                              key={idx}
+                              className="text-xs px-2 py-1 rounded-full bg-gray-600 text-gray-100"
+                            >
+                              {feat}
+                            </span>
+                          ))}
                       </div>
                     )}
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Numbered Pagination */}
+          {!loading && destinations.length > 0 && totalPages > 1 && (
+            <div className="flex justify-center mt-8 flex-wrap gap-2">
+              {[...Array(totalPages)].map((_, index) => {
+                const pageNumber = index + 1;
+                return (
+                  <button
+                    key={pageNumber}
+                    onClick={() => setPage(pageNumber)}
+                    className={`px-4 py-2 rounded ${
+                      page === pageNumber
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>

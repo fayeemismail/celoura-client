@@ -4,9 +4,10 @@ import AdminStats from "../AdminStats";
 interface Props {
   users?: any[];
   guide?: any[];
+  destinations?: any[];
 }
 
-export default function AdminDashboardContent({ users, guide }: Props) {
+export default function AdminDashboardContent({ users, guide, destinations }: Props) {
   return (
     <div className="p-6">
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
@@ -27,7 +28,7 @@ export default function AdminDashboardContent({ users, guide }: Props) {
         <AdminStats 
           icon={<MapPin className="h-6 w-6" />}
           title="Destinations"
-          value="126"
+          value={destinations?.length?.toString() || "0"}
           trend="+3"
           trendUp
         />

@@ -1,4 +1,4 @@
-import { adminRefreshAccessToken, BlockUser, createDestinationApi, getAllCount, getAllUsers, getAppliesGuide, getDestinationsApi, guideApproveApi, guideRejectApi, unBlockUser } from "../../api/admin/adminApi";
+import { adminRefreshAccessToken, BlockUser, createDestinationApi, getAllCount, getAllUsers, getAppliesGuide, getDestinationsApi, guideApproveApi, guideRejectApi, pageinatedDestinations, unBlockUser } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
@@ -155,6 +155,19 @@ export const getAllDestinations = () => {
             return response.data
         } catch (error: any) {
             console.error('Error on Getting Destinations: ', error.response);
+            throw error
+        }
+    }
+}
+
+
+export const getAllPaginatedDesti = (page = 1, limit = 9, search = "", attraction = "") => {
+    return async() => {
+        try {
+            const response = await pageinatedDestinations(page, limit, search, attraction);
+            return response.data
+        } catch (error: any) {
+            console.error('Error on Getting paginated: ', error.message);
             throw error
         }
     }

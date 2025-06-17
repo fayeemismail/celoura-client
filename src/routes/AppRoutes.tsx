@@ -17,6 +17,8 @@ import DestinationPage from '../pages/admin/Destination';
 import CreateDestination from '../pages/admin/CreateDestination';
 import UserDestinations from '../pages/user/Destinations';
 import DestinationDetailPage from '../components/user/Destination/DetailedDestination';
+import GuideProfile from '../pages/Guide/ProfileGuide';
+import GuideDestinations from '../pages/Guide/GuideDestinations';
 
 export default function AppRoutes() {
   return (
@@ -47,6 +49,8 @@ export default function AppRoutes() {
         {/* guide side */}
         <Route path='/guide/login' element={ <GuideLogin /> } />
         <Route path='/guide/home' element={ <GuideHome /> } />
+        <Route path='/guide/profile' element={ <GuideProfile /> } />
+        <Route path='/guide/destinations' element={ <GuideDestinations /> } />
 
       </Routes>
     </BrowserRouter>

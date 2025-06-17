@@ -52,7 +52,9 @@ export default function DestinationDetailPage() {
       <Navbar />
       <section className="pt-24 pb-10 px-4 max-w-7xl mx-auto min-h-screen">
         {loading ? (
-          <p className="text-center text-lg font-semibold">Loading...</p>
+          <div className="flex justify-center items-center py-32">
+              <div className="w-12 h-12 border-4 border-[#9B8759] border-t-transparent rounded-full animate-spin"></div>
+            </div>
         ) : error ? (
           <p className="text-center text-red-500">{error}</p>
         ) : destination ? (
@@ -62,6 +64,8 @@ export default function DestinationDetailPage() {
               <img
                 src={activePhoto}
                 alt={destination.name}
+                loading="lazy"
+                decoding="async"
                 className="w-full h-[500px] object-cover rounded-t-2xl"
               />
               {/* Thumbnails */}
