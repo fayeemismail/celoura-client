@@ -19,10 +19,10 @@ export default function HomeAdmin() {
   const fetchAllUsersAndGuides = async () => {
     try {
       const response = await dispatch(GetUserGuideCount());
-      if (response.data) {
-        setUsers(response.data.users);
-        setGuide(response.data.guide);
-        setDestiantion(response.data.destination);
+      if (response) {
+        setUsers(response.user);
+        setGuide(response.guide);
+        setDestiantion(response.destination);
       }
     } catch (error: any) {
       console.error(error);

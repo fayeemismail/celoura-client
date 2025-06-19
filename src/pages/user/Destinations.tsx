@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
-import { getAllPaginatedDesti } from "../../redux/admin/authThunks";
+import { getAllPaginatedDestiUser } from "../../redux/user/userThunks";
 
 type Destination = {
   _id: string;
@@ -35,7 +35,7 @@ export default function UserDestinations() {
     setLoading(true);
     try {
       const response = await dispatch(
-        getAllPaginatedDesti(page, limit, search, category)
+        getAllPaginatedDestiUser(page, limit, search, category)
       );
       setDestinations(response.data || []);
       setTotalPages(response.pagination?.totalPages || 1);

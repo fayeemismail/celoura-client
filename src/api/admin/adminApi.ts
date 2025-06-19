@@ -51,4 +51,8 @@ export const getDestinationsApi = async () => {
 
 export const pageinatedDestinations = async (page: number, limit: number, search: string, attraction: string) => {
     return await adminInstance.get(`/admin/destination?page=${page}&limit=${limit}&search=${search}&attraction=${attraction}`)
+};
+
+export const deleteDestinationApi = async (destinationId: string) => {
+    return await adminInstance.delete(`/admin/destinations${destinationId}l/delete`)
 }

@@ -1,4 +1,4 @@
-import { adminRefreshAccessToken, BlockUser, createDestinationApi, getAllCount, getAllUsers, getAppliesGuide, getDestinationsApi, guideApproveApi, guideRejectApi, pageinatedDestinations, unBlockUser } from "../../api/admin/adminApi";
+import { adminRefreshAccessToken, BlockUser, createDestinationApi, deleteDestinationApi, getAllCount, getAllUsers, getAppliesGuide, getDestinationsApi, guideApproveApi, guideRejectApi, pageinatedDestinations, unBlockUser } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
@@ -168,6 +168,19 @@ export const getAllPaginatedDesti = (page = 1, limit = 9, search = "", attractio
             return response.data
         } catch (error: any) {
             console.error('Error on Getting paginated: ', error.message);
+            throw error
+        }
+    }
+};
+
+
+export const deleteDestinationThunk = (destinationId: string) => {
+    return async() => {
+        try {
+            const response = await deleteDestinationApi(destinationId);
+            return response.data;
+        } catch (error) {
+            console.log(error);
             throw error
         }
     }

@@ -5,6 +5,7 @@ import AdminHeader from "../../components/admin/home/AdminHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { getAllPaginatedDesti } from "../../redux/admin/authThunks";
+import { Pencil, Trash2 } from "lucide-react";
 
 export default function DestinationPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -34,6 +35,14 @@ export default function DestinationPage() {
       setLoading(false);
     }
   };
+
+  // const deleteDestintions = async (id: string) => {
+  //   try {
+      
+  //   } catch (error: any) {
+  //     console.log(error.message);
+  //   }
+  // }
 
   useEffect(() => {
     if (!isAuthenticated) {
@@ -117,8 +126,28 @@ export default function DestinationPage() {
               {destinations.map((destination: any) => (
                 <div
                   key={destination._id}
-                  className="bg-[#1f273b] rounded-xl overflow-hidden shadow-md border border-[#2c354d] transform transition duration-300 hover:scale-105 flex flex-col"
+                  className="relative bg-[#1f273b] rounded-xl overflow-hidden shadow-md border border-[#2c354d] transform transition duration-300 hover:scale-105 flex flex-col"
                 >
+                  {/* Action Buttons */}
+                  <div className="absolute top-3 right-3 flex gap-2 z-10">
+                    <button
+                      onClick={() =>
+                        navigate(`/admin/edit-destination/${destination._id}`)
+                      }
+                      className="p-1 rounded-full bg-black/30 hover:bg-indigo-600 transition"
+                    >
+                      <Pencil className="w-4 h-4 text-white" />
+                    </button>
+                    <button
+                      onClick={() =>
+                        console.log("Delete destination:", destination._id)
+                      }
+                      className="p-1 rounded-full bg-black/30 hover:bg-red-600 transition"
+                    >
+                      <Trash2 className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+
                   {destination.photos?.[0] ? (
                     <img
                       src={destination.photos[0]}
@@ -133,9 +162,7 @@ export default function DestinationPage() {
 
                   <div className="p-5 flex-1 flex flex-col justify-between">
                     <div className="mb-3">
-                      <h3 className="text-xl font-semibold mb-1">
-                        {destination.name}
-                      </h3>
+                      <h3 className="text-xl font-semibold mb-1">{destination.name}</h3>
                       <p className="text-sm text-gray-400 mb-2">
                         {destination.location} — {destination.country}
                       </p>
@@ -150,16 +177,14 @@ export default function DestinationPage() {
 
                     {destination.features?.length > 0 && (
                       <div className="flex flex-wrap gap-2 mb-3">
-                        {destination.features
-                          .slice(0, 3)
-                          .map((feat: string, idx: number) => (
-                            <span
-                              key={idx}
-                              className="text-xs px-2 py-1 rounded-full bg-gray-600 text-gray-100"
-                            >
-                              {feat}
-                            </span>
-                          ))}
+                        {destination.features.slice(0, 3).map((feat: string, idx: number) => (
+                          <span
+                            key={idx}
+                            className="text-xs px-2 py-1 rounded-full bg-gray-600 text-gray-100"
+                          >
+                            {feat}
+                          </span>
+                        ))}
                       </div>
                     )}
                   </div>
@@ -168,7 +193,7 @@ export default function DestinationPage() {
             </div>
           )}
 
-          {/* Numbered Pagination */}
+          {/* Pagination */}
           {!loading && destinations.length > 0 && totalPages > 1 && (
             <div className="flex justify-center mt-8 flex-wrap gap-2">
               {[...Array(totalPages)].map((_, index) => {
