@@ -1,77 +1,27 @@
-import { Home, LogOut } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
-import { useDispatch } from 'react-redux';
-import { AppDispatch } from '../../redux/store';
-import { GUIDE_COLORS } from '../../styles/theme';
-import { handleGuideLogout } from '../../redux/guide/authThunks';
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+
 
 const GuideNavbar = () => {
-    const navigate = useNavigate();
-    const dispatch = useDispatch<AppDispatch>();
-
-    const handleNavigateHome = () => {
-        navigate('/guide/home');  
-    };
-
-    const handleLogout = () => {
-        dispatch(handleGuideLogout());
-        navigate('/guide/login');
-    };
-
+    const { currentGuide } = useSelector((state: RootState) => state.guide)
     return (
-        <header
-            style={{ 
-                backgroundColor: GUIDE_COLORS.cardBg, 
-                borderColor: GUIDE_COLORS.border 
-            }}
-            className="fixed top-0 left-0 w-full z-50 border-b shadow-sm"
-        >
-            <div className="container mx-auto flex items-center justify-between p-4">
-                {/* Logo / App Name */}
-                <div className="flex items-center">
-                    <h1
-                        style={{ color: GUIDE_COLORS.accent }}
-                        className="text-2xl font-bold cursor-pointer"
-                        onClick={handleNavigateHome}
-                    >
-                        Celoura Travels
-                    </h1>
-                </div>
+        <header className="fixed top-0 left-0 right-0 z-30 border-b border-[#1f1f20] bg-[#000] shadow-sm">
+            <div className="flex items-center justify-between p-4 px-6">
+                {/* Left side - Celoura */}
+                <h1 className="text-[#d0b012]">Celoura</h1>
 
-                {/* Center Title - Guide Portal */}
-                <div className="hidden md:flex items-center">
-                    <h2
-                        style={{
-                            color: GUIDE_COLORS.accent,
-                            fontSize: '1.125rem',
-                            fontWeight: 500,
-                        }}
-                        className="text-lg font-medium">
-                        Guide Portal
-                    </h2>
-                </div>
+                {/* Center - Guide Portal */}
+                <h1 className="text-xl font-bold text-[#09b86c] hidden md:block absolute left-1/2 transform -translate-x-1/2">
+                    Welcome - {currentGuide? currentGuide.name :  "User"}
+                </h1>
 
-                {/* Navigation Actions */}
+                {/* Right side - Notification */}
                 <div className="flex items-center space-x-4">
-                    <div className="flex items-center">
-                        <div className="flex items-center">
-                            <button
-                                onClick={handleNavigateHome}
-                                style={{ color: GUIDE_COLORS.secondaryText }}
-                                className="mr-4 flex items-center hover:text-accent"
-                            >
-                                <Home className="h-5 w-5 mr-1" />
-                                <span className="hidden md:inline">Home</span>
-                            </button>
-                            <button
-                                onClick={handleLogout}
-                                style={{ color: GUIDE_COLORS.secondaryText }}
-                                className="flex items-center font-medium cursor-pointer"
-                            >
-                                <LogOut className="mr-2 h-5 w-5 cursor-pointer" /> Log Out
-                            </button>
-                        </div>
-                    </div>
+                    <button className="text-[#fff] hover:text-[#09b86c] transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                    </button>
                 </div>
             </div>
         </header>

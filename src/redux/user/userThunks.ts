@@ -2,7 +2,7 @@
 import { 
   getCurrentUser, 
 } from "../../api/auth";
-import { editProfile, getDestinationsApi, singleSpotApi } from "../../api/userAPI";
+import { editProfile, getCurrentMe, getDestinationsApi, getNewDestinationApi, pageinatedDestiUserApi, singleSpotApi } from "../../api/userAPI";
 import { UpdateProfilePayload } from "../../types/user";
 import { AppDispatch } from "../store";
 import {
@@ -55,6 +55,44 @@ export const GetSingleDestination = (id: string) => {
       return response.data
     } catch (error: any) {
       console.log(error.message);
+      throw error
+    }
+  }
+}
+
+export const getAllPaginatedDestiUser = (page = 1, limit = 9, search = "", attraction = "") => {
+    return async() => {
+        try {
+            const response = await pageinatedDestiUserApi(page, limit, search, attraction);
+            return response.data
+        } catch (error: any) {
+            console.error('Error on Getting paginated: ', error.message);
+            throw error
+        }
+    }
+}
+
+export const getNewDestinationsThunk = (limit: number) => {
+  return async() => {
+    try {
+      const response = await getNewDestinationApi(limit);
+      return response
+    } catch (error: any) {
+      console.log(error.message);
+      throw error
+    }
+  }
+}
+
+
+
+export const getCurrentMeThunk = (id: string) => {
+  return async() => {
+    try {
+      const response = await getCurrentMe(id);
+      return response
+    } catch (error) {
+      console.log(error);
       throw error
     }
   }

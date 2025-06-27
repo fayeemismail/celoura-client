@@ -4,29 +4,43 @@ import AdminSidebar from "../../components/admin/home/AdminSidebar";
 import AdminHeader from "../../components/admin/home/AdminHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { getAllDestinations } from "../../redux/admin/authThunks";
+import { getAllPaginatedDesti } from "../../redux/admin/authThunks";
+import { Pencil, Trash2 } from "lucide-react";
 
 export default function DestinationPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [destinations, setDestinations] = useState([]);
+  const [search, setSearch] = useState("");
+  const [AttractionFilter, setAttractionFilter] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit] = useState(9);
+  const [totalPages, setTotalPages] = useState(1);
+  const [loading, setLoading] = useState(false);
+
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state: RootState) => state.admin);
   const dispatch = useDispatch<AppDispatch>();
 
   const getDestinations = async () => {
+    setLoading(true);
     try {
-      const response = await dispatch(getAllDestinations());
-      setDestinations(response.data);
+      const response = await dispatch(
+        getAllPaginatedDesti(page, limit, search, AttractionFilter)
+      );
+      setDestinations(response.data || []);
+      setTotalPages(response.pagination?.totalPages || 1);
     } catch (error: any) {
       console.log(error.message);
+    } finally {
+      setLoading(false);
     }
   };
 
-  // const singleDestination = async(destinaionId: string) => {
+  // const deleteDestintions = async (id: string) => {
   //   try {
       
-  //   } catch (error) {
-      
+  //   } catch (error: any) {
+  //     console.log(error.message);
   //   }
   // }
 
@@ -36,11 +50,14 @@ export default function DestinationPage() {
     } else {
       getDestinations();
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, navigate, page, search, AttractionFilter]);
 
   return (
     <div className="flex min-h-screen text-white bg-[rgb(8,16,40)]">
-      <AdminSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+      <AdminSidebar
+        sidebarOpen={sidebarOpen}
+        toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
+      />
       <main
         className={`flex-1 transition-all duration-300 min-w-0 ${
           sidebarOpen ? "pl-64" : "pl-20"
@@ -59,7 +76,48 @@ export default function DestinationPage() {
             </button>
           </div>
 
-          {destinations.length === 0 ? (
+          {/* Search & Filter */}
+          <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
+            <input
+              type="text"
+              placeholder="Search destinations..."
+              value={search}
+              onChange={(e) => {
+                setSearch(e.target.value);
+                setPage(1);
+              }}
+              className="w-full sm:w-1/2 px-4 py-2 rounded bg-[#1a1f2e] border border-gray-600 text-white"
+            />
+
+            <div className="relative inline-block w-64">
+              <select
+                value={AttractionFilter}
+                onChange={(e) => {
+                  setAttractionFilter(e.target.value);
+                  setPage(1);
+                }}
+                className="w-full appearance-none px-4 py-2 pr-10 rounded bg-[#1a1f2e] border border-gray-600 text-white"
+              >
+                <option value="">All Attractions</option>
+                <option value="Historical">Historical</option>
+                <option value="Adventure">Adventure</option>
+                <option value="Camping">Camping</option>
+                <option value="Spiritual">Spiritual</option>
+                <option value="Beaches">Beaches</option>
+                <option value="Religious">Religious</option>
+                <option value="Architecture">Architecture</option>
+              </select>
+
+              <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 h-2 w-2 rotate-45 border-r-2 border-b-2 border-white"></div>
+            </div>
+          </div>
+
+          {/* Destination Content */}
+          {loading ? (
+            <div className="flex justify-center py-20">
+              <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+          ) : destinations.length === 0 ? (
             <div className="text-center py-20 text-gray-400 text-lg border border-gray-700 rounded-lg bg-[#1a1f2e]">
               No destinations available. Add one to get started.
             </div>
@@ -68,8 +126,28 @@ export default function DestinationPage() {
               {destinations.map((destination: any) => (
                 <div
                   key={destination._id}
-                  className="bg-[#1f273b] rounded-xl overflow-hidden shadow-md border border-[#2c354d] transform transition duration-300 hover:scale-105 flex flex-col"
+                  className="relative bg-[#1f273b] rounded-xl overflow-hidden shadow-md border border-[#2c354d] transform transition duration-300 hover:scale-105 flex flex-col"
                 >
+                  {/* Action Buttons */}
+                  <div className="absolute top-3 right-3 flex gap-2 z-10">
+                    <button
+                      onClick={() =>
+                        navigate(`/admin/edit-destination/${destination._id}`)
+                      }
+                      className="p-1 rounded-full bg-black/30 hover:bg-indigo-600 transition"
+                    >
+                      <Pencil className="w-4 h-4 text-white" />
+                    </button>
+                    <button
+                      onClick={() =>
+                        console.log("Delete destination:", destination._id)
+                      }
+                      className="p-1 rounded-full bg-black/30 hover:bg-red-600 transition"
+                    >
+                      <Trash2 className="w-4 h-4 text-white" />
+                    </button>
+                  </div>
+
                   {destination.photos?.[0] ? (
                     <img
                       src={destination.photos[0]}
@@ -112,6 +190,28 @@ export default function DestinationPage() {
                   </div>
                 </div>
               ))}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {!loading && destinations.length > 0 && totalPages > 1 && (
+            <div className="flex justify-center mt-8 flex-wrap gap-2">
+              {[...Array(totalPages)].map((_, index) => {
+                const pageNumber = index + 1;
+                return (
+                  <button
+                    key={pageNumber}
+                    onClick={() => setPage(pageNumber)}
+                    className={`px-4 py-2 rounded ${
+                      page === pageNumber
+                        ? "bg-indigo-600 text-white"
+                        : "bg-gray-700 text-gray-300 hover:bg-gray-600"
+                    }`}
+                  >
+                    {pageNumber}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>

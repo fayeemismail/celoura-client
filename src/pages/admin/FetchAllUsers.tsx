@@ -9,6 +9,7 @@ import AdminSidebar from "../../components/admin/home/AdminSidebar";
 import AdminHeader from "../../components/admin/home/AdminHeader";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
+import ConfirmationDialog from "../../components/common/ConfirmationDialog"; // ✅ Import here
 
 interface User {
   _id: string;
@@ -34,6 +35,10 @@ export default function AllUsersPage() {
   const { isAuthenticated } = useSelector((state: RootState) => state.admin);
   const navigate = useNavigate();
 
+  // Confirmation modal states
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
+
   const fetchUsers = async () => {
     try {
       const response = await dispatch(GetAllUsersData(page, limit, filterRole, search));
@@ -46,24 +51,31 @@ export default function AllUsersPage() {
     }
   };
 
-  const UserBlockUnBlock = async (
-    userId: string,
-    isCurrentlyBlocked: boolean
-  ): Promise<void> => {
+  const handleBlockUnblockConfirmed = async () => {
+    if (!selectedUser) return;
+
     try {
-      await dispatch(handleUserBlockUnblock(userId, isCurrentlyBlocked));
+      await dispatch(handleUserBlockUnblock(selectedUser._id, selectedUser.blocked));
 
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user._id === userId ? { ...user, blocked: !isCurrentlyBlocked } : user
+          user._id === selectedUser._id ? { ...user, blocked: !selectedUser.blocked } : user
         )
       );
 
-      toast.success(`User ${isCurrentlyBlocked ? "unblocked" : "blocked"} successfully`);
+      toast.success(`User ${selectedUser.blocked ? "unblocked" : "blocked"} successfully`);
     } catch (error: any) {
       console.error("Unexpected Error", error.message);
       toast.error("Something went wrong. Please try again.");
+    } finally {
+      setConfirmDialogOpen(false);
+      setSelectedUser(null);
     }
+  };
+
+  const openConfirmDialog = (user: User) => {
+    setSelectedUser(user);
+    setConfirmDialogOpen(true);
   };
 
   useEffect(() => {
@@ -78,11 +90,8 @@ export default function AllUsersPage() {
         toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
 
-      <main
-        className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}
-      >
+      <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
         <AdminHeader />
-
         <div className="p-6">
           <div style={{ backgroundColor: "#242A38" }} className="rounded-lg shadow-md p-6">
             <div className="flex justify-between items-center mb-6">
@@ -93,11 +102,7 @@ export default function AllUsersPage() {
                     setFilterRole("user");
                     setPage(1);
                   }}
-                  className={`px-4 py-2 rounded ${
-                    filterRole === "user"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-300 text-gray-800"
-                  }`}
+                  className={`px-4 py-2 rounded ${filterRole === "user" ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-800"}`}
                 >
                   All Users
                 </button>
@@ -106,11 +111,7 @@ export default function AllUsersPage() {
                     setFilterRole("guide");
                     setPage(1);
                   }}
-                  className={`px-4 py-2 rounded ${
-                    filterRole === "guide"
-                      ? "bg-blue-600 text-white"
-                      : "bg-gray-300 text-gray-800"
-                  }`}
+                  className={`px-4 py-2 rounded ${filterRole === "guide" ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-800"}`}
                 >
                   All Guides
                 </button>
@@ -125,12 +126,13 @@ export default function AllUsersPage() {
                 value={search}
                 onChange={(e) => {
                   setSearch(e.target.value);
-                  setPage(1); // reset page on new search
+                  setPage(1);
                 }}
                 className="w-full md:w-1/3 px-4 py-2 rounded border border-gray-500 text-white bg-[#1A1F2C] focus:outline-none"
               />
             </div>
 
+            {/* 🧾 Table */}
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm text-left">
                 <thead
@@ -161,7 +163,7 @@ export default function AllUsersPage() {
                         </td>
                         <td className="py-3 px-4">
                           <button
-                            onClick={() => UserBlockUnBlock(user._id, user.blocked)}
+                            onClick={() => openConfirmDialog(user)}
                             className={`px-3 py-1 cursor-pointer rounded text-white ${
                               user.blocked ? "bg-green-600" : "bg-red-600"
                             }`}
@@ -182,7 +184,7 @@ export default function AllUsersPage() {
               </table>
             </div>
 
-            {/* Pagination */}
+            {/* 📄 Pagination */}
             <div className="flex justify-center mt-6 space-x-4">
               <button
                 onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
@@ -203,6 +205,16 @@ export default function AllUsersPage() {
           </div>
         </div>
       </main>
+
+      {/* ✅ Block/Unblock Confirmation */}
+      <ConfirmationDialog
+        isOpen={confirmDialogOpen}
+        title="Confirm Action"
+        message={`Are you sure you want to ${selectedUser?.blocked ? "unblock" : "block"} this user?`}
+        color={selectedUser?.blocked ? "#16a34a" : "#dc2626"}
+        onConfirm={handleBlockUnblockConfirmed}
+        onCancel={() => setConfirmDialogOpen(false)}
+      />
     </div>
   );
 }

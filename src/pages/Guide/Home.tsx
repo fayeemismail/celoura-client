@@ -1,79 +1,67 @@
-import { Users, Calendar, MapPin } from 'lucide-react';
-import { GUIDE_COLORS } from '../../styles/theme';
-
-
-
-// Import components
-import GuideNavbar from '../../components/guide/GuideNavbar';
-import StatCard from '../../components/guide/StatCard';
-import UpcomingTrips from '../../components/guide/UpcomingTrips';
-import QuickActions from '../../components/guide/QuickActions';
-import { useEffect } from 'react';
-import { useSelector } from 'react-redux';
-import {  RootState } from '../../redux/store';
-import { useNavigate } from 'react-router-dom';
-
-
-
+import { useEffect, useState } from "react";
+import { useSelector } from "react-redux";
+import { RootState } from "../../redux/store";
+import { useNavigate } from "react-router-dom";
+import GuideNavbar from "../../components/guide/GuideNavbar";
+import Sidebar from "../../components/guide/GuideSidebar";
+import { Plus, Compass, MapPin, User as UserIcon } from "lucide-react";
 
 const GuideHome = () => {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const navigate = useNavigate();
+  const { isAuthenticated } = useSelector((state: RootState) => state.guide);
 
-    const navigate = useNavigate()
-    const { isAuthenticated, currentGuide } = useSelector((state: RootState) => state.guide);
-    console.log(currentGuide?.id)
-
-    
-
-     useEffect(() => {
+  useEffect(() => {
     if (!isAuthenticated) {
       navigate("/guide/login");
-
     }
   }, [isAuthenticated, navigate]);
 
+  const toggleSidebar = () => {
+    setSidebarOpen(!sidebarOpen);
+  };
 
   return (
-    <div 
-      style={{ 
-        backgroundColor: GUIDE_COLORS.bg, 
-        minHeight: '100vh',
-        color: GUIDE_COLORS.text 
-      }} 
-      className="p-8 pt-24"
-    >
-      <GuideNavbar />
-      
-      <div className="grid grid-cols-4 gap-6">
-        <div className="col-span-3">
-          <h1 
-            className="text-3xl font-bold mb-6"
-            style={{ color: GUIDE_COLORS.text }}
-          >
-            Welcome, {currentGuide? currentGuide.name : 'User'}
-          </h1>
-          
-          <div className="grid grid-cols-3 gap-6 mb-8">
-            <StatCard 
-              icon={<Users />} 
-              title="Total Clients" 
-              value={42} 
-            />
-            <StatCard 
-              icon={<MapPin />} 
-              title="Trips Completed" 
-              value={18} 
-            />
-            <StatCard 
-              icon={<Calendar />} 
-              title="Upcoming Trips" 
-              value={6} 
-            />
+    <div className="min-h-screen flex bg-[#000]">
+      <Sidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
+      <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
+        <GuideNavbar />
+        <main className="p-10 pt-24 text-white">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div
+              onClick={() => navigate("/guide/new-post")}
+              className="rounded-lg shadow-md p-3 flex flex-col items-center justify-center h-24 cursor-pointer transition-transform transform hover:scale-105 bg-[#09b86c]"
+            >
+              <Plus className="w-5 h-5 mb-1" />
+              <h2 className="text-sm font-medium">New Post</h2>
+            </div>
+
+            <div
+              onClick={() => navigate("/guide/explore")}
+              className="rounded-lg shadow-md p-3 flex flex-col items-center justify-center h-24 cursor-pointer transition-transform transform hover:scale-105 bg-[#2596be]"
+            >
+              <Compass className="w-5 h-5 mb-1" />
+              <h2 className="text-sm font-medium">Explore</h2>
+            </div>
+
+            <div
+              onClick={() => navigate("/guide/add-destination")}
+              className="rounded-lg shadow-md p-3 flex flex-col items-center justify-center h-24 cursor-pointer transition-transform transform hover:scale-105 bg-[#e0a800]"
+            >
+              <MapPin className="w-5 h-5 mb-1" />
+              <h2 className="text-sm font-medium">Add Destination</h2>
+            </div>
+
+            <div
+              onClick={() => navigate("/guide/profile")}
+              className="rounded-lg shadow-md p-3 flex flex-col items-center justify-center h-24 cursor-pointer transition-transform transform hover:scale-105 bg-[#ff6f61]"
+            >
+              <UserIcon className="w-5 h-5 mb-1" />
+              <h2 className="text-sm font-medium">Profile</h2>
+            </div>
           </div>
 
-          <UpcomingTrips />
-        </div>
-        
-        <QuickActions />
+        </main>
       </div>
     </div>
   );

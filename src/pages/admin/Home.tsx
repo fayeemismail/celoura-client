@@ -14,13 +14,15 @@ export default function HomeAdmin() {
   const dispatch = useDispatch<AppDispatch>();
   const [users, setUsers] = useState([]);
   const [guide, setGuide] = useState([]);
+  const [destination, setDestiantion] = useState([]) 
 
   const fetchAllUsersAndGuides = async () => {
     try {
       const response = await dispatch(GetUserGuideCount());
-      if (response.data) {
-        setUsers(response.data.users);
-        setGuide(response.data.guide);
+      if (response) {
+        setUsers(response.user);
+        setGuide(response.guide);
+        setDestiantion(response.destination);
       }
     } catch (error: any) {
       console.error(error);
@@ -37,7 +39,7 @@ export default function HomeAdmin() {
       <AdminSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
       <main className={`flex-1 ${sidebarOpen ? "ml-64" : "ml-20"} transition-all duration-300`}>
         <AdminHeader />
-        <AdminDashboardContent users={users} guide={guide} />
+        <AdminDashboardContent users={users} guide={guide} destinations={destination} />
       </main>
     </div>
   );

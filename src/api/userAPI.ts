@@ -22,5 +22,17 @@ export const getDestinationsApi = async () => {
 }
 
 export const singleSpotApi = async (id: string) => {
-  return await axiosInstance.get(`/user/destinations/${id}`)
+  return await axiosInstance.get(`/user/destinations/${id}`);
 }
+
+export const pageinatedDestiUserApi = async (page: number, limit: number, search: string, attraction: string) => {
+  return await axiosInstance.get(`/user/destination?page=${page}&limit=${limit}&search=${search}&attraction=${attraction}`);
+}
+
+export const getNewDestinationApi = async (limit: number) => {
+  return await axiosInstance.get(`/user/destinations/new-spots/${limit}`);
+}
+
+export const getCurrentMe = async (id: string) => {
+  return await axiosInstance.get(`/user/get-UserProfile/${id}`);
+};

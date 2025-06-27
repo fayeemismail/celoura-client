@@ -1,5 +1,3 @@
-import { GUIDE_COLORS } from '../../styles/theme';
-
 const UpcomingTrips = () => {
   const trips = [
     { id: 1, destination: 'Bali, Indonesia', date: 'June 15-22, 2024', clients: 5 },
@@ -9,43 +7,24 @@ const UpcomingTrips = () => {
 
   return (
     <div>
-      <h2 
-        style={{ color: GUIDE_COLORS.text }} 
-        className="text-xl font-semibold mb-4"
-      >
+      <h2 className="text-xl font-semibold mb-4 text-gray-800">
         Upcoming Trips
       </h2>
       <div className="space-y-3">
         {trips.map(trip => (
           <div 
             key={trip.id}
-            style={{ 
-              backgroundColor: GUIDE_COLORS.inputBg,
-              borderColor: GUIDE_COLORS.border
-            }} 
-            className="p-4 rounded-lg border flex justify-between items-center"
+            className="p-4 rounded-lg border border-gray-200 bg-white flex justify-between items-center"
           >
             <div>
-              <h3 
-                style={{ color: GUIDE_COLORS.text }} 
-                className="font-medium"
-              >
+              <h3 className="font-medium text-gray-800">
                 {trip.destination}
               </h3>
-              <p 
-                style={{ color: GUIDE_COLORS.secondaryText }} 
-                className="text-sm"
-              >
+              <p className="text-sm text-gray-500">
                 {trip.date}
               </p>
             </div>
-            <span 
-              style={{ 
-                backgroundColor: GUIDE_COLORS.accent + '20', 
-                color: GUIDE_COLORS.accent 
-              }} 
-              className="px-3 py-1 rounded-full text-sm"
-            >
+            <span className="px-3 py-1 rounded-full text-sm bg-blue-100 text-blue-600">
               {trip.clients} Clients
             </span>
           </div>
