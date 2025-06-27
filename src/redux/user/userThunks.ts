@@ -2,7 +2,7 @@
 import { 
   getCurrentUser, 
 } from "../../api/auth";
-import { editProfile, getDestinationsApi, getNewDestinationApi, pageinatedDestiUserApi, singleSpotApi } from "../../api/userAPI";
+import { editProfile, getCurrentMe, getDestinationsApi, getNewDestinationApi, pageinatedDestiUserApi, singleSpotApi } from "../../api/userAPI";
 import { UpdateProfilePayload } from "../../types/user";
 import { AppDispatch } from "../store";
 import {
@@ -79,6 +79,20 @@ export const getNewDestinationsThunk = (limit: number) => {
       return response
     } catch (error: any) {
       console.log(error.message);
+      throw error
+    }
+  }
+}
+
+
+
+export const getCurrentMeThunk = (id: string) => {
+  return async() => {
+    try {
+      const response = await getCurrentMe(id);
+      return response
+    } catch (error) {
+      console.log(error);
       throw error
     }
   }
