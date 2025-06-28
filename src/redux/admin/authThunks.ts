@@ -1,4 +1,4 @@
-import { adminRefreshAccessToken, BlockUser, createDestinationApi, deleteDestinationApi, getAllCount, getAllUsers, getAppliesGuide, getDestinationsApi, guideApproveApi, guideRejectApi, pageinatedDestinations, unBlockUser } from "../../api/admin/adminApi";
+import { adminRefreshAccessToken, BlockUser, createDestinationApi, deleteDestinationApi, getAllCount, getAllUsers, getAppliesGuide, getDestinationById, getDestinationsApi, guideApproveApi, guideRejectApi, pageinatedDestinations, unBlockUser, updateDestinationApi } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
@@ -13,8 +13,8 @@ export const handleAdminLogin = ( formData: { email: string, password: string } 
             dispatch(signInSuccess(response));
 
         } catch (error: any) {
-            console.log(error.response?.data?.error);
-            dispatch(signInFailure(error.response?.data.error || 'Login failed'))
+            console.log(error.response?.data?.message);
+            dispatch(signInFailure(error.response?.data?.message || 'Login failed'))
         }
     }
 }
@@ -182,6 +182,36 @@ export const deleteDestinationThunk = (destinationId: string) => {
         } catch (error) {
             console.log(error);
             throw error
+        }
+    };
+};
+
+
+export const getDestinationByIdThunk = (destinationId: string) => {
+    return async() => {
+        try {
+            const data = await getDestinationById(destinationId);
+            return data.data
+        } catch (error: unknown) {
+            if(error instanceof Error){
+                console.log(error.message);
+                throw error
+            } else {
+                console.log(error)
+                throw error
+            }
+        }
+    };
+};
+
+
+export const updateDestinationThunk = (id: string, formData: FormData) => {
+    return async() => {
+        try {
+            const response = await updateDestinationApi(id, formData);
+            return response.data
+        } catch (error) {
+            console.log(error)
         }
     }
 }

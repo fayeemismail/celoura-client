@@ -36,14 +36,6 @@ export default function DestinationPage() {
     }
   };
 
-  // const deleteDestintions = async (id: string) => {
-  //   try {
-      
-  //   } catch (error: any) {
-  //     console.log(error.message);
-  //   }
-  // }
-
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/admin/login");
@@ -126,28 +118,8 @@ export default function DestinationPage() {
               {destinations.map((destination: any) => (
                 <div
                   key={destination._id}
-                  className="relative bg-[#1f273b] rounded-xl overflow-hidden shadow-md border border-[#2c354d] transform transition duration-300 hover:scale-105 flex flex-col"
+                  className="relative bg-[#1f273b] rounded-xl overflow-hidden shadow-md border border-[#2c354d] transform transition duration-300 hover:scale-[1.02] flex flex-col"
                 >
-                  {/* Action Buttons */}
-                  <div className="absolute top-3 right-3 flex gap-2 z-10">
-                    <button
-                      onClick={() =>
-                        navigate(`/admin/edit-destination/${destination._id}`)
-                      }
-                      className="p-1 rounded-full bg-black/30 hover:bg-indigo-600 transition"
-                    >
-                      <Pencil className="w-4 h-4 text-white" />
-                    </button>
-                    <button
-                      onClick={() =>
-                        console.log("Delete destination:", destination._id)
-                      }
-                      className="p-1 rounded-full bg-black/30 hover:bg-red-600 transition"
-                    >
-                      <Trash2 className="w-4 h-4 text-white" />
-                    </button>
-                  </div>
-
                   {destination.photos?.[0] ? (
                     <img
                       src={destination.photos[0]}
@@ -176,7 +148,7 @@ export default function DestinationPage() {
                     </div>
 
                     {destination.features?.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-3">
+                      <div className="flex flex-wrap gap-2 mb-4">
                         {destination.features.slice(0, 3).map((feat: string, idx: number) => (
                           <span
                             key={idx}
@@ -187,6 +159,28 @@ export default function DestinationPage() {
                         ))}
                       </div>
                     )}
+
+                    {/* Action Buttons */}
+                    <div className="flex justify-between mt-4">
+                      <button
+                        onClick={() =>
+                          navigate(`/admin/edit-destination/${destination._id}`)
+                        }
+                        className="flex items-center gap-1 text-sm border border-[#e2e6f2] text-[#fff] hover:bg-[#95909c] hover:text-white px-3 py-1 rounded-full transition"
+                      >
+                        <Pencil className="w-3 h-3" />
+                        Edit
+                      </button>
+                      <button
+                        onClick={() =>
+                          console.log("Delete destination:", destination._id)
+                        }
+                        className="flex items-center gap-1 text-sm border border-red-500 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1 rounded-full transition"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                        Delete
+                      </button>
+                    </div>
                   </div>
                 </div>
               ))}

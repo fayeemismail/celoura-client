@@ -15,8 +15,8 @@ export const handleGuideLogin = ( formData: { email: string, password: string } 
             dispatch(signInSuccess(response));
 
         } catch (error: any) {
-            console.log(error.response?.data?.error);
-            dispatch(signInFailure(error.response?.data?.error || "Login failed"));
+            console.log(error);
+            dispatch(signInFailure(error.response?.data?.message || "Login failed"));
         }
     }
 };
