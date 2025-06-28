@@ -54,5 +54,14 @@ export const pageinatedDestinations = async (page: number, limit: number, search
 };
 
 export const deleteDestinationApi = async (destinationId: string) => {
-    return await adminInstance.delete(`/admin/destinations${destinationId}l/delete`)
+    return await adminInstance.delete(`/admin/destinations/${destinationId}/delete`);
+};
+
+export const getDestinationById = async(id: string) => {
+    return await adminInstance.get(`/admin/destinations/get-destinations/${id}` );
+};
+
+
+export const updateDestinationApi = async(id: string, formData: FormData) => {
+    return await adminInstance.put(`/admin/destination/edit-destination/${id}`, formData)
 }

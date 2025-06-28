@@ -19,6 +19,7 @@ import UserDestinations from '../pages/user/Destinations';
 import DestinationDetailPage from '../components/user/Destination/DetailedDestination';
 import GuideProfile from '../pages/Guide/ProfileGuide';
 import GuideDestinations from '../pages/Guide/GuideDestinations';
+import EditDestination from '../pages/admin/EditDestination';
 
 export default function AppRoutes() {
   return (
@@ -45,6 +46,7 @@ export default function AppRoutes() {
         <Route path='/admin/guide-requests' element={< GuideRequests /> } />
         <Route path='/admin/destinations' element={ <DestinationPage /> } />
         <Route path='/admin/create-destinations' element={ <CreateDestination /> } />
+        <Route path='/admin/edit-destination/:id' element={ <EditDestination /> } />
 
         {/* guide side */}
         <Route path='/guide/login' element={ <GuideLogin /> } />
