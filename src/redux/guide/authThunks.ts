@@ -1,5 +1,5 @@
 import { guideLogin, logoutGuide } from "../../api/auth";
-import { getMyDetails, guideRefreshAccessToken } from "../../api/guide/guideApi";
+import { getMyDetails, getNewDestinationApi, getPaginatiedDestinationGuideAPI, guideRefreshAccessToken } from "../../api/guide/guideApi";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./guideSlice"
 
 
@@ -21,6 +21,19 @@ export const handleGuideLogin = ( formData: { email: string, password: string } 
     }
 };
 
+
+export const getPaginatedDestinationGuideThunk = (page: number, limit: number, search: string, attraction: string) => {
+    return async() => {
+        try {
+            const response = await getPaginatiedDestinationGuideAPI(page, limit, search, attraction);
+            console.log(response.data, 'this is data')
+            return response.data
+        } catch (error) {
+            console.log(error)
+            throw error
+        }
+    }
+}
 
 
 export const handleGuideTokenRefresh = (): any => {
@@ -70,6 +83,20 @@ export const getMe = (id: string) => {
         } catch (error) {
             console.error('something wrong with fetching data', error);;
             dispatch(signOut())
+        }
+    }
+};
+
+
+
+export const getNewDestinationsThunk = (limit: number) => {
+    return async() => {
+        try {
+            const res = await getNewDestinationApi(limit);
+            return res.data
+        } catch (error) {
+            console.error("something went wrong on fetching destination", error);
+            throw error
         }
     }
 }

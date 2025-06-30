@@ -64,4 +64,4 @@ export const getDestinationById = async(id: string) => {
 
 export const updateDestinationApi = async(id: string, formData: FormData) => {
     return await adminInstance.put(`/admin/destination/edit-destination/${id}`, formData)
-}
+};
