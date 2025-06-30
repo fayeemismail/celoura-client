@@ -1,20 +1,32 @@
 import { useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
 import GuideNavbar from "../../components/guide/GuideNavbar";
 import Sidebar from "../../components/guide/GuideSidebar";
 import { Plus, Compass, MapPin, User as UserIcon } from "lucide-react";
+import { getNewDestinationsThunk } from "../../redux/guide/authThunks";
 
 const GuideHome = () => {
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state: RootState) => state.guide);
+  const dispatch = useDispatch<AppDispatch>()
+
+  const getNewDestinations = async() => {
+    try {
+      const response = await dispatch(getNewDestinationsThunk(4));
+      console.log(response)
+    } catch (error) {
+      console.log(error);
+    }
+  }
 
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/guide/login");
     }
+    getNewDestinations()
   }, [isAuthenticated, navigate]);
 
   const toggleSidebar = () => {

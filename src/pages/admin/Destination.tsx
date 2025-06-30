@@ -28,7 +28,6 @@ export default function DestinationPage() {
 
   const handleDeleteDestination = async (destinationId: string) => {
     try {
-      // 🔥 Replace with actual delete logic (API call);
       const response = await dispatch(deleteDestinationThunk(destinationId));
       console.log("Deleting destination:", response);
       toast.success("Deleted successfully");
