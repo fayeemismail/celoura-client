@@ -5,9 +5,10 @@ interface Props {
   index: number;
   file: File | string | null;
   onChange: (file: File, index: number) => void;
+  onDelete?: () => void;
 }
 
-export default function ImageUploader({ index, file, onChange }: Props) {
+export default function ImageUploader({ index, file, onChange, onDelete }: Props) {
   const inputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFile = (file: File) => {
@@ -39,17 +40,31 @@ export default function ImageUploader({ index, file, onChange }: Props) {
 
   return (
     <div
-      className="w-48 h-48 border-2 border-dashed border-gray-500 rounded-lg flex items-center justify-center bg-[#1A1F2C] text-center text-gray-400 cursor-pointer relative overflow-hidden"
+      className="relative w-48 h-48 border-2 border-dashed border-gray-500 rounded-lg flex items-center justify-center bg-[#1A1F2C] text-center text-gray-400 cursor-pointer overflow-hidden group"
       onClick={() => inputRef.current?.click()}
       onDrop={handleDrop}
       onDragOver={(e) => e.preventDefault()}
     >
       {previewUrl ? (
-        <img
-          src={previewUrl}
-          alt={`Preview ${index + 1}`}
-          className="absolute inset-0 object-cover w-full h-full rounded-lg"
-        />
+        <>
+          <img
+            src={previewUrl}
+            alt={`Preview ${index + 1}`}
+            className="absolute inset-0 object-cover w-full h-full rounded-lg"
+          />
+          {onDelete && (
+            <button
+              type="button"
+              onClick={(e) => {
+                e.stopPropagation(); // prevent triggering file picker
+                onDelete();
+              }}
+              className="absolute top-2 right-2 bg-red-600 hover:bg-red-700 text-white text-xs px-2 py-1 rounded opacity-80 group-hover:opacity-100"
+            >
+              Delete
+            </button>
+          )}
+        </>
       ) : (
         <p className="text-sm px-2 z-10">Click or drop Image {index + 1}</p>
       )}

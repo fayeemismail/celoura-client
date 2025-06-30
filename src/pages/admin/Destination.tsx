@@ -6,6 +6,8 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import { getAllPaginatedDesti } from "../../redux/admin/authThunks";
 import { Pencil, Trash2 } from "lucide-react";
+import { toast } from "react-toastify";
+import ConfirmationDialog from "../../components/common/ConfirmationDialog"; // 👈 import your component
 
 export default function DestinationPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -17,9 +19,25 @@ export default function DestinationPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
+  const [showConfirm, setShowConfirm] = useState(false); // 👈 modal visibility
+  const [selectedId, setSelectedId] = useState<string | null>(null); // 👈 destination to delete
+
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state: RootState) => state.admin);
   const dispatch = useDispatch<AppDispatch>();
+
+  const handleDeleteDestination = async (destinationId: string) => {
+    try {
+      // 🔥 Replace with actual delete logic (API call)
+      console.log("Deleting destination:", destinationId);
+      toast.success("Deleted successfully");
+      setShowConfirm(false);
+      getDestinations(); // Refresh list after deletion
+    } catch (error) {
+      console.error(error);
+      toast.error("Something went wrong");
+    }
+  };
 
   const getDestinations = async () => {
     setLoading(true);
@@ -56,8 +74,8 @@ export default function DestinationPage() {
         }`}
       >
         <AdminHeader />
-
         <div className="p-8 max-w-7xl mx-auto">
+          {/* Heading and Create Button */}
           <div className="flex justify-between items-center mb-8">
             <h2 className="text-3xl font-bold tracking-wide">🌍 Destinations</h2>
             <button
@@ -68,7 +86,7 @@ export default function DestinationPage() {
             </button>
           </div>
 
-          {/* Search & Filter */}
+          {/* Search and Filter */}
           <div className="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
             <input
               type="text"
@@ -80,7 +98,6 @@ export default function DestinationPage() {
               }}
               className="w-full sm:w-1/2 px-4 py-2 rounded bg-[#1a1f2e] border border-gray-600 text-white"
             />
-
             <div className="relative inline-block w-64">
               <select
                 value={AttractionFilter}
@@ -99,12 +116,11 @@ export default function DestinationPage() {
                 <option value="Religious">Religious</option>
                 <option value="Architecture">Architecture</option>
               </select>
-
               <div className="pointer-events-none absolute right-3 top-1/2 transform -translate-y-1/2 h-2 w-2 rotate-45 border-r-2 border-b-2 border-white"></div>
             </div>
           </div>
 
-          {/* Destination Content */}
+          {/* Content */}
           {loading ? (
             <div className="flex justify-center py-20">
               <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin"></div>
@@ -160,7 +176,6 @@ export default function DestinationPage() {
                       </div>
                     )}
 
-                    {/* Action Buttons */}
                     <div className="flex justify-between mt-4">
                       <button
                         onClick={() =>
@@ -172,9 +187,10 @@ export default function DestinationPage() {
                         Edit
                       </button>
                       <button
-                        onClick={() =>
-                          console.log("Delete destination:", destination._id)
-                        }
+                        onClick={() => {
+                          setSelectedId(destination._id); // set ID
+                          setShowConfirm(true); // open modal
+                        }}
                         className="flex items-center gap-1 text-sm border border-red-500 text-red-400 hover:bg-red-500 hover:text-white px-3 py-1 rounded-full transition"
                       >
                         <Trash2 className="w-4 h-4" />
@@ -210,6 +226,17 @@ export default function DestinationPage() {
           )}
         </div>
       </main>
+
+      {/* 🔥 Confirmation Dialog */}
+      <ConfirmationDialog
+        isOpen={showConfirm}
+        message="Are you sure you want to delete this destination? This action cannot be undone."
+        color="#e11d48" // Tailwind red-600
+        onConfirm={() => {
+          if (selectedId) handleDeleteDestination(selectedId);
+        }}
+        onCancel={() => setShowConfirm(false)}
+      />
     </div>
   );
 }
