@@ -4,7 +4,7 @@ import AdminSidebar from "../../components/admin/home/AdminSidebar";
 import AdminHeader from "../../components/admin/home/AdminHeader";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { getAllPaginatedDesti } from "../../redux/admin/authThunks";
+import { deleteDestinationThunk, getAllPaginatedDesti } from "../../redux/admin/authThunks";
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../../components/common/ConfirmationDialog"; // 👈 import your component
@@ -28,8 +28,9 @@ export default function DestinationPage() {
 
   const handleDeleteDestination = async (destinationId: string) => {
     try {
-      // 🔥 Replace with actual delete logic (API call)
-      console.log("Deleting destination:", destinationId);
+      // 🔥 Replace with actual delete logic (API call);
+      const response = await dispatch(deleteDestinationThunk(destinationId));
+      console.log("Deleting destination:", response);
       toast.success("Deleted successfully");
       setShowConfirm(false);
       getDestinations(); // Refresh list after deletion
