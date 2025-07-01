@@ -1,5 +1,5 @@
 import { guideLogin, logoutGuide } from "../../api/auth";
-import { getMyDetails, getNewDestinationApi, getPaginatiedDestinationGuideAPI, guideRefreshAccessToken } from "../../api/guide/guideApi";
+import { getdestinations, getMyDetails, getNewDestinationApi, getPaginatiedDestinationGuideAPI, getProfileDataAPI, guideRefreshAccessToken, updateProfileGuideApi } from "../../api/guide/guideApi";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./guideSlice"
 
 
@@ -30,6 +30,18 @@ export const getPaginatedDestinationGuideThunk = (page: number, limit: number, s
             return response.data
         } catch (error) {
             console.log(error)
+            throw error
+        }
+    }
+};
+
+export const getCompleteDesti = () => {
+    return async() => {
+        try {
+            const response = await getdestinations();
+            return response
+        } catch (error) {
+            console.log(error);
             throw error
         }
     }
@@ -75,14 +87,12 @@ export const handleGuideLogout = () => {
 
 
 export const getMe = (id: string) => {
-    return async (dispatch: any) => {
+    return async () => {
         try {
             const Users = await getMyDetails(id);
-            await guideRefreshAccessToken();
             return Users.data;
         } catch (error) {
-            console.error('something wrong with fetching data', error);;
-            dispatch(signOut())
+            console.error('something wrong with fetching data', error);
         }
     }
 };
@@ -96,6 +106,32 @@ export const getNewDestinationsThunk = (limit: number) => {
             return res.data
         } catch (error) {
             console.error("something went wrong on fetching destination", error);
+            throw error
+        }
+    }
+};
+
+
+export const getProfileGuide = (id: string) => {
+    return async() => {
+        try {
+            const response = await getProfileDataAPI(id);
+            return response.data
+        } catch (error) {
+            console.log(error);
+            throw error
+        }
+    }
+};
+
+
+export const updateProfileGuideThunk = (formData: FormData) => {
+    return async() => {
+        try {
+            const response = await updateProfileGuideApi(formData);
+            return response.data
+        } catch (error) {
+            console.log(error);
             throw error
         }
     }
