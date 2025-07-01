@@ -34,7 +34,6 @@ const GuideDestinations = () => {
       const res = await dispatch(
         getPaginatedDestinationGuideThunk(page, limit, search, attractionFilter)
       );
-      console.log(res, 'this is res')
       setDestinations(res.data || []);
       setTotalPages(res.pagination?.totalPages || 1);
     } catch (err) {

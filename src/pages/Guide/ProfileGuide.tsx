@@ -5,6 +5,7 @@ import { AppDispatch, RootState } from "../../redux/store";
 import Sidebar from "../../components/guide/GuideSidebar";
 import GuideNavbar from "../../components/guide/GuideNavbar";
 import { GetAllDestinations } from "../../redux/user/userThunks";
+import { User } from "lucide-react";
 
 type Destination = {
   _id: string;
@@ -47,7 +48,8 @@ const GuideProfile = () => {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const profileImage = useMemo(() => {
-    return destinations[5]?.photos?.[0] || "/placeholder.jpg";
+    const photo = destinations[5]?.photos?.[5];
+    return photo && photo.trim() !== "" ? photo : undefined;
   }, [destinations]);
 
   const profileDescription = useMemo(() => {
@@ -71,20 +73,28 @@ const GuideProfile = () => {
             <>
               {/* Profile Header */}
               <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6 mb-10">
-                <div className="flex-shrink-0">
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    loading="lazy"
-                    onError={(e) => (e.currentTarget.src = "/placeholder.jpg")}
-                    className="w-32 h-32 rounded-full object-cover border-4 border-[#09b86c]"
-                  />
+                <div className="flex-shrink-0 w-32 h-32 relative">
+                  {profileImage ? (
+                    <img
+                      src={profileImage}
+                      alt="Profile"
+                      loading="lazy"
+                      onError={(e) => (e.currentTarget.src = "/placeholder.jpg")}
+                      className="w-32 h-32 rounded-full object-cover border-4 border-[#09b86c]"
+                    />
+                  ) : (
+                    <div className="w-32 h-32 rounded-full border-4 border-[#09b86c] bg-gray-800 flex items-center justify-center">
+                      <User className="w-16 h-16 text-gray-500" />
+                    </div>
+                  )}
                 </div>
 
                 {/* Guide Info */}
                 <div className="text-center sm:text-left flex-1">
                   <h2 className="text-2xl font-bold">{currentGuide?.name || "Guide Name"}</h2>
-                  <p className="text-gray-400">@{currentGuide?.email?.split("@")[0] || "guide_user"}</p>
+                  <p className="text-gray-400">
+                    @{currentGuide?.email?.split("@")[0] || "guide_user"}
+                  </p>
                   <p className="mt-2 text-sm text-gray-300 max-w-md">{profileDescription}</p>
 
                   {/* Stats */}
