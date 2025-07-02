@@ -97,7 +97,7 @@ const GuideProfile = () => {
 
                 <div className="flex-1 text-center sm:text-left">
                   <h2 className="text-2xl font-bold mb-1">
-                    {currentGuide?.email?.split("@")[0]}
+                    {currentGuide?.name}
                   </h2>
                   <p className="text-gray-400 mb-3">
                     @{currentGuide?.email?.split("@")[0]}
