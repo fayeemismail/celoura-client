@@ -25,8 +25,7 @@ export default function HomePage() {
     const getNewDestinations = async () => {
       try {
         const data = await dispatch(getNewDestinationsThunk(3))
-        setNewDestinations(data.data?.data)
-        console.log(data.data?.data)
+        setNewDestinations(data.data?.data);
       } catch (error) {
         console.log(error)
       }

@@ -1,38 +1,27 @@
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import Sidebar from "../../components/guide/GuideSidebar";
 import GuideNavbar from "../../components/guide/GuideNavbar";
-import { GetAllDestinations } from "../../redux/user/userThunks";
-
-type Destination = {
-  _id: string;
-  name: string;
-  location: string;
-  country: string;
-  description: string;
-  photos: string[];
-  features?: string[];
-};
+import { User, Settings  } from "lucide-react";
+import { getProfileGuide } from "../../redux/guide/authThunks";
+import { Guide } from "../../types/Guide";
 
 const GuideProfile = () => {
   const { isAuthenticated, currentGuide } = useSelector((state: RootState) => state.guide);
   const navigate = useNavigate();
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-  const [destinations, setDestinations] = useState<Destination[]>([]);
-  const [loading, setLoading] = useState(false);
   const dispatch = useDispatch<AppDispatch>();
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [guideProfile, setGuideProfile] = useState<Guide | null>(null);
+  const [showMenu, setShowMenu] = useState(false);
 
-  const getDestinations = async () => {
-    setLoading(true);
+  const handleProfile = async () => {
     try {
-      const response = await dispatch(GetAllDestinations());
-      setDestinations(response.data?.data || []);
-    } catch (error: any) {
-      console.error("Failed to fetch destinations:", error.message);
-    } finally {
-      setLoading(false);
+      const response = await dispatch(getProfileGuide(currentGuide?.id!));
+      setGuideProfile(response);
+    } catch (error) {
+      console.error("Failed to fetch guide profile", error);
     }
   };
 
@@ -40,86 +29,101 @@ const GuideProfile = () => {
     if (!isAuthenticated) {
       navigate("/guide/login");
     } else {
-      getDestinations();
+      handleProfile();
     }
-  }, [isAuthenticated, navigate]);
+  }, [isAuthenticated, currentGuide?.id]);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
-  const profileImage = useMemo(() => {
-    return destinations[5]?.photos?.[0] || "/placeholder.jpg";
-  }, [destinations]);
+  const handleCreatePost = () => {
+    navigate("/guide/create-post");
+  };
 
-  const profileDescription = useMemo(() => {
-    return (
-      destinations[8]?.description?.slice(0, 121) ||
-      "Welcome to my guide profile. Exploring new places and sharing my stories."
-    );
-  }, [destinations]);
+  const handleEditProfile = () => {
+    navigate("/guide/edit-profile");
+  };
 
   return (
     <div className="min-h-screen flex bg-[#000] text-white">
       <Sidebar sidebarOpen={sidebarOpen} toggleSidebar={toggleSidebar} />
       <div className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
         <GuideNavbar />
-        <main className="pt-24 px-8 pb-10">
-          {loading ? (
-            <div className="flex justify-center items-center py-32">
-              <div className="w-12 h-12 border-4 border-indigo-500 border-t-transparent rounded-full animate-spin" />
-            </div>
-          ) : (
-            <>
-              {/* Profile Header */}
-              <div className="flex flex-col sm:flex-row items-center sm:items-start sm:justify-between gap-6 mb-10">
-                <div className="flex-shrink-0">
-                  <img
-                    src={profileImage}
-                    alt="Profile"
-                    loading="lazy"
-                    onError={(e) => (e.currentTarget.src = "/placeholder.jpg")}
-                    className="w-32 h-32 rounded-full object-cover border-4 border-[#09b86c]"
-                  />
-                </div>
-
-                {/* Guide Info */}
-                <div className="text-center sm:text-left flex-1">
-                  <h2 className="text-2xl font-bold">{currentGuide?.name || "Guide Name"}</h2>
-                  <p className="text-gray-400">@{currentGuide?.email?.split("@")[0] || "guide_user"}</p>
-                  <p className="mt-2 text-sm text-gray-300 max-w-md">{profileDescription}</p>
-
-                  {/* Stats */}
-                  <div className="mt-4 flex justify-center sm:justify-start gap-6 text-sm">
-                    <div>
-                      <span className="font-semibold">25</span> Posts
-                    </div>
-                    <div>
-                      <span className="font-semibold">1.2k</span> Followers
-                    </div>
-                    <div>
-                      <span className="font-semibold">180</span> Following
-                    </div>
+        <main className="pt-24 px-4 pb-10">
+          {guideProfile && (
+            <div className="bg-[#111] p-6 rounded-2xl shadow-md relative max-w-4xl mx-auto">
+              {/* Action menu */}
+              <div className="absolute top-4 right-4">
+                <button
+                  onClick={() => setShowMenu((prev) => !prev)}
+                  className="p-2 hover:bg-gray-700 rounded-full transition"
+                >
+                  <Settings  className="w-6 h-6 text-gray-400" />
+                </button>
+                {showMenu && (
+                  <div className="absolute right-0 mt-2 w-44 bg-[#1c1c1c] border border-gray-700 rounded-md shadow-lg z-50">
+                    <button
+                      onClick={handleCreatePost}
+                      className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-700"
+                    >
+                      Create New Post
+                    </button>
+                    <button
+                      onClick={handleEditProfile}
+                      className="block w-full px-4 py-2 text-left text-sm hover:bg-gray-700"
+                    >
+                      Edit Profile
+                    </button>
                   </div>
-                </div>
+                )}
               </div>
 
-              {/* Posts Grid */}
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                {destinations.map((item) => (
-                  <div
-                    key={item._id}
-                    className="w-full aspect-square bg-gray-800 rounded-lg overflow-hidden group"
-                  >
+              {/* Profile section */}
+              <div className="flex flex-col sm:flex-row items-center sm:items-start sm:gap-8">
+                <div className="flex-shrink-0 w-32 h-32 relative mb-4 sm:mb-0">
+                  {guideProfile.profilePic ? (
                     <img
-                      src={item.photos?.[0] || "/placeholder.jpg"}
-                      alt={item.name}
+                      src={guideProfile.profilePic}
+                      alt="Profile"
                       loading="lazy"
                       onError={(e) => (e.currentTarget.src = "/placeholder.jpg")}
-                      className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                      className="w-32 h-32 rounded-full object-cover border-4 border-[#09b86c]"
                     />
-                  </div>
-                ))}
+                  ) : (
+                    <div className="w-32 h-32 rounded-full border-4 border-[#09b86c] bg-gray-800 flex items-center justify-center">
+                      <User className="w-16 h-16 text-gray-500" />
+                    </div>
+                  )}
+                </div>
+
+                <div className="flex-1 text-center sm:text-left">
+                  <h2 className="text-2xl font-bold mb-1">
+                    {currentGuide?.name}
+                  </h2>
+                  <p className="text-gray-400 mb-3">
+                    @{currentGuide?.email?.split("@")[0]}
+                  </p>
+                  <p className="text-sm text-gray-300 max-w-md mx-auto sm:mx-0">
+                    {guideProfile.bio?.trim() || "Add bio"}
+                  </p>
+                </div>
               </div>
-            </>
+
+              {/* Stats Section */}
+              <div className="mt-8 grid grid-cols-3 text-center gap-4 text-sm text-gray-400">
+                <div>
+                  <p className="text-lg font-semibold text-white">{guideProfile.destinations.length}</p>
+                  <p>Destinations</p>
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-white">{guideProfile.followers.length}</p>
+                  <p>Followers</p>
+                </div>
+                <div>
+                  <p className="text-lg font-semibold text-white">{guideProfile.happyCustomers.length}</p>
+                  <p>Happy Customers</p>
+                </div>
+              </div>
+            </div>
           )}
         </main>
       </div>

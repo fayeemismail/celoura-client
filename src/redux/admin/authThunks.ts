@@ -212,6 +212,7 @@ export const updateDestinationThunk = (id: string, formData: FormData) => {
             return response.data
         } catch (error) {
             console.log(error)
+            throw error
         }
     }
 }

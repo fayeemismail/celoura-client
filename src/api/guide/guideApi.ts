@@ -20,4 +20,19 @@ export const getPaginatiedDestinationGuideAPI = async (page: number, limit: numb
 
 export const getNewDestinationApi = async(limit: number) => {
     return await guideInstance.get(`/guide/destinations/new-spots/${limit}`);
+};
+
+
+export const getdestinations = async() => {
+    return await guideInstance.get('/user/destinations')
+};
+
+export const getProfileDataAPI = async(id: string) => {
+    return await guideInstance.get(`/guide/profile/${id}`);
+};
+
+
+
+export const updateProfileGuideApi = async(formData: FormData) => {
+    return await guideInstance.put('/guide/profile/edit-profile-update', formData);
 }

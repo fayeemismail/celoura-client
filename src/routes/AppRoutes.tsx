@@ -20,6 +20,7 @@ import DestinationDetailPage from '../components/user/Destination/DetailedDestin
 import GuideProfile from '../pages/Guide/ProfileGuide';
 import GuideDestinations from '../pages/Guide/GuideDestinations';
 import EditDestination from '../pages/admin/EditDestination';
+import EditProfile from '../pages/Guide/EditProfileGuide';
 
 export default function AppRoutes() {
   return (
@@ -53,6 +54,7 @@ export default function AppRoutes() {
         <Route path='/guide/home' element={ <GuideHome /> } />
         <Route path='/guide/profile' element={ <GuideProfile /> } />
         <Route path='/guide/destinations' element={ <GuideDestinations /> } />
+        <Route path='/guide/edit-profile' element={ <EditProfile /> } />
 
       </Routes>
     </BrowserRouter>

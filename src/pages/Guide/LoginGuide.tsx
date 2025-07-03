@@ -68,7 +68,7 @@ export default function GuideLogin() {
 
         if(response.status == 200) {
           const userData = {
-            id: response.data.data.id,
+            id: response.data.data._id,
             name: response.data.data.name,
             email: response.data.data.email,
             role: response.data.data.role,
