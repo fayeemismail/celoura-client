@@ -48,7 +48,7 @@ export default function EditDestination() {
 
         setFormData(fetchedData);
         setOriginalData(fetchedData);
-        setExistingPhotoUrls(photos); // Save original URLs
+        setExistingPhotoUrls(photos);
       } catch {
         toast.error("Failed to load destination.");
       } finally {
@@ -134,7 +134,7 @@ export default function EditDestination() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    if (!validateForm() || !originalData) return;
 
     const hasAnyPhoto = formData.photos.some(
       (p) => p instanceof File || (typeof p === "string" && p.trim() !== "")
@@ -147,19 +147,38 @@ export default function EditDestination() {
 
     setLoading(true);
 
+    const formPayload = new FormData();
+
+    if (formData.name.trim() !== originalData.name) {
+      formPayload.append("name", formData.name.trim());
+    }
+
+    if (formData.description.trim() !== originalData.description) {
+      formPayload.append("description", formData.description.trim());
+    }
+
+    if (formData.location.trim() !== originalData.location) {
+      formPayload.append("location", formData.location.trim());
+    }
+
+    if (formData.country.trim() !== originalData.country) {
+      formPayload.append("country", formData.country.trim());
+    }
+
     const features = formData.featureInput
       .split(",")
       .map((f) => f.trim())
       .filter(Boolean);
 
-    const formPayload = new FormData();
-    formPayload.append("name", formData.name.trim());
-    formPayload.append("description", formData.description.trim());
-    formPayload.append("location", formData.location.trim());
-    formPayload.append("country", formData.country.trim());
-    formPayload.append("features", JSON.stringify(features));
+    const originalFeatures = originalData.featureInput
+      .split(",")
+      .map((f) => f.trim())
+      .filter(Boolean);
 
-    // Find deleted photos (existing URLs not present in formData)
+    if (JSON.stringify(features) !== JSON.stringify(originalFeatures)) {
+      formPayload.append("features", JSON.stringify(features));
+    }
+
     const currentPhotoUrls = formData.photos.filter(
       (p) => typeof p === "string"
     ) as string[];
@@ -172,7 +191,6 @@ export default function EditDestination() {
       formPayload.append("deletedPhotos", JSON.stringify(deletedPhotos));
     }
 
-    // Append only new photos (Files)
     formData.photos.forEach((photo) => {
       if (photo instanceof File) {
         formPayload.append("photos", photo);
@@ -181,10 +199,10 @@ export default function EditDestination() {
 
     try {
       const data = await dispatch(updateDestinationThunk(id!, formPayload));
-      console.log(data.message, 'this is updated')
-      toast.success(data.message? data.message : "Destination updated successfully!");
+      toast.success(data.message ? data.message : "Destination updated successfully!");
       navigate('/admin/destinations');
     } catch {
+      
       toast.error("Update failed.");
     } finally {
       setLoading(false);
