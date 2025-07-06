@@ -51,6 +51,18 @@ const guideSlice = createSlice({
             state.error = false;
             state.isAuthenticated = false
         },
+        updateGuidePending(state) {
+            state.loading = true
+        },
+        updatedGuideSuccess(state, aciton: PayloadAction<Guide>){
+            state.loading = false;
+            state.currentGuide = aciton.payload;
+            state.error = false
+        },
+        updateGuideFailure(state, action: PayloadAction<string>) {
+            state.loading = false;
+            state.error = action.payload
+        },
         clearError(state) {
             state.error = null
         }
@@ -64,7 +76,10 @@ export const {
     signInFailure,
     signOut,
     clearError,
-    setGuide
+    setGuide,
+    updateGuidePending,
+    updatedGuideSuccess,
+    updateGuideFailure
 } = guideSlice.actions;
 
 export default guideSlice.reducer;

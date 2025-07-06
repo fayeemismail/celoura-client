@@ -1,6 +1,6 @@
 import { guideLogin, logoutGuide } from "../../api/auth";
 import { getdestinations, getMyDetails, getNewDestinationApi, getPaginatiedDestinationGuideAPI, getProfileDataAPI, guideRefreshAccessToken, updateProfileGuideApi } from "../../api/guide/guideApi";
-import { signInFailure, signInPending, signInSuccess, signOut } from "./guideSlice"
+import { signInFailure, signInPending, signInSuccess, signOut, updateGuidePending } from "./guideSlice"
 
 
 
@@ -126,9 +126,11 @@ export const getProfileGuide = (id: string) => {
 
 
 export const updateProfileGuideThunk = (formData: FormData) => {
-    return async() => {
+    return async(dispatch: any) => {
+        dispatch(updateGuidePending());
         try {
             const response = await updateProfileGuideApi(formData);
+            console.log(response.data , 'this is response Data');
             return response.data
         } catch (error) {
             console.log(error);

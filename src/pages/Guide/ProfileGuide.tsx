@@ -9,17 +9,18 @@ import { getProfileGuide } from "../../redux/guide/authThunks";
 import { Guide } from "../../types/Guide";
 
 const GuideProfile = () => {
-  const { isAuthenticated, currentGuide } = useSelector((state: RootState) => state.guide);
+  let { isAuthenticated, currentGuide } = useSelector((state: RootState) => state.guide);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [guideProfile, setGuideProfile] = useState<Guide | null>(null);
   const [showMenu, setShowMenu] = useState(false);
 
-  const handleProfile = async () => {
+  const handleProfile = async (id: string) => {
     try {
-      const response = await dispatch(getProfileGuide(currentGuide?.id!));
+      const response = await dispatch(getProfileGuide(id));
       setGuideProfile(response);
+      // if(currentGuide) 
     } catch (error) {
       console.error("Failed to fetch guide profile", error);
     }
@@ -28,9 +29,8 @@ const GuideProfile = () => {
   useEffect(() => {
     if (!isAuthenticated) {
       navigate("/guide/login");
-    } else {
-      handleProfile();
     }
+    handleProfile(currentGuide?.id!);
   }, [isAuthenticated, currentGuide?.id]);
 
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
@@ -96,9 +96,16 @@ const GuideProfile = () => {
                 </div>
 
                 <div className="flex-1 text-center sm:text-left">
-                  <h2 className="text-2xl font-bold mb-1">
-                    {currentGuide?.name}
+                  {guideProfile.name ? (
+                    <h2 className="text-2xl font-bold mb-1">
+                    {guideProfile.name}
                   </h2>
+                  ) : (
+                    <h2 className="text-2xl font-bold mb-1">
+                    User
+                  </h2>
+                  )}
+                  
                   <p className="text-gray-400 mb-3">
                     @{currentGuide?.email?.split("@")[0]}
                   </p>
