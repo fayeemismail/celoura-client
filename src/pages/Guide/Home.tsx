@@ -41,7 +41,7 @@ const GuideHome = () => {
         <main className="p-10 pt-24 text-white">
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
             <div
-              onClick={() => navigate("/guide/new-post")}
+              onClick={() => navigate("/guide/create-post")}
               className="rounded-lg shadow-md p-3 flex flex-col items-center justify-center h-24 cursor-pointer transition-transform transform hover:scale-105 bg-[#09b86c]"
             >
               <Plus className="w-5 h-5 mb-1" />
