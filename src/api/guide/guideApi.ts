@@ -35,4 +35,18 @@ export const getProfileDataAPI = async(id: string) => {
 
 export const updateProfileGuideApi = async(formData: FormData) => {
     return await guideInstance.put('/guide/profile/edit-profile-update', formData);
+};
+
+
+export const createNewPostApi = async(formData: FormData) => {
+    return await guideInstance.post('/guide/posts/new-post', formData);
+};
+
+export const getGuideAllPostApi = async(id: string) => {
+    return await guideInstance.get(`/guide/posts/allposts/${id}`)
+};
+
+
+export const getSinglePostApi = async(id: string) => {
+    return await guideInstance.get(`/guide/posts/${id}/single`)
 }

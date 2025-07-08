@@ -47,32 +47,31 @@ export default function EditProfile() {
     confirmPassword: "",
   });
 
-  useEffect(() => {
-    if (!isAuthenticated) navigate("/guide/login");
-  }, [isAuthenticated, navigate]);
+  const fetchGuide = async () => {
+    try {
+      const data = await dispatch(getProfileGuide(currentGuide?.id!));
+      setName(data.name || "");
+      setBio(data.bio || "");
+      setExistingProfilePicUrl(data.profilePic || "");
+      setInitialData({
+        name: data.name || "",
+        bio: data.bio || "",
+        profilePic: data.profilePic || "",
+      });
+    } catch (error) {
+      console.log(error)
+      toast.error("Failed to load profile");
+    }
+  };
+
 
   useEffect(() => {
-    const fetchGuide = async () => {
-      try {
-        const data = await dispatch(getProfileGuide(currentGuide?.id!));
-        setName(data.name || "");
-        setBio(data.bio || "");
-        setExistingProfilePicUrl(data.profilePic || "");
-        setInitialData({
-          name: data.name || "",
-          bio: data.bio || "",
-          profilePic: data.profilePic || "",
-        });
-      } catch {
-        toast.error("Failed to load profile");
-      }
-    };
+    if (!isAuthenticated) navigate("/guide/login");
     fetchGuide();
-  }, [dispatch, currentGuide?.id]);
+  }, [isAuthenticated, navigate]);
 
   const validateForm = () => {
     const trimmedName = name.trim();
-    const trimmedBio = bio.trim();
     const passwordRegex =
       /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9])/;
     let valid = true;
@@ -90,7 +89,7 @@ export default function EditProfile() {
       valid = false;
     }
 
-    if (bio.length > 0 && !trimmedBio) {
+    if (bio.length > 0 && !bio.trim()) {
       newErrors.bio = "Bio cannot be just spaces";
       valid = false;
     }
@@ -139,12 +138,10 @@ export default function EditProfile() {
 
   const hasChanges = useMemo(() => {
     const trimmedName = name.trim();
-    const trimmedBio = bio.trim();
     const initialName = initialData.name.trim();
-    const initialBio = initialData.bio.trim();
 
     const nameChanged = trimmedName && trimmedName !== initialName;
-    const bioChanged = trimmedBio !== initialBio;
+    const bioChanged = bio !== initialData.bio;
 
     const profilePicChanged = !!profilePic;
     const profilePicRemoved =
@@ -185,24 +182,20 @@ export default function EditProfile() {
     formData.append("_id", currentGuide?.id || "");
 
     const trimmedName = name.trim();
-    const trimmedBio = bio.trim();
 
     if (trimmedName !== initialData.name.trim()) {
       formData.append("name", trimmedName);
     }
 
-    if (trimmedBio !== initialData.bio.trim()) {
-      formData.append("bio", trimmedBio);
+    if (bio !== initialData.bio) {
+      formData.append("bio", bio.trim());
     }
 
     if (profilePic) {
       formData.append("profilePic", profilePic);
     }
 
-    if (
-      !existingProfilePicUrl &&
-      initialData.profilePic
-    ) {
+    if (!existingProfilePicUrl && initialData.profilePic) {
       formData.append("removeProfilePic", "true");
     }
 
@@ -215,9 +208,9 @@ export default function EditProfile() {
     try {
       await dispatch(updateProfileGuideThunk(formData));
       toast.success("Profile updated!");
-      navigate('/guide/profile')
+      navigate("/guide/profile");
     } catch (err: any) {
-        console.log(err?.response?.data?.message)
+      console.log(err?.response?.data?.message);
       toast.error(err?.response?.data?.message || "Update failed");
     }
   };
@@ -234,7 +227,6 @@ export default function EditProfile() {
       setProfilePic(e.dataTransfer.files[0]);
     }
   };
-
   return (
     <div className="min-h-screen flex bg-black text-white">
       <GuideSidebar
@@ -242,9 +234,8 @@ export default function EditProfile() {
         toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
       <div
-        className={`flex-1 transition-all duration-300 ${
-          sidebarOpen ? "ml-64" : "ml-20"
-        }`}
+        className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"
+          }`}
       >
         <GuideNavbar />
         <main className="pt-24 px-6 pb-12">
@@ -314,9 +305,8 @@ export default function EditProfile() {
                   type="text"
                   value={name}
                   onChange={(e) => setName(e.target.value)}
-                  className={`w-full bg-[#222] border rounded-lg px-4 py-2 ${
-                    errors.name ? "border-red-500" : "border-gray-600"
-                  }`}
+                  className={`w-full bg-[#222] border rounded-lg px-4 py-2 ${errors.name ? "border-red-500" : "border-gray-600"
+                    }`}
                   placeholder="Your name"
                 />
                 {errors.name && (
@@ -330,9 +320,8 @@ export default function EditProfile() {
                 <textarea
                   value={bio}
                   onChange={(e) => setBio(e.target.value)}
-                  className={`w-full bg-[#222] border rounded-lg px-4 py-2 ${
-                    errors.bio ? "border-red-500" : "border-gray-600"
-                  }`}
+                  className={`w-full bg-[#222] border rounded-lg px-4 py-2 ${errors.bio ? "border-red-500" : "border-gray-600"
+                    }`}
                   rows={3}
                   placeholder="Something about you"
                 />
@@ -347,14 +336,12 @@ export default function EditProfile() {
                 <button
                   type="button"
                   onClick={() => setChangePassword(!changePassword)}
-                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${
-                    changePassword ? "bg-green-500" : "bg-gray-600"
-                  }`}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-300 ${changePassword ? "bg-green-500" : "bg-gray-600"
+                    }`}
                 >
                   <span
-                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${
-                      changePassword ? "translate-x-6" : "translate-x-1"
-                    }`}
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform duration-300 ${changePassword ? "translate-x-6" : "translate-x-1"
+                      }`}
                   />
                 </button>
               </div>
@@ -370,11 +357,10 @@ export default function EditProfile() {
                       onChange={(e) =>
                         setCurrentPassword(e.target.value)
                       }
-                      className={`w-full bg-[#222] border rounded-lg px-4 py-2 pr-10 ${
-                        errors.currentPassword
+                      className={`w-full bg-[#222] border rounded-lg px-4 py-2 pr-10 ${errors.currentPassword
                           ? "border-red-500"
                           : "border-gray-600"
-                      }`}
+                        }`}
                     />
                     {showCurrentPassword ? (
                       <EyeOff
@@ -401,11 +387,10 @@ export default function EditProfile() {
                       placeholder="New Password"
                       value={newPassword}
                       onChange={(e) => setNewPassword(e.target.value)}
-                      className={`w-full bg-[#222] border rounded-lg px-4 py-2 pr-10 ${
-                        errors.newPassword
+                      className={`w-full bg-[#222] border rounded-lg px-4 py-2 pr-10 ${errors.newPassword
                           ? "border-red-500"
                           : "border-gray-600"
-                      }`}
+                        }`}
                     />
                     {showNewPassword ? (
                       <EyeOff
@@ -434,11 +419,10 @@ export default function EditProfile() {
                       onChange={(e) =>
                         setConfirmPassword(e.target.value)
                       }
-                      className={`w-full bg-[#222] border rounded-lg px-4 py-2 pr-10 ${
-                        errors.confirmPassword
+                      className={`w-full bg-[#222] border rounded-lg px-4 py-2 pr-10 ${errors.confirmPassword
                           ? "border-red-500"
                           : "border-gray-600"
-                      }`}
+                        }`}
                     />
                     {showConfirmPassword ? (
                       <EyeOff
@@ -464,11 +448,10 @@ export default function EditProfile() {
               <button
                 type="submit"
                 disabled={!hasChanges}
-                className={`w-full py-2 rounded-lg font-medium transition ${
-                  hasChanges
+                className={`w-full py-2 rounded-lg font-medium transition ${hasChanges
                     ? "bg-[#09b86c] hover:bg-[#07a05e]"
                     : "bg-gray-700 cursor-not-allowed"
-                }`}
+                  }`}
               >
                 Save Changes
               </button>

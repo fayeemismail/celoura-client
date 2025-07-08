@@ -21,6 +21,8 @@ import GuideProfile from '../pages/Guide/ProfileGuide';
 import GuideDestinations from '../pages/Guide/GuideDestinations';
 import EditDestination from '../pages/admin/EditDestination';
 import EditProfile from '../pages/Guide/EditProfileGuide';
+import CreatePost from '../pages/Guide/CreatePost';
+import GuidePostView from '../components/guide/GuidePostView';
 
 export default function AppRoutes() {
   return (
@@ -55,6 +57,8 @@ export default function AppRoutes() {
         <Route path='/guide/profile' element={ <GuideProfile /> } />
         <Route path='/guide/destinations' element={ <GuideDestinations /> } />
         <Route path='/guide/edit-profile' element={ <EditProfile /> } />
+        <Route path='/guide/create-post' element={ <CreatePost /> } />;
+        <Route path='/guide/posts/:postId' element={ <GuidePostView /> } />
 
       </Routes>
     </BrowserRouter>

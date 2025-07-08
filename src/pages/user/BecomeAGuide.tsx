@@ -25,7 +25,7 @@ export default function BecomeAGuide() {
     experience: "",
     expertise: "",
     idFile: null,
-    userId: currentUser?.id,
+    userId: currentUser?._id,
   };
 
   const navigate = useNavigate();

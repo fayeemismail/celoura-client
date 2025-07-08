@@ -1,7 +1,4 @@
 // /redux/user/userThunks.ts
-import { 
-  getCurrentUser, 
-} from "../../api/auth";
 import { editProfile, getCurrentMe, getDestinationsApi, getNewDestinationApi, pageinatedDestiUserApi, singleSpotApi } from "../../api/userAPI";
 import { UpdateProfilePayload } from "../../types/user";
 import { AppDispatch } from "../store";
@@ -17,16 +14,16 @@ export const handleUpdateProfile = (payload: UpdateProfilePayload) => {
     dispatch(updateUserPending());
 
     try {
-      await editProfile(payload);
-      const { data: userData } = await getCurrentUser();
-      dispatch(updateUserSuccess(userData));
+      const result = await editProfile(payload);
+      console.log(result.data?.data, 'this is result');
+      dispatch(updateUserSuccess(result.data?.data));
     } catch (error: any) {
       const status = error?.response?.status;
       const message = error?.response?.data?.message || "Failed to update profile";
 
       if (status === 403 || error?.response?.data?.blocked) {
         dispatch(signOut());
-      }
+      };
 
       dispatch(updateUserFailure(message));
       throw new Error(message); 

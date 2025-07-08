@@ -1,6 +1,6 @@
 import { guideLogin, logoutGuide } from "../../api/auth";
-import { getdestinations, getMyDetails, getNewDestinationApi, getPaginatiedDestinationGuideAPI, getProfileDataAPI, guideRefreshAccessToken, updateProfileGuideApi } from "../../api/guide/guideApi";
-import { signInFailure, signInPending, signInSuccess, signOut } from "./guideSlice"
+import { createNewPostApi, getdestinations, getGuideAllPostApi, getMyDetails, getNewDestinationApi, getPaginatiedDestinationGuideAPI, getProfileDataAPI, getSinglePostApi, guideRefreshAccessToken, updateProfileGuideApi } from "../../api/guide/guideApi";
+import { signInFailure, signInPending, signInSuccess, signOut, updateGuidePending } from "./guideSlice"
 
 
 
@@ -126,13 +126,54 @@ export const getProfileGuide = (id: string) => {
 
 
 export const updateProfileGuideThunk = (formData: FormData) => {
-    return async() => {
+    return async(dispatch: any) => {
+        dispatch(updateGuidePending());
         try {
             const response = await updateProfileGuideApi(formData);
+            console.log(response.data , 'this is response Data');
             return response.data
         } catch (error) {
             console.log(error);
             throw error
+        }
+    }
+};
+
+
+export const createNewPostThunk = (formdata: FormData) => {
+    return async() => {
+        try {
+            const response = await createNewPostApi(formdata);
+            console.log(response);
+            return response;
+        } catch (error) {
+            console.log(error, 'Error creating new Post')
+            throw error;
+        }
+    }
+};
+
+
+export const getGuideAllPosts = (id: string) => {
+    return async() => {
+        try {
+            const response = await getGuideAllPostApi(id);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+};
+
+export const getSinglePostThunk = (id: string) => {
+    return async() => {
+        try {
+            const response = await getSinglePostApi(id);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            throw error;
         }
     }
 }
