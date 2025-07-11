@@ -1,5 +1,6 @@
 import { guideLogin, logoutGuide } from "../../api/auth";
-import { createNewPostApi, getdestinations, getGuideAllPostApi, getMyDetails, getNewDestinationApi, getPaginatiedDestinationGuideAPI, getProfileDataAPI, getSinglePostApi, guideRefreshAccessToken, updateProfileGuideApi } from "../../api/guide/guideApi";
+import { commentPostApi, createNewPostApi, getdestinations, getGuideAllPostApi, getMyDetails, getNewDestinationApi, getPaginatiedDestinationGuideAPI, getProfileDataAPI, getSinglePostApi, guideRefreshAccessToken, likePostApi, unlikePostApi, updateProfileGuideApi } from "../../api/guide/guideApi";
+import { AddCommentArgs } from "../../types/CommentReqSummary";
 import { signInFailure, signInPending, signInSuccess, signOut, updateGuidePending } from "./guideSlice"
 
 
@@ -177,3 +178,41 @@ export const getSinglePostThunk = (id: string) => {
         }
     }
 }
+
+export const likePostThunk = (id: string, userId: string) => {
+    return async() => {
+        try {
+            const response = await likePostApi(id, userId);
+            return response
+        } catch (error) {
+            console.log(error, 'error on liking');
+            throw error
+        }
+    }
+};
+
+export const unlikePostThunk = (id: string, userId: string) => {
+    return async () => {
+        try {
+            const response = await unlikePostApi(id, userId);
+            return response;
+        } catch (error) {
+            console.log(error, 'error on unliking comment');
+            throw error
+        }
+    }
+}
+
+
+
+export const addCommentThunk = ({ postId, content, userId }: AddCommentArgs) => {
+  return async () => {
+   try {
+    const response = await commentPostApi({postId, content, userId});
+    return response.data;
+   } catch (error) {
+    console.log(error, 'this is error on commenting');
+    throw error
+   }
+  };
+};
