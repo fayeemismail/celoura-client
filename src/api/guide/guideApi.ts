@@ -1,3 +1,4 @@
+import { AddCommentArgs } from "../../types/CommentReqSummary";
 import guideInstance from "./axiosGuideInstance"
 
 
@@ -49,4 +50,21 @@ export const getGuideAllPostApi = async(id: string) => {
 
 export const getSinglePostApi = async(id: string) => {
     return await guideInstance.get(`/guide/posts/${id}/single`)
-}
+};
+
+
+export const likePostApi = async(id: string, userId: string) => {
+    return await guideInstance.put(`/guide/like/${id}/${userId}`);
+};
+
+export const unlikePostApi = async(id: string, userId: string) => {
+    return await guideInstance.delete(`/guide/like/${id}/${userId}`);
+};
+
+export const commentPostApi = async({postId, content, userId}: AddCommentArgs) => {
+    return await guideInstance.post(`/guide/comment`, { postId, content, userId })
+};
+
+
+// export const replyCommentPostApi = async({ postId, content, userId, parentId }: AddReplyComment)
+// export const replyCommentPostApi = async({  }: AddReplyComment)

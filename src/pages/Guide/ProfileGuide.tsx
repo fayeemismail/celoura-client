@@ -3,23 +3,28 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import Sidebar from "../../components/guide/GuideSidebar";
 import GuideNavbar from "../../components/guide/GuideNavbar";
-import { 
-  User, Settings, Heart, MessageCircle, 
-  Image as ImageIcon, X, ChevronLeft, 
-  ChevronRight, Bookmark, MoreHorizontal 
+import {
+  User, Settings, Heart, MessageCircle,
+  Image as ImageIcon, X, ChevronLeft,
+  ChevronRight, Bookmark, Send
 } from "lucide-react";
-import { 
-  getGuideAllPosts, 
-  getProfileGuide, 
-  getSinglePostThunk 
+import {
+  getGuideAllPosts,
+  getProfileGuide,
+  getSinglePostThunk,
+  likePostThunk,
+  unlikePostThunk,
+  addCommentThunk
 } from "../../redux/guide/authThunks";
 import { Guide } from "../../types/Guide";
 import { IPostSummary } from "../../types/IPostSummary";
 import { toast } from "react-toastify";
+import { useNavigate } from "react-router-dom";
 
 const GuideProfile = () => {
   const { isAuthenticated, currentGuide } = useSelector((state: RootState) => state.guide);
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [guideProfile, setGuideProfile] = useState<Guide | null>(null);
   const [showMenu, setShowMenu] = useState(false);
@@ -27,31 +32,36 @@ const GuideProfile = () => {
   const [selectedPost, setSelectedPost] = useState<any>(null);
   const [currentPostIndex, setCurrentPostIndex] = useState(0);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isLiked, setIsLiked] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
+  const [commentText, setCommentText] = useState("");
+  const [isCommenting, setIsCommenting] = useState(false);
+  const [replyingTo, setReplyingTo] = useState<string | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [isReplying, setIsReplying] = useState(false);
 
   const handleProfile = async (id: string) => {
     try {
-      const response = await dispatch(getProfileGuide(id));
+      const response = await dispatch(getProfileGuide(id))
       setGuideProfile(response);
     } catch (error) {
       console.error("Failed to fetch guide profile", error);
+      toast.error("Failed to load profile");
     }
   };
 
   const fetchAllPosts = async () => {
     try {
-      const response = await dispatch(getGuideAllPosts(currentGuide?.id!));
+      const response = await dispatch(getGuideAllPosts(currentGuide?.id!))
       setPosts(response);
     } catch (error) {
       console.error("Failed to fetch posts", error);
-      toast.error("Something went wrong");
+      toast.error("Failed to load posts");
     }
   };
 
   const handleViewPost = async (postId: string) => {
     try {
-      const response = await dispatch(getSinglePostThunk(postId));
+      const response = await dispatch(getSinglePostThunk(postId))
+      console.log(response, "this is response")
       setSelectedPost(response);
       setCurrentPostIndex(posts.findIndex(post => post._id === postId));
       setCurrentImageIndex(0);
@@ -63,6 +73,7 @@ const GuideProfile = () => {
 
   const handleCloseModal = () => {
     setSelectedPost(null);
+    setReplyingTo(null);
     document.body.style.overflow = 'auto';
   };
 
@@ -95,19 +106,97 @@ const GuideProfile = () => {
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const handleCreatePost = () => {
-    // Navigate to create post page
+    navigate("/guide/create-post");
   };
 
   const handleEditProfile = () => {
-    // Navigate to edit profile page
+    navigate("/guide/edit-profile");
+  };
+
+  const handleLikePost = async () => {
+    if (!selectedPost) return;
+
+    try {
+      if (selectedPost.likes.some((like: any) => like._id === currentGuide?.id)) {
+        await dispatch(unlikePostThunk(selectedPost._id, currentGuide?.id!))
+        setSelectedPost({
+          ...selectedPost,
+          likes: selectedPost.likes.filter((like: any) => like._id !== currentGuide?.id)
+        });
+      } else {
+        await dispatch(likePostThunk(selectedPost._id, currentGuide?.id!))
+        setSelectedPost({
+          ...selectedPost,
+          likes: [...selectedPost.likes, { _id: currentGuide?.id }]
+        });
+      }
+    } catch (error) {
+      toast.error("Failed to update like");
+    }
+  };
+
+  const handleAddComment = async () => {
+    if (!commentText.trim() || !selectedPost || isCommenting) return;
+
+    setIsCommenting(true);
+    try {
+      const response = await dispatch(addCommentThunk({
+        postId: selectedPost._id,
+        content: commentText,
+        userId: currentGuide?.id!
+      }));
+      console.log(response, 'this is comment response');
+
+      setSelectedPost({
+        ...selectedPost,
+        comments: [...selectedPost.comments, response]
+      });
+      setCommentText("");
+      toast.success("Comment added");
+    } catch (error) {
+      toast.error("Failed to add comment");
+    } finally {
+      setIsCommenting(false);
+    }
+  };
+
+  const handleAddReply = async () => {
+    if (!replyText.trim() || !selectedPost || !replyingTo || isReplying) return;
+
+    setIsReplying(true);
+    try {
+      const response = await dispatch(addCommentThunk({
+        postId: selectedPost._id,
+        content: replyText,
+        userId: currentGuide?.id!,
+      }));
+
+      setSelectedPost({
+        ...selectedPost,
+        comments: [...selectedPost.comments, response]
+      });
+      setReplyText("");
+      setReplyingTo(null);
+      toast.success("Reply added");
+    } catch (error) {
+      toast.error("Failed to add reply");
+    } finally {
+      setIsReplying(false);
+    }
+  };
+
+  const cancelReply = () => {
+    setReplyingTo(null);
+    setReplyText("");
   };
 
   useEffect(() => {
     if (!isAuthenticated) {
-      // Redirect to login if not authenticated
+      navigate("/guide/login");
+    } else {
+      handleProfile(currentGuide?.id!);
+      fetchAllPosts();
     }
-    handleProfile(currentGuide?.id!);
-    fetchAllPosts();
   }, [isAuthenticated, currentGuide?.id]);
 
   return (
@@ -238,52 +327,60 @@ const GuideProfile = () => {
                 <div className="relative flex-1 flex items-center justify-center bg-black group">
                   <img
                     src={selectedPost.photo[currentImageIndex]}
-                    alt="Post"
+                    alt={selectedPost.caption || "Post image"}
                     className="max-h-full max-w-full object-contain"
                   />
 
-                  {/* Image Navigation Arrows - Instagram-like hover behavior */}
-                  {currentImageIndex > 0 && (
-                    <button
-                      onClick={handlePrevImage}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-black/60 hover:scale-110"
-                    >
-                      <ChevronLeft size={32} strokeWidth={1.5} />
-                    </button>
+                  {/* Image Navigation Arrows */}
+                  {selectedPost.photo.length > 1 && (
+                    <>
+                      {currentImageIndex > 0 && (
+                        <button
+                          onClick={handlePrevImage}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-black/60 hover:scale-110"
+                        >
+                          <ChevronLeft size={32} strokeWidth={1.5} />
+                        </button>
+                      )}
+
+                      {currentImageIndex < selectedPost.photo.length - 1 && (
+                        <button
+                          onClick={handleNextImage}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-black/60 hover:scale-110"
+                        >
+                          <ChevronRight size={32} strokeWidth={1.5} />
+                        </button>
+                      )}
+                    </>
                   )}
 
-                  {currentImageIndex < selectedPost.photo.length - 1 && (
-                    <button
-                      onClick={handleNextImage}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-black/60 hover:scale-110"
-                    >
-                      <ChevronRight size={32} strokeWidth={1.5} />
-                    </button>
-                  )}
+                  {/* Post Navigation Arrows */}
+                  {posts.length > 1 && (
+                    <>
+                      {currentPostIndex > 0 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handlePrevPost();
+                          }}
+                          className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
+                        >
+                          <ChevronLeft size={32} strokeWidth={1.5} />
+                        </button>
+                      )}
 
-                  {/* Post Navigation Arrows - Between different posts */}
-                  {currentPostIndex > 0 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handlePrevPost();
-                      }}
-                      className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
-                    >
-                      <ChevronLeft size={32} strokeWidth={1.5} />
-                    </button>
-                  )}
-
-                  {currentPostIndex < posts.length - 1 && (
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleNextPost();
-                      }}
-                      className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
-                    >
-                      <ChevronRight size={32} strokeWidth={1.5} />
-                    </button>
+                      {currentPostIndex < posts.length - 1 && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleNextPost();
+                          }}
+                          className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/40 text-white p-2 rounded-full opacity-0 group-hover:opacity-100 transition-all duration-200 hover:bg-black/60 hover:scale-110 z-10"
+                        >
+                          <ChevronRight size={32} strokeWidth={1.5} />
+                        </button>
+                      )}
+                    </>
                   )}
 
                   {/* Image Indicators */}
@@ -306,12 +403,25 @@ const GuideProfile = () => {
                   <div className="p-4 border-b border-gray-800 flex items-center gap-3">
                     <div className="w-10 h-10 rounded-full bg-gray-800 flex items-center justify-center overflow-hidden">
                       {guideProfile?.profilePic ? (
-                        <img src={guideProfile.profilePic} alt="Profile" className="w-full h-full object-cover" />
+                        <img
+                          src={guideProfile.profilePic}
+                          alt="Profile"
+                          className="w-full h-full object-cover"
+                        />
                       ) : (
                         <User size={20} className="text-gray-500" />
                       )}
                     </div>
-                    <span className="font-semibold">{guideProfile?.name || currentGuide?.email?.split("@")[0]}</span>
+                    <div className="flex-1">
+                      <span className="font-semibold">{guideProfile?.name || currentGuide?.email?.split("@")[0]}</span>
+                      <p className="text-xs text-gray-400">
+                        {new Date(selectedPost.createdAt).toLocaleDateString('en-US', {
+                          month: 'long',
+                          day: 'numeric',
+                          year: 'numeric'
+                        })}
+                      </p>
+                    </div>
                   </div>
 
                   {/* Caption and Comments */}
@@ -320,7 +430,11 @@ const GuideProfile = () => {
                     <div className="flex items-start gap-3">
                       <div className="w-10 h-10 rounded-full bg-gray-800 flex-shrink-0 flex items-center justify-center overflow-hidden">
                         {guideProfile?.profilePic ? (
-                          <img src={guideProfile.profilePic} alt="Profile" className="w-full h-full object-cover" />
+                          <img
+                            src={guideProfile.profilePic}
+                            alt="Profile"
+                            className="w-full h-full object-cover"
+                          />
                         ) : (
                           <User size={20} className="text-gray-500" />
                         )}
@@ -328,25 +442,82 @@ const GuideProfile = () => {
                       <div>
                         <span className="font-semibold">{guideProfile?.name || currentGuide?.email?.split("@")[0]}</span>
                         <p className="text-sm mt-1">{selectedPost.caption}</p>
+                        <div className="flex gap-4 mt-2 text-xs text-gray-400">
+                          <span>
+                            {selectedPost.likes.length} like{selectedPost.likes.length !== 1 ? 's' : ''}
+                          </span>
+                          <span>
+                            {selectedPost.comments.length} comment{selectedPost.comments.length !== 1 ? 's' : ''}
+                          </span>
+                        </div>
                       </div>
                     </div>
 
                     {/* Comments */}
                     {selectedPost.comments.length > 0 ? (
                       selectedPost.comments.map((comment: any) => (
-                        <div key={comment._id} className="flex items-start gap-3">
+                        <div 
+                          key={comment._id} 
+                          className={`flex items-start gap-3 ${comment.parentId ? 'ml-10 border-l-2 border-gray-700 pl-3' : ''}`}
+                        >
                           <div className="w-10 h-10 rounded-full bg-gray-800 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                            <User size={20} className="text-gray-500" />
+                            {comment.user?.profilePic ? (
+                              <img
+                                src={comment.user.profilePic}
+                                alt="Profile"
+                                className="w-full h-full object-cover"
+                              />
+                            ) : (
+                              <User size={20} className="text-gray-500" />
+                            )}
                           </div>
-                          <div>
+                          <div className="flex-1">
                             <span className="font-semibold">{comment.user?.username || "User"}</span>
                             <p className="text-sm mt-1">{comment.text}</p>
+                            <div className="flex gap-3 mt-1 text-xs text-gray-400">
+                              <span>
+                                {new Date(comment.createdAt).toLocaleDateString('en-US', {
+                                  month: 'short',
+                                  day: 'numeric'
+                                })}
+                              </span>
+                              <button 
+                                onClick={() => {
+                                  setReplyingTo(comment._id);
+                                  document.querySelector('.comment-input')?.scrollIntoView({ behavior: 'smooth' });
+                                }} 
+                                className="hover:text-white"
+                              >
+                                Reply
+                              </button>
+                            </div>
+                            
+                            {/* Reply input appears when replying to this comment */}
+                            {replyingTo === comment._id && (
+                              <div className="mt-3 flex items-center gap-2">
+                                <input
+                                  type="text"
+                                  placeholder="Write a reply..."
+                                  className="flex-1 bg-gray-800 text-sm outline-none placeholder-gray-500 px-3 py-2 rounded"
+                                  value={replyText}
+                                  onChange={(e) => setReplyText(e.target.value)}
+                                  onKeyPress={(e) => e.key === 'Enter' && handleAddReply()}
+                                />
+                                <button
+                                  onClick={handleAddReply}
+                                  disabled={!replyText.trim() || isReplying}
+                                  className={`${replyText.trim() ? 'text-[#09b86c]' : 'text-gray-500'} font-semibold text-sm`}
+                                >
+                                  {isReplying ? 'Posting...' : 'Post'}
+                                </button>
+                              </div>
+                            )}
                           </div>
                         </div>
                       ))
                     ) : (
                       <div className="text-center text-gray-500 py-10">
-                        No comments yet
+                        No comments yet. Be the first to comment!
                       </div>
                     )}
                   </div>
@@ -355,45 +526,60 @@ const GuideProfile = () => {
                   <div className="p-4 border-t border-gray-800">
                     <div className="flex justify-between mb-3">
                       <div className="flex gap-4">
-                        <button 
-                          onClick={() => setIsLiked(!isLiked)}
+                        <button
+                          onClick={handleLikePost}
                           className="hover:opacity-70"
                         >
-                          <Heart size={24} fill={isLiked ? "currentColor" : "none"} />
+                          <Heart
+                            size={24}
+                            fill={
+                              selectedPost.likes.some((like: any) => like._id === currentGuide?.id)
+                                ? "currentColor"
+                                : "none"
+                            }
+                          />
                         </button>
                         <button className="hover:opacity-70">
                           <MessageCircle size={24} />
                         </button>
                       </div>
-                      <button 
-                        onClick={() => setIsSaved(!isSaved)}
-                        className="hover:opacity-70"
-                      >
-                        <Bookmark size={24} fill={isSaved ? "currentColor" : "none"} />
+                      <button className="hover:opacity-70">
+                        <Bookmark size={24} />
                       </button>
                     </div>
 
                     <div className="text-sm font-semibold">
-                      {selectedPost.likesCount + (isLiked ? 1 : 0)} likes
-                    </div>
-                    <div className="text-xs text-gray-400 mt-1">
-                      {new Date(selectedPost.createdAt).toLocaleDateString('en-US', {
-                        month: 'short',
-                        day: 'numeric'
-                      })}
+                      {selectedPost.likes.length} like{selectedPost.likes.length !== 1 ? 's' : ''}
                     </div>
                   </div>
 
                   {/* Comment Input */}
-                  <div className="p-4 border-t border-gray-800">
+                  <div className="p-4 border-t border-gray-800 comment-input">
+                    {replyingTo && (
+                      <div className="flex items-center justify-between mb-2 text-xs text-gray-400">
+                        <span>Replying to comment</span>
+                        <button onClick={cancelReply} className="text-gray-500 hover:text-white">
+                          Cancel
+                        </button>
+                      </div>
+                    )}
                     <div className="flex items-center gap-2">
                       <input
                         type="text"
-                        placeholder="Add a comment..."
-                        className="flex-1 bg-transparent text-sm outline-none"
+                        placeholder={replyingTo ? "Write your reply..." : "Add a comment..."}
+                        className="flex-1 bg-transparent text-sm outline-none placeholder-gray-500"
+                        value={replyingTo ? replyText : commentText}
+                        onChange={(e) => replyingTo ? setReplyText(e.target.value) : setCommentText(e.target.value)}
+                        onKeyPress={(e) => e.key === 'Enter' && (replyingTo ? handleAddReply() : handleAddComment())}
                       />
-                      <button className="text-[#09b86c] font-semibold text-sm disabled:opacity-50">
-                        Post
+                      <button
+                        onClick={replyingTo ? handleAddReply : handleAddComment}
+                        disabled={(replyingTo ? !replyText.trim() : !commentText.trim()) || (replyingTo ? isReplying : isCommenting)}
+                        className={`${(replyingTo ? replyText.trim() : commentText.trim()) ? 'text-[#09b86c]' : 'text-gray-500'} font-semibold text-sm`}
+                      >
+                        {replyingTo ? 
+                          (isReplying ? 'Posting...' : <Send size={20} />) : 
+                          (isCommenting ? 'Posting...' : <Send size={20} />)}
                       </button>
                     </div>
                   </div>
