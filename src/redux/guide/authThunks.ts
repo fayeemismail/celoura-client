@@ -1,6 +1,6 @@
 import { guideLogin, logoutGuide } from "../../api/auth";
-import { commentPostApi, createNewPostApi, getdestinations, getGuideAllPostApi, getMyDetails, getNewDestinationApi, getPaginatiedDestinationGuideAPI, getProfileDataAPI, getSinglePostApi, guideRefreshAccessToken, likePostApi, unlikePostApi, updateProfileGuideApi } from "../../api/guide/guideApi";
-import { AddCommentArgs } from "../../types/CommentReqSummary";
+import { commentPostApi, createNewPostApi, getdestinations, getGuideAllPostApi, getMyDetails, getNewDestinationApi, getPaginatiedDestinationGuideAPI, getProfileDataAPI, getSinglePostApi, guideRefreshAccessToken, likePostApi, replyCommentPostApi, unlikePostApi, updateProfileGuideApi } from "../../api/guide/guideApi";
+import { AddCommentArgs, AddReplyComment } from "../../types/CommentReqSummary";
 import { signInFailure, signInPending, signInSuccess, signOut, updateGuidePending } from "./guideSlice"
 
 
@@ -216,3 +216,14 @@ export const addCommentThunk = ({ postId, content, userId }: AddCommentArgs) => 
    }
   };
 };
+
+export const addReplyCommentThunk = ({ postId, content, userId, parentId }: AddReplyComment) => {
+    return async() => {
+        try {
+            const response = await replyCommentPostApi({postId, content, userId, parentId});
+            return response.data
+        } catch (error) {
+            
+        }
+    }
+} 
