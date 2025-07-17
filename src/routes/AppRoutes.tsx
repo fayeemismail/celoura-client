@@ -22,6 +22,7 @@ import GuideDestinations from '../pages/Guide/GuideDestinations';
 import EditDestination from '../pages/admin/EditDestination';
 import EditProfile from '../pages/Guide/EditProfileGuide';
 import CreatePost from '../pages/Guide/CreatePost';
+import GuideListing from '../pages/user/GuideListing';
 
 export default function AppRoutes() {
   return (
@@ -39,6 +40,7 @@ export default function AppRoutes() {
           <Route path='/become-a-guide' element={ <BecomeAGuide /> } />
           <Route path='/destinations' element={ <UserDestinations /> } />
           <Route path='/destination/:id' element={ <DestinationDetailPage /> } />
+          <Route path='/guides' element={ <GuideListing /> } />
         </Route>
 
         {/* Admin Routes */}
