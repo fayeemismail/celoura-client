@@ -11,5 +11,5 @@ export interface AddReplyComment {
     postId: string;
     content: string;
     userId: string;
-    patentId: string;
+    parentId: string;
 }

@@ -14,7 +14,8 @@ import {
   getSinglePostThunk,
   likePostThunk,
   unlikePostThunk,
-  addCommentThunk
+  addCommentThunk,
+  addReplyCommentThunk
 } from "../../redux/guide/authThunks";
 import { Guide } from "../../types/Guide";
 import { IPostSummary } from "../../types/IPostSummary";
@@ -60,8 +61,7 @@ const GuideProfile = () => {
 
   const handleViewPost = async (postId: string) => {
     try {
-      const response = await dispatch(getSinglePostThunk(postId))
-      console.log(response, "this is response")
+      const response = await dispatch(getSinglePostThunk(postId));
       setSelectedPost(response);
       setCurrentPostIndex(posts.findIndex(post => post._id === postId));
       setCurrentImageIndex(0);
@@ -145,7 +145,6 @@ const GuideProfile = () => {
         content: commentText,
         userId: currentGuide?.id!
       }));
-      console.log(response, 'this is comment response');
 
       setSelectedPost({
         ...selectedPost,
@@ -165,15 +164,27 @@ const GuideProfile = () => {
 
     setIsReplying(true);
     try {
-      const response = await dispatch(addCommentThunk({
+      const response = await dispatch(addReplyCommentThunk({
         postId: selectedPost._id,
         content: replyText,
         userId: currentGuide?.id!,
+        parentId: replyingTo
       }));
+
+      // Find the parent comment and add the reply to its replies array
+      const updatedComments = selectedPost.comments.map((comment: any) => {
+        if (comment._id === replyingTo) {
+          return {
+            ...comment,
+            replies: [...(comment.replies || []), response]
+          };
+        }
+        return comment;
+      });
 
       setSelectedPost({
         ...selectedPost,
-        comments: [...selectedPost.comments, response]
+        comments: updatedComments
       });
       setReplyText("");
       setReplyingTo(null);
@@ -456,63 +467,75 @@ const GuideProfile = () => {
                     {/* Comments */}
                     {selectedPost.comments.length > 0 ? (
                       selectedPost.comments.map((comment: any) => (
-                        <div 
-                          key={comment._id} 
-                          className={`flex items-start gap-3 ${comment.parentId ? 'ml-10 border-l-2 border-gray-700 pl-3' : ''}`}
-                        >
-                          <div className="w-10 h-10 rounded-full bg-gray-800 flex-shrink-0 flex items-center justify-center overflow-hidden">
-                            {comment.user?.profilePic ? (
-                              <img
-                                src={comment.user.profilePic}
-                                alt="Profile"
-                                className="w-full h-full object-cover"
-                              />
-                            ) : (
-                              <User size={20} className="text-gray-500" />
-                            )}
-                          </div>
-                          <div className="flex-1">
-                            <span className="font-semibold">{comment.user?.username || "User"}</span>
-                            <p className="text-sm mt-1">{comment.text}</p>
-                            <div className="flex gap-3 mt-1 text-xs text-gray-400">
-                              <span>
-                                {new Date(comment.createdAt).toLocaleDateString('en-US', {
-                                  month: 'short',
-                                  day: 'numeric'
-                                })}
-                              </span>
-                              <button 
-                                onClick={() => {
-                                  setReplyingTo(comment._id);
-                                  document.querySelector('.comment-input')?.scrollIntoView({ behavior: 'smooth' });
-                                }} 
-                                className="hover:text-white"
-                              >
-                                Reply
-                              </button>
-                            </div>
-                            
-                            {/* Reply input appears when replying to this comment */}
-                            {replyingTo === comment._id && (
-                              <div className="mt-3 flex items-center gap-2">
-                                <input
-                                  type="text"
-                                  placeholder="Write a reply..."
-                                  className="flex-1 bg-gray-800 text-sm outline-none placeholder-gray-500 px-3 py-2 rounded"
-                                  value={replyText}
-                                  onChange={(e) => setReplyText(e.target.value)}
-                                  onKeyPress={(e) => e.key === 'Enter' && handleAddReply()}
+                        <div key={comment._id} className="space-y-3">
+                          {/* Parent Comment */}
+                          <div className="flex items-start gap-3">
+                            <div className="w-10 h-10 rounded-full bg-gray-800 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                              {comment.user?.profilePic ? (
+                                <img
+                                  src={comment.user.profilePic}
+                                  alt="Profile"
+                                  className="w-full h-full object-cover"
                                 />
-                                <button
-                                  onClick={handleAddReply}
-                                  disabled={!replyText.trim() || isReplying}
-                                  className={`${replyText.trim() ? 'text-[#09b86c]' : 'text-gray-500'} font-semibold text-sm`}
+                              ) : (
+                                <User size={20} className="text-gray-500" />
+                              )}
+                            </div>
+                            <div className="flex-1">
+                              <span className="font-semibold">{comment.user?.username || "User"}</span>
+                              <p className="text-sm mt-1">{comment.text}</p>
+                              <div className="flex gap-3 mt-1 text-xs text-gray-400">
+                                <span>
+                                  {new Date(comment.createdAt).toLocaleDateString('en-US', {
+                                    month: 'short',
+                                    day: 'numeric'
+                                  })}
+                                </span>
+                                <button 
+                                  onClick={() => {
+                                    setReplyingTo(comment._id);
+                                    document.querySelector('.comment-input')?.scrollIntoView({ behavior: 'smooth' });
+                                  }} 
+                                  className="hover:text-white"
                                 >
-                                  {isReplying ? 'Posting...' : 'Post'}
+                                  Reply
                                 </button>
                               </div>
-                            )}
+                            </div>
                           </div>
+
+                          {/* Replies */}
+                          {comment.replies && comment.replies.length > 0 && (
+                            <div className="ml-10 pl-3 border-l-2 border-gray-700 space-y-3">
+                              {comment.replies.map((reply: any) => (
+                                <div key={reply._id} className="flex items-start gap-3">
+                                  <div className="w-8 h-8 rounded-full bg-gray-800 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                                    {reply.user?.profilePic ? (
+                                      <img
+                                        src={reply.user.profilePic}
+                                        alt="Profile"
+                                        className="w-full h-full object-cover"
+                                      />
+                                    ) : (
+                                      <User size={16} className="text-gray-500" />
+                                    )}
+                                  </div>
+                                  <div className="flex-1">
+                                    <span className="font-semibold text-sm">{reply.user?.username || "User"}</span>
+                                    <p className="text-xs mt-1">{reply.text}</p>
+                                    <div className="flex gap-3 mt-1 text-xs text-gray-400">
+                                      <span>
+                                        {new Date(reply.createdAt).toLocaleDateString('en-US', {
+                                          month: 'short',
+                                          day: 'numeric'
+                                        })}
+                                      </span>
+                                    </div>
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
                         </div>
                       ))
                     ) : (

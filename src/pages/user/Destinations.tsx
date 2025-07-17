@@ -43,7 +43,7 @@ export default function UserDestinations() {
       console.error(err.message);
     } finally {
       setLoading(false);
-    }
+    };
   };
 
   useEffect(() => {

@@ -36,3 +36,7 @@ export const getNewDestinationApi = async (limit: number) => {
 export const getCurrentMe = async (id: string) => {
   return await axiosInstance.get(`/user/get-UserProfile/${id}`);
 };
+
+export const getAllGuidesOnUserApi = async(page: number, limit: number, search: string, category: string) => {
+  return await axiosInstance.get(`/user/get-guides?page=${page}&limit=${limit}&search=${search}&category=${category}`);
+}

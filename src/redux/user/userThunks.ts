@@ -1,5 +1,5 @@
 // /redux/user/userThunks.ts
-import { editProfile, getCurrentMe, getDestinationsApi, getNewDestinationApi, pageinatedDestiUserApi, singleSpotApi } from "../../api/userAPI";
+import { editProfile, getAllGuidesOnUserApi, getCurrentMe, getDestinationsApi, getNewDestinationApi, pageinatedDestiUserApi, singleSpotApi } from "../../api/userAPI";
 import { UpdateProfilePayload } from "../../types/user";
 import { AppDispatch } from "../store";
 import {
@@ -94,3 +94,15 @@ export const getCurrentMeThunk = (id: string) => {
     }
   }
 }
+
+export const getAllGuidesOnUserThunk = (page: number, limit: number, search: string, category: string) => {
+  return async() => {
+    try {
+      const response = await getAllGuidesOnUserApi(page, limit, search, category);
+      return response.data
+    } catch (error) {
+      console.log(error);
+      throw error
+    }
+  }
+} 

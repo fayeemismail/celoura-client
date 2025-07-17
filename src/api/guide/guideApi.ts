@@ -1,6 +1,6 @@
 import { AddCommentArgs } from "../../types/CommentReqSummary";
 import guideInstance from "./axiosGuideInstance"
-
+import { AddReplyComment } from "../../types/CommentReqSummary";
 
 
 
@@ -66,5 +66,7 @@ export const commentPostApi = async({postId, content, userId}: AddCommentArgs) =
 };
 
 
-// export const replyCommentPostApi = async({ postId, content, userId, parentId }: AddReplyComment)
+export const replyCommentPostApi = async({ postId, content, userId, parentId }: AddReplyComment) => {
+    return await guideInstance.post('/guide/reply-comment', { postId, content, userId, parentId });
+}
 // export const replyCommentPostApi = async({  }: AddReplyComment)
