@@ -1,5 +1,6 @@
 // /redux/user/userThunks.ts
-import { editProfile, getAllGuidesOnUserApi, getCurrentMe, getDestinationsApi, getNewDestinationApi, pageinatedDestiUserApi, singleSpotApi } from "../../api/userAPI";
+import { commentOnGuidePostApi, editProfile, getAllGuidesOnUserApi, getAllPostGuideApi, getCurrentMe, getDestinationsApi, getGuideSingleDataApi, getNewDestinationApi, likePostUserApi, pageinatedDestiUserApi, replyCommentOnGuidePostApi, singleSpotApi, unLikePostUserApi } from "../../api/userAPI";
+import { AddCommentArgs, AddReplyComment } from "../../types/CommentReqSummary";
 import { UpdateProfilePayload } from "../../types/user";
 import { AppDispatch } from "../store";
 import {
@@ -105,4 +106,79 @@ export const getAllGuidesOnUserThunk = (page: number, limit: number, search: str
       throw error
     }
   }
-} 
+};
+
+
+
+export const getGuideSingleDataThunk = (id: string) => {
+  return async() => {
+    try {
+      const response = await getGuideSingleDataApi(id);
+      return response.data
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+};
+
+export const getAllPostGUideThunk = (id: string) => {
+  return async() => {
+    try {
+      const response = await getAllPostGuideApi(id);
+      return response.data
+    } catch (error) {
+      console.log(error, 'error on getting posts');
+      throw error;
+    }
+  }
+};
+
+export const likePostThunkUser = (postId: string, userId: string) => {
+  return async() => {
+    try {
+      console.log(postId, 'postId', userId, 'UserId')
+      const response = await likePostUserApi(postId, userId);
+      return response
+    } catch (error) {
+      console.log(error);
+      throw error
+    }
+  }
+};
+
+export const unLikePostThunkUser = (postId: string, userId: string) => {
+  return async() => {
+    try {
+      const response = await unLikePostUserApi(postId, userId);
+      return response;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  }
+};
+
+export const addCommentOnGuidePostThunk = ({postId, content, userId}: AddCommentArgs) => {
+  return async() => {
+    try {
+      const response = await commentOnGuidePostApi({postId, content, userId});
+      return response.data;
+    } catch (error) {
+      console.log(error, 'erro on add cooment');
+      throw error;
+    }
+  }
+};
+
+export const addReplyCommentOnGuidePostThunk = ({postId, content, userId, parentId}: AddReplyComment) => {
+  return async() => {
+    try {
+      const response = await replyCommentOnGuidePostApi({ postId, content, userId, parentId });
+      return response.data;
+    } catch (error) {
+      console.log(error, 'on Reply Comment');
+      throw error;
+    }
+  }
+}

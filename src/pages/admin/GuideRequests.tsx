@@ -23,6 +23,7 @@ interface requests {
   dob: Date;
   address: string;
   idFileUrl: string;
+  basedOn: string;
   userId: string;
 }
 
@@ -143,6 +144,8 @@ export default function GuideRequests() {
                   <p><span className="font-medium text-white">Experience:</span> {Application.experience}</p>
                   <p><span className="font-medium text-white">Expertise:</span> {Application.expertise}</p>
                   <p><span className="font-medium text-white">Address:</span> {Application.address}</p>
+                  <p><span className="font-medium text-white">Based On:</span> {Application.basedOn}</p>
+                  
                   <p>
                     <span className="font-medium text-white">Status:</span>{" "}
                     <span className={`inline-block px-2 py-1 rounded-md text-xs font-semibold ${

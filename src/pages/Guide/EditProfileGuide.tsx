@@ -92,7 +92,7 @@ export default function EditProfile() {
     if (bio.length > 0 && !bio.trim()) {
       newErrors.bio = "Bio cannot be just spaces";
       valid = false;
-    }
+    };
 
     if (changePassword) {
       if (!currentPassword.trim()) {

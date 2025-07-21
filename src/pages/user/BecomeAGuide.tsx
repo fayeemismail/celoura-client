@@ -25,9 +25,10 @@ export default function BecomeAGuide() {
     experience: "",
     expertise: "",
     idFile: null,
-    userId: currentUser?._id,
+    userId: currentUser?.id,
+    basedOn: '',
   };
-
+  console.log(currentUser?.id, 'this is currentUser.id');
   const navigate = useNavigate();
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
@@ -41,10 +42,11 @@ export default function BecomeAGuide() {
       formData.append("experience", values.experience);
       formData.append("expertise", values.expertise);
       formData.append("userId", values.userId);
+      formData.append("basedOn", values.basedOn);
       if (values.idFile) {
         formData.append("idFile", values.idFile);
       }
-
+      console.log(formData, 'this is formData')
       await applyForGuide(formData);
 
       toast.success("Application submitted successfully!");
@@ -218,6 +220,20 @@ export default function BecomeAGuide() {
                     ))}
                   </Field>
                   <ErrorMessage name="expertise" component="div" className="text-red-600 text-sm mt-1" />
+                </div>
+
+                <div>
+                  <label className="block mb-2 font-medium" style={{ color: COLORS.text }}>
+                    Based On *
+                  </label>
+                  <Field
+                    as="input"  // Explicitly set as input
+                    type="text"  // Specify the input type
+                    name="basedOn"
+                    className="w-full p-3 border rounded-lg"
+                    style={{ borderColor: COLORS.border }}
+                  />
+                  <ErrorMessage name="basedOn" component="div" className="text-red-600 text-sm mt-1" />
                 </div>
 
                 <div className="pt-4">

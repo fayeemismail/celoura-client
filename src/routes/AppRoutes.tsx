@@ -23,6 +23,7 @@ import EditDestination from '../pages/admin/EditDestination';
 import EditProfile from '../pages/Guide/EditProfileGuide';
 import CreatePost from '../pages/Guide/CreatePost';
 import GuideListing from '../pages/user/GuideListing';
+import GuideProfileUserView from '../pages/user/GuideProfile';
 
 export default function AppRoutes() {
   return (
@@ -41,6 +42,7 @@ export default function AppRoutes() {
           <Route path='/destinations' element={ <UserDestinations /> } />
           <Route path='/destination/:id' element={ <DestinationDetailPage /> } />
           <Route path='/guides' element={ <GuideListing /> } />
+          <Route path='/guide/:guideId' element={ <GuideProfileUserView /> } />;
         </Route>
 
         {/* Admin Routes */}

@@ -13,8 +13,9 @@ type Guide = {
   email: string;
   profilePic?: string;
   bio?: string;
-  followersCount: number;
-  happyCustomersCount: number;
+  followers: number;
+  happyCustomers: number;
+  basedOn: string
 };
 
 export default function GuideListing() {
@@ -25,7 +26,7 @@ export default function GuideListing() {
   const [guides, setGuides] = useState<Guide[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
-  const [limit] = useState(9);
+  const [limit] = useState(6);
   const [totalPages, setTotalPages] = useState(1);
 
   const [search, setSearch] = useState("");
@@ -35,7 +36,6 @@ export default function GuideListing() {
     setLoading(true);
     try {
     const response = await dispatch(getAllGuidesOnUserThunk(page, limit, search, category));
-    console.log(response, 'this is reponse--------------------------')
       setGuides(response.data || []);
       setTotalPages(response.pagination?.totalPages || 1);
       setCategory(response.category);
@@ -126,6 +126,9 @@ export default function GuideListing() {
                       <p className="text-sm" style={{ color: COLORS.secondaryText }}>
                         {guide.email}
                       </p>
+                      <p className="text-sm" style={{ color: COLORS.secondaryText }}>
+                        Based On: {guide.basedOn}
+                      </p>
                     </div>
                   </div>
 
@@ -146,13 +149,13 @@ export default function GuideListing() {
                     <div className="flex items-center">
                       <Users className="h-4 w-4 mr-1" style={{ color: COLORS.accent }} />
                       <span className="text-sm" style={{ color: COLORS.secondaryText }}>
-                        {guide.followersCount} followers
+                        {guide.followers} followers
                       </span>
                     </div>
                     <div className="flex items-center">
                       <Smile className="h-4 w-4 mr-1" style={{ color: COLORS.accent }} />
                       <span className="text-sm" style={{ color: COLORS.secondaryText }}>
-                        {guide.happyCustomersCount} happy customers
+                        {guide.happyCustomers} happy customers
                       </span>
                     </div>
                   </div>

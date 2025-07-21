@@ -16,5 +16,6 @@ export const guideApplicationSchema = Yup.object().shape({
   idFile: Yup.mixed().required("ID verification file is required"),
   address: Yup.string()
     .min(10, "Address must be at least 10 characters")
-    .required("Address is required"), 
+    .required("Address is required"),
+  basedOn: Yup.string().required('Location is required')
 });
