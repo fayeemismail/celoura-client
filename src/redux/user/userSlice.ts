@@ -20,7 +20,7 @@ export const fetchUserData = createAsyncThunk(
 
 
 interface CurrentUser {
-    _id: string,
+    id: string,
     name: string,
     email: string,
     role: string

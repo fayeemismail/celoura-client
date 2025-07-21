@@ -39,7 +39,7 @@ export default function ProfileForm() {
       return;
     }
 
-    const changes: any = { id: currentUser._id };
+    const changes: any = { id: currentUser.id };
 
     if (name.trim() && name.trim() !== currentUser.name) {
       changes.name = name.trim();

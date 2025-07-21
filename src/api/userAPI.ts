@@ -1,4 +1,5 @@
 import axiosInstance from "./axiosInstance"
+import { AddCommentArgs, AddReplyComment } from "../types/CommentReqSummary";
 
 
 
@@ -39,4 +40,28 @@ export const getCurrentMe = async (id: string) => {
 
 export const getAllGuidesOnUserApi = async(page: number, limit: number, search: string, category: string) => {
   return await axiosInstance.get(`/user/get-guides?page=${page}&limit=${limit}&search=${search}&category=${category}`);
-}
+};
+
+export const getGuideSingleDataApi = async(id: string) => {
+  return await axiosInstance.get(`/user/guide/${id}`);
+};
+
+export const getAllPostGuideApi = async(id: string) => {
+  return await axiosInstance.get(`/user/guide/posts/${id}`);
+};
+
+export const likePostUserApi = async(postId: string, userId: string) => {
+  return await axiosInstance.put(`/user/like/${postId}/${userId}`);
+};
+
+export const unLikePostUserApi = async(postId: string, userId: string) => {
+  return await axiosInstance.delete(`/user/like/${postId}/${userId}`);
+};
+
+export const commentOnGuidePostApi = async({ postId, content, userId }: AddCommentArgs) => {
+  return await axiosInstance.post('/user/comment', { postId, content, userId });
+};
+
+export const replyCommentOnGuidePostApi = async({ postId, content, userId, parentId }: AddReplyComment) => {
+  return await axiosInstance.post('/user/reply-comment', { postId, content, userId, parentId });
+};
