@@ -50,6 +50,10 @@ export const getAllPostGuideApi = async(id: string) => {
   return await axiosInstance.get(`/user/guide/posts/${id}`);
 };
 
+export const getGuideSinglePostApi = async(postId: string) => {
+  return await axiosInstance.get(`/user/guide/singlePost/${postId}`);
+};
+
 export const likePostUserApi = async(postId: string, userId: string) => {
   return await axiosInstance.put(`/user/like/${postId}/${userId}`);
 };
@@ -64,4 +68,12 @@ export const commentOnGuidePostApi = async({ postId, content, userId }: AddComme
 
 export const replyCommentOnGuidePostApi = async({ postId, content, userId, parentId }: AddReplyComment) => {
   return await axiosInstance.post('/user/reply-comment', { postId, content, userId, parentId });
+};
+
+export const followGuideApi = async(guideId: string, requesterId: string) => {
+  return await axiosInstance.post(`/user/follow/${guideId}/${requesterId}`);
+};
+
+export const unfollowGuideApi = async(guideId: string, requesterId: string) => {
+  return await axiosInstance.delete(`/user/unfollow/${guideId}/${requesterId}`);
 };
