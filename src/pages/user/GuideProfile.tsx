@@ -2,16 +2,24 @@ import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import Navbar from "../../components/user/home/Navbar";
-import { User, Heart, MessageCircle, Image as ImageIcon, X, ChevronLeft, ChevronRight, Bookmark, Send} from "lucide-react";
-import {getSinglePostThunk} from "../../redux/guide/authThunks";
+import { User, Heart, MessageCircle, Image as ImageIcon, X, ChevronLeft, ChevronRight, Bookmark, Send } from "lucide-react";
+import { getSinglePostThunk } from "../../redux/guide/authThunks";
 import { IPostSummary } from "../../types/IPostSummary";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";
 import COLORS from "../../styles/theme";
 import { Guide } from "../../types/IPostSummaryOnUser";
-import { 
-    addCommentOnGuidePostThunk, addReplyCommentOnGuidePostThunk, getAllPostGUideThunk, getGuideSingleDataThunk, 
-    likePostThunkUser, unLikePostThunkUser } from "../../redux/user/userThunks";
+import {
+  addCommentOnGuidePostThunk,
+  addReplyCommentOnGuidePostThunk,
+  getAllPostGUideThunk,
+  getGuideSingleDataThunk,
+  likePostThunkUser,
+  unLikePostThunkUser,
+  followGuideThunk,
+  unfollowGuideThunk,
+  getGuideSinglePostThunk,
+} from "../../redux/user/userThunks";
 import { FollowButton } from "../../components/user/Guide/FollowButton";
 
 const GuideProfileUserView = () => {
@@ -52,8 +60,7 @@ const GuideProfileUserView = () => {
 
   const handleViewPost = async (postId: string) => {
     try {
-      const response = await dispatch(getSinglePostThunk(postId));
-      console.log(response, 'thi is single post response');
+      const response = await dispatch(getGuideSinglePostThunk(postId));
       setSelectedPost(response);
       setCurrentPostIndex(posts.findIndex(post => post._id === postId));
       setCurrentImageIndex(0);
@@ -99,7 +106,7 @@ const GuideProfileUserView = () => {
     if (!selectedPost || !isAuthenticated) return;
 
     try {
-      if (selectedPost.likes.some((like: any) =>  like._id === currentUser?.id)) {
+      if (selectedPost.likes.some((like: any) => like._id === currentUser?.id)) {
         await dispatch(unLikePostThunkUser(selectedPost._id, currentUser?.id!))
         setSelectedPost({
           ...selectedPost,
@@ -113,7 +120,7 @@ const GuideProfileUserView = () => {
         });
       }
     } catch (error) {
-        console.log(error)
+      console.log(error)
       toast.error("Failed to update like");
     }
   };
@@ -136,7 +143,7 @@ const GuideProfileUserView = () => {
       setCommentText("");
       toast.success("Comment added");
     } catch (error) {
-        console.log(error, 'error while commenting');
+      console.log(error, 'error while commenting');
       toast.error("Failed to add comment");
     } finally {
       setIsCommenting(false);
@@ -173,22 +180,37 @@ const GuideProfileUserView = () => {
       setReplyingTo(null);
       toast.success("Reply added");
     } catch (error) {
-        console.log(error, 'Error on reply comment');
+      console.log(error, 'Error on reply comment');
       toast.error("Failed to add reply");
     } finally {
       setIsReplying(false);
     }
   };
-  // GuideProfile.tsx
-    const handleFollowToggle = () => {
-    if (guideProfile && guideProfile.followers.includes(currentUser?.id!)) {
-        console.log(currentUser?.id, 'this is id');
-    } else {
-        console.log('id of user is ', currentUser?.id, guideProfile, 'this is profiile')
+
+  const handleFollowToggle = async () => {
+    if (!guideId || !currentUser?.id || !guideProfile) return;
+
+    try {
+      if (guideProfile.followers.includes(currentUser.id)) {
+        await dispatch(unfollowGuideThunk(guideId, currentUser.id));
+        setGuideProfile({
+          ...guideProfile,
+          followers: guideProfile.followers.filter(id => id !== currentUser.id)
+        });
+        toast.success(`You've unfollowed ${guideProfile.name}`);
+      } else {
+        await dispatch(followGuideThunk(guideId, currentUser.id));
+        setGuideProfile({
+          ...guideProfile,
+          followers: [...guideProfile.followers, currentUser.id]
+        });
+        toast.success(`You're now following ${guideProfile.name}`);
+      }
+    } catch (error) {
+      console.error("Failed to update follow status", error);
+      toast.error("Failed to update follow status");
     }
-    };
-
-
+  };
 
   const cancelReply = () => {
     setReplyingTo(null);
@@ -210,98 +232,97 @@ const GuideProfileUserView = () => {
       <main className="pt-24 px-4 pb-10 max-w-7xl mx-auto">
         {/* Profile Section */}
         {guideProfile && (
-            <div
-                className="p-6 rounded-2xl shadow-md relative mb-8"
-                style={{
-                backgroundColor: COLORS.cardBg,
-                border: `1px solid ${COLORS.border}`,
-                }}
-            >
-                {/* Follow Button */}
-                {currentUser && currentUser.id !== guideProfile._id && (
-                <div className="absolute top-4 right-4">
-                    <FollowButton
-                    isFollowing={guideProfile.followers.includes(currentUser.id)}
-                      onToggleFollow={handleFollowToggle}
-                    />
-                </div>
+          <div
+            className="p-6 rounded-2xl shadow-md relative mb-8"
+            style={{
+              backgroundColor: COLORS.cardBg,
+              border: `1px solid ${COLORS.border}`,
+            }}
+          >
+            {/* Follow Button */}
+            {currentUser && currentUser.id !== guideProfile._id && (
+              <div className="absolute top-4 right-4">
+                <FollowButton
+                  isFollowing={guideProfile.followers.includes(currentUser.id)}
+                  onToggleFollow={handleFollowToggle}
+                />
+              </div>
+            )}
+
+            {/* Profile Content */}
+            <div className="flex flex-col sm:flex-row items-center sm:items-start sm:gap-8">
+              <div className="flex-shrink-0 w-32 h-32 relative mb-4 sm:mb-0">
+                {guideProfile.profilePic ? (
+                  <img
+                    src={guideProfile.profilePic}
+                    alt="Profile"
+                    className="w-32 h-32 rounded-full object-cover border-4"
+                    style={{ borderColor: COLORS.accent }}
+                  />
+                ) : (
+                  <div
+                    className="w-32 h-32 rounded-full border-4 flex items-center justify-center"
+                    style={{
+                      borderColor: COLORS.accent,
+                      backgroundColor: COLORS.accent + "20",
+                    }}
+                  >
+                    <User className="w-16 h-16" style={{ color: COLORS.accent }} />
+                  </div>
                 )}
+              </div>
 
-                {/* Profile Content */}
-                <div className="flex flex-col sm:flex-row items-center sm:items-start sm:gap-8">
-                <div className="flex-shrink-0 w-32 h-32 relative mb-4 sm:mb-0">
-                    {guideProfile.profilePic ? (
-                    <img
-                        src={guideProfile.profilePic}
-                        alt="Profile"
-                        className="w-32 h-32 rounded-full object-cover border-4"
-                        style={{ borderColor: COLORS.accent }}
-                    />
-                    ) : (
-                    <div
-                        className="w-32 h-32 rounded-full border-4 flex items-center justify-center"
-                        style={{
-                        borderColor: COLORS.accent,
-                        backgroundColor: COLORS.accent + "20",
-                        }}
-                    >
-                        <User className="w-16 h-16" style={{ color: COLORS.accent }} />
-                    </div>
-                    )}
-                </div>
-
-                <div className="flex-1 text-center sm:text-left">
-                    <h2
-                    className="text-2xl font-bold mb-1"
-                    style={{ color: COLORS.text }}
-                    >
-                    {guideProfile.name || "Guide"}
-                    </h2>
-                    <p className="mb-3" style={{ color: COLORS.secondaryText }}>
-                    @{guideProfile.email?.split("@")[0]}
-                    </p>
-                    <p
-                    className="text-sm max-w-md mx-auto sm:mx-0"
-                    style={{ color: COLORS.secondaryText }}
-                    >
-                    {guideProfile.bio?.trim() || "No bio available"}
-                    </p>
-                    <p className="mt-2 text-sm" style={{ color: COLORS.secondaryText }}>
-                    Based in: {guideProfile.basedOn || "Not specified"}
-                    </p>
-                </div>
-                </div>
-
-                {/* Stats Section */}
-                <div className="mt-8 grid grid-cols-3 text-center gap-4 text-sm">
-                <div>
-                    <p className="text-lg font-semibold" style={{ color: COLORS.text }}>
-                    {guideProfile.destinations?.length || 0}
-                    </p>
-                    <p style={{ color: COLORS.secondaryText }}>Destinations</p>
-                </div>
-                <div>
-                    <p className="text-lg font-semibold" style={{ color: COLORS.text }}>
-                    {guideProfile.followers.length || 0}
-                    </p>
-                    <p style={{ color: COLORS.secondaryText }}>Followers</p>
-                </div>
-                <div>
-                    <p className="text-lg font-semibold" style={{ color: COLORS.text }}>
-                    {guideProfile.happyCustomers.length || 0}
-                    </p>
-                    <p style={{ color: COLORS.secondaryText }}>Happy Customers</p>
-                </div>
-                </div>
+              <div className="flex-1 text-center sm:text-left">
+                <h2
+                  className="text-2xl font-bold mb-1"
+                  style={{ color: COLORS.text }}
+                >
+                  {guideProfile.name || "Guide"}
+                </h2>
+                <p className="mb-3" style={{ color: COLORS.secondaryText }}>
+                  @{guideProfile.email?.split("@")[0]}
+                </p>
+                <p
+                  className="text-sm max-w-md mx-auto sm:mx-0"
+                  style={{ color: COLORS.secondaryText }}
+                >
+                  {guideProfile.bio?.trim() || ""}
+                </p>
+                <p className="mt-2 text-sm" style={{ color: COLORS.secondaryText }}>
+                  Based in: {guideProfile.basedOn || "Not specified"}
+                </p>
+              </div>
             </div>
-        )}
 
+            {/* Stats Section */}
+            <div className="mt-8 grid grid-cols-3 text-center gap-4 text-sm">
+              <div>
+                <p className="text-lg font-semibold" style={{ color: COLORS.text }}>
+                  {guideProfile.destinations?.length || 0}
+                </p>
+                <p style={{ color: COLORS.secondaryText }}>Destinations</p>
+              </div>
+              <div>
+                <p className="text-lg font-semibold" style={{ color: COLORS.text }}>
+                  {guideProfile.followers.length || 0}
+                </p>
+                <p style={{ color: COLORS.secondaryText }}>Followers</p>
+              </div>
+              <div>
+                <p className="text-lg font-semibold" style={{ color: COLORS.text }}>
+                  {guideProfile.happyCustomers.length || 0}
+                </p>
+                <p style={{ color: COLORS.secondaryText }}>Happy Customers</p>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Posts Grid */}
         <h3 className="text-xl font-bold mb-4" style={{ color: COLORS.text }}>
           Recent Posts
         </h3>
-        
+
         {posts.length === 0 ? (
           <p className="text-center py-8" style={{ color: COLORS.secondaryText }}>
             This guide hasn't posted anything yet.
@@ -507,11 +528,11 @@ const GuideProfileUserView = () => {
                                   day: 'numeric'
                                 })}
                               </span>
-                              <button 
+                              <button
                                 onClick={() => {
                                   setReplyingTo(comment._id);
                                   document.querySelector('.comment-input')?.scrollIntoView({ behavior: 'smooth' });
-                                }} 
+                                }}
                                 className="hover:text-gray-700"
                               >
                                 Reply
@@ -617,8 +638,8 @@ const GuideProfileUserView = () => {
                       disabled={(replyingTo ? !replyText.trim() : !commentText.trim()) || (replyingTo ? isReplying : isCommenting)}
                       className={`${(replyingTo ? replyText.trim() : commentText.trim()) ? 'text-[#09b86c]' : 'text-gray-400'} font-semibold text-sm`}
                     >
-                      {replyingTo ? 
-                        (isReplying ? 'Posting...' : <Send size={20} />) : 
+                      {replyingTo ?
+                        (isReplying ? 'Posting...' : <Send size={20} />) :
                         (isCommenting ? 'Posting...' : <Send size={20} />)}
                     </button>
                   </div>

@@ -1,5 +1,5 @@
 // /redux/user/userThunks.ts
-import { commentOnGuidePostApi, editProfile, getAllGuidesOnUserApi, getAllPostGuideApi, getCurrentMe, getDestinationsApi, getGuideSingleDataApi, getNewDestinationApi, likePostUserApi, pageinatedDestiUserApi, replyCommentOnGuidePostApi, singleSpotApi, unLikePostUserApi } from "../../api/userAPI";
+import { commentOnGuidePostApi, editProfile, followGuideApi, getAllGuidesOnUserApi, getAllPostGuideApi, getCurrentMe, getDestinationsApi, getGuideSingleDataApi, getGuideSinglePostApi, getNewDestinationApi, likePostUserApi, pageinatedDestiUserApi, replyCommentOnGuidePostApi, singleSpotApi, unfollowGuideApi, unLikePostUserApi } from "../../api/userAPI";
 import { AddCommentArgs, AddReplyComment } from "../../types/CommentReqSummary";
 import { UpdateProfilePayload } from "../../types/user";
 import { AppDispatch } from "../store";
@@ -134,6 +134,19 @@ export const getAllPostGUideThunk = (id: string) => {
   }
 };
 
+export const getGuideSinglePostThunk = (postId: string) => {
+  return async() => {
+    try {
+      const response = await getGuideSinglePostApi(postId);
+      return response.data;
+    } catch (error) {
+      console.log(error, "error on fetching post");
+      throw error;
+    }
+  }
+}
+
+
 export const likePostThunkUser = (postId: string, userId: string) => {
   return async() => {
     try {
@@ -178,6 +191,31 @@ export const addReplyCommentOnGuidePostThunk = ({postId, content, userId, parent
       return response.data;
     } catch (error) {
       console.log(error, 'on Reply Comment');
+      throw error;
+    }
+  }
+};
+
+
+export const followGuideThunk = (guideId: string, requesterId: string) => {
+  return async() => {
+    try {
+      const response = await followGuideApi(guideId, requesterId);
+      return response.data;
+    } catch (error) {
+      console.log(error, 'Error on following');
+      throw error;
+    }
+  }
+};
+
+export const unfollowGuideThunk = (guideId: string, requesterId: string) => {
+  return async() => {
+    try {
+      const response = await unfollowGuideApi(guideId, requesterId);
+      return response.data;
+    } catch (error) {
+      console.log(error, 'Error on unfollow');
       throw error;
     }
   }
