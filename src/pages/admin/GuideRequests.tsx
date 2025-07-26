@@ -34,6 +34,8 @@ export default function GuideRequests() {
   const [selectedApplication, setSelectedApplication] = useState<requests | null>(null);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
   const [approveApplication, setApproveApplication] = useState<requests | null>(null);
+  const [rejectionReason, setRejectionReason] = useState("");
+  const [showReasonModal, setShowReasonModal] = useState(false);
 
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -43,8 +45,7 @@ export default function GuideRequests() {
 
   const getGuideApplies = async (page: number) => {
     try {
-      const response = await dispatch(GetAllGuideApplications( page, limit ))
-      console.log(response)
+      const response = await dispatch(GetAllGuideApplications(page, limit));
       setGuideApplies(response.data);
       setTotalPages(response.totalPages);
       setCurrentPage(response.page);
@@ -71,8 +72,22 @@ export default function GuideRequests() {
 
   const handleRejectConfirmed = async () => {
     if (!selectedApplication) return;
+    setShowReasonModal(true);
+    setConfirmDialogOpen(false);
+  };
+
+  const submitRejectionWithReason = async () => {
+    if (!selectedApplication || !rejectionReason.trim()) {
+      toast.error("Please provide a rejection reason");
+      return;
+    }
+
     try {
-      await dispatch(RejectAsGuide(selectedApplication._id, selectedApplication.userId));
+      await dispatch(RejectAsGuide({
+        applicationId: selectedApplication._id, 
+        userId: selectedApplication.userId,
+        reason: rejectionReason
+      }));
       setGuideApplies((prev) =>
         prev?.map((app) =>
           app._id === selectedApplication._id ? { ...app, status: "rejected" } : app
@@ -83,8 +98,9 @@ export default function GuideRequests() {
       console.error(error);
       toast.error("Error on Rejecting the guide");
     } finally {
-      setConfirmDialogOpen(false);
+      setShowReasonModal(false);
       setSelectedApplication(null);
+      setRejectionReason("");
     }
   };
 
@@ -228,6 +244,40 @@ export default function GuideRequests() {
         onConfirm={handleRejectConfirmed}
         onCancel={() => setConfirmDialogOpen(false)}
       />
+
+      {/* Rejection Reason Modal */}
+      {showReasonModal && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-[#1D2436] border border-[#2D3345] rounded-lg p-6 max-w-md w-full">
+            <h3 className="text-lg font-medium mb-2 text-white">Rejection Reason</h3>
+            <p className="mb-4 text-gray-300">Please provide the reason for rejection:</p>
+            <textarea
+              className="w-full mt-3 p-2 border border-[#2D3345] rounded-md text-white bg-[#1A1F2C]"
+              rows={3}
+              placeholder="Enter rejection reason..."
+              value={rejectionReason}
+              onChange={(e) => setRejectionReason(e.target.value)}
+            />
+            <div className="flex justify-end space-x-3 mt-4">
+              <button
+                onClick={() => {
+                  setShowReasonModal(false);
+                  setRejectionReason("");
+                }}
+                className="px-4 py-2 rounded-md bg-gray-600 text-white hover:bg-gray-700"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={submitRejectionWithReason}
+                className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700"
+              >
+                Submit Rejection
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Approve Confirmation */}
       <ConfirmationDialog

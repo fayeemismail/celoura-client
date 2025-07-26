@@ -1,5 +1,5 @@
 // /redux/user/userThunks.ts
-import { commentOnGuidePostApi, editProfile, followGuideApi, getAllGuidesOnUserApi, getAllPostGuideApi, getCurrentMe, getDestinationsApi, getGuideSingleDataApi, getGuideSinglePostApi, getNewDestinationApi, likePostUserApi, pageinatedDestiUserApi, replyCommentOnGuidePostApi, singleSpotApi, unfollowGuideApi, unLikePostUserApi } from "../../api/userAPI";
+import { commentOnGuidePostApi, editProfile, followGuideApi, getAllGuidesOnUserApi, getAllPostGuideApi, getCurrentMe, getDestinationsApi, getGuideSingleDataApi, getGuideSinglePostApi, getNewDestinationApi, hasRegistered, likePostUserApi, pageinatedDestiUserApi, replyCommentOnGuidePostApi, singleSpotApi, unfollowGuideApi, unLikePostUserApi } from "../../api/userAPI";
 import { AddCommentArgs, AddReplyComment } from "../../types/CommentReqSummary";
 import { UpdateProfilePayload } from "../../types/user";
 import { AppDispatch } from "../store";
@@ -31,6 +31,18 @@ export const handleUpdateProfile = (payload: UpdateProfilePayload) => {
     }
   };
 };
+
+export const hasRegisteredThunk = (userId: string) => {
+  return async() => {
+    try {
+      const response = await hasRegistered(userId);
+      return response.data;
+    } catch (error) {
+      console.log(error, 'this is error');
+      throw error
+    }
+  }
+} 
 
 
 export const GetAllDestinations = () => {

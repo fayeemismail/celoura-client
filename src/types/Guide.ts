@@ -14,4 +14,11 @@ export interface Guide {
   posts: string[];
   createdAt?: string;
   updatedAt?: string;
+};
+
+
+export interface guideRejection{
+  applicationId: string;
+  userId: string;
+  reason: string;
 }

@@ -1,5 +1,6 @@
 import { adminRefreshAccessToken, BlockUser, createDestinationApi, deleteDestinationApi, getAllCount, getAllUsers, getAppliesGuide, getDestinationById, getDestinationsApi, guideApproveApi, guideRejectApi, pageinatedDestinations, unBlockUser, updateDestinationApi } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
+import { guideRejection } from "../../types/Guide";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
 
@@ -124,10 +125,10 @@ export const ApproveAsGuide = (applicationId: string, userId: string) => {
     }
 };
 
-export const RejectAsGuide = (applicationId: string, userId: string) => {
+export const RejectAsGuide = ({applicationId, userId, reason}: guideRejection) => {
     return async() => {
         try {
-            const response = await guideRejectApi(applicationId, userId);
+            const response = await guideRejectApi({applicationId, userId, reason});
             return response;
         } catch (error: any) {
             console.log('Error on Rejects as guide', error.message);

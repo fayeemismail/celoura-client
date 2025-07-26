@@ -6,16 +6,19 @@ import COLORS from "../../styles/theme";
 import Navbar from "../../components/user/home/Navbar";
 import { applyForGuide } from "../../api/userAPI";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useEffect } from "react";
+import { hasRegisteredThunk } from "../../redux/user/userThunks";
 
 const experienceOptions = ["0-1 years", "1-2 years", "2-3 years", "3+ years"];
 const expertiseOptions = ["Historical Tours", "Adventure", "Food Tours", "Nature"];
 
 export default function BecomeAGuide() {
-  const { currentUser } = useSelector((state: RootState) => state.user);
+  const { currentUser, isAuthenticated } = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch<AppDispatch>()
   const initialValues = {
     fullName: "",
     dob: "",
@@ -30,6 +33,15 @@ export default function BecomeAGuide() {
   };
   console.log(currentUser?.id, 'this is currentUser.id');
   const navigate = useNavigate();
+
+  const hasRegistered = async() => {
+    try {
+      const data = await dispatch(hasRegisteredThunk(currentUser?.id!));
+      console.log(data);
+    } catch (error) {
+      toast.error('An error occured');
+    }
+  };
 
   const handleSubmit = async (values: any, { setSubmitting }: any) => {
     try {
@@ -58,6 +70,11 @@ export default function BecomeAGuide() {
       setSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if(!isAuthenticated) navigate('/login');
+    hasRegistered()
+  }, [isAuthenticated, navigate])
 
   return (
     <div className="min-h-screen pt-28 pb-12" style={{ backgroundColor: COLORS.bg }}>

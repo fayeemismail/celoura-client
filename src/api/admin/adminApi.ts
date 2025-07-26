@@ -1,3 +1,4 @@
+import { guideRejection } from "../../types/Guide";
 import adminInstance from "./axiosAdminInstance";
 
 
@@ -36,8 +37,8 @@ export const guideApproveApi = async (applicationId: string, userId: string) => 
     return await adminInstance.patch(`/admin/users/approveAsGuide`, { applicationId, userId })
 }
 
-export const guideRejectApi = async (applicationId: string, userId: string) => {
-    return await adminInstance.patch(`/admin/users/rejectAsGuide`, { applicationId, userId })
+export const guideRejectApi = async ({applicationId, userId, reason}: guideRejection) => {
+    return await adminInstance.patch(`/admin/users/rejectAsGuide`, { applicationId, userId, reason })
 };
 
 export const createDestinationApi = async(formData: FormData) => {

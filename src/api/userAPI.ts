@@ -11,7 +11,9 @@ export const applyForGuide = (formData: FormData) => {
   });
 };
 
-
+export const hasRegistered = async(userId: string) => {
+  return axiosInstance.get(`/user/registerGuide/${userId}`)
+}
 
 export const editProfile = async (payload: Object) => {
     const response = await axiosInstance.put('/user/editProfile', payload);
