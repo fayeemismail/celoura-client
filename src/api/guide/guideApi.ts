@@ -25,7 +25,7 @@ export const getNewDestinationApi = async(limit: number) => {
 
 
 export const getdestinations = async() => {
-    return await guideInstance.get('/user/destinations')
+    return await guideInstance.get('/guide/destinations')
 };
 
 export const getProfileDataAPI = async(id: string) => {

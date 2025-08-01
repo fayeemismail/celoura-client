@@ -43,7 +43,7 @@ export default function AppRoutes() {
           <Route path='/destinations' element={ <UserDestinations /> } />
           <Route path='/destination/:id' element={ <DestinationDetailPage /> } />
           <Route path='/guides' element={ <GuideListing /> } />
-          <Route path='/guide/:guideId' element={ <GuideProfileUserView /> } />;
+          <Route path='/guide-profile/:guideId' element={ <GuideProfileUserView /> } />;
         </Route>
 
         {/* Admin Routes */}

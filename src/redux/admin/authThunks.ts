@@ -1,10 +1,25 @@
-import { adminRefreshAccessToken, BlockUser, createDestinationApi, deleteDestinationApi, getAllCount, getAllUsers, getAppliesGuide, getDestinationById, getDestinationsApi, guideApproveApi, guideRejectApi, pageinatedDestinations, unBlockUser, updateDestinationApi } from "../../api/admin/adminApi";
+import {
+    adminRefreshAccessToken,
+    BlockUser,
+    createDestinationApi,
+    deleteDestinationApi,
+    getAllCount,
+    getAllUsers,
+    getAppliesGuide,
+    getDestinationById,
+    getDestinationsApi,
+    guideApproveApi,
+    guideRejectApi,
+    pageinatedDestinations,
+    unBlockUser,
+    updateDestinationApi
+} from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { guideRejection } from "../../types/Guide";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
 
 
-export const handleAdminLogin = ( formData: { email: string, password: string } ) => {
+export const handleAdminLogin = (formData: { email: string, password: string }) => {
     return async (dispatch: any) => {
         try {
             dispatch(signInPending());
@@ -29,7 +44,7 @@ export const handleAdminTokenRefresh = (): any => {
             const state = getState();
             const currentAdmin = state.admin?.currentAdmin;
 
-            if(!currentAdmin) {
+            if (!currentAdmin) {
                 console.warn('No current admin found in Redux. Logging out...');
                 await logoutAdmin();
                 dispatch(signOut());
@@ -65,8 +80,8 @@ export const handleUserBlockUnblock = (userId: string, isCurrentlyBlocked: boole
     return async () => {
         try {
             const response = isCurrentlyBlocked ?
-            await unBlockUser(userId) :
-            await BlockUser(userId)
+                await unBlockUser(userId) :
+                await BlockUser(userId)
             return response
         } catch (error) {
             console.error('Something went wrong with user block un block', error);
@@ -76,14 +91,15 @@ export const handleUserBlockUnblock = (userId: string, isCurrentlyBlocked: boole
 
 
 export const GetAllUsersData = (page = 1, limit = 10, role: 'user' | 'guide' = 'user', search: string) => {
-  return async () => {
-    try {
-      const response = await getAllUsers(page, limit, role, search);
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching users:', error);
-    }
-  };
+    return async () => {
+        try {
+            const response = await getAllUsers(page, limit, role, search);
+            return response.data;
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            throw error
+        }
+    };
 };
 
 export const GetUserGuideCount = () => {
@@ -93,28 +109,29 @@ export const GetUserGuideCount = () => {
             return response.data;
         } catch (error) {
             console.error('Error fetching users count: ', error);
+            throw error
         }
-    } 
+    }
 }
 
 export const GetAllGuideApplications = (page: number, limit: number) => {
-  return async (dispatch: any) => {
-    try {
-      const response = await getAppliesGuide(page, limit);
+    return async (dispatch: any) => {
+        try {
+            const response = await getAppliesGuide(page, limit);
 
-      return response.data;
-    } catch (error: any) {
-      console.error('Error on get applications', error);
-      dispatch(signOut());
-      throw error; 
-    }
-  };
+            return response.data;
+        } catch (error: any) {
+            console.error('Error on get applications', error);
+            dispatch(signOut());
+            throw error;
+        }
+    };
 };
 
 
 
 export const ApproveAsGuide = (applicationId: string, userId: string) => {
-    return async( ) => {
+    return async () => {
         try {
             const response = await guideApproveApi(applicationId, userId);
             return response;
@@ -125,10 +142,10 @@ export const ApproveAsGuide = (applicationId: string, userId: string) => {
     }
 };
 
-export const RejectAsGuide = ({applicationId, userId, reason}: guideRejection) => {
-    return async() => {
+export const RejectAsGuide = ({ applicationId, userId, reason }: guideRejection) => {
+    return async () => {
         try {
-            const response = await guideRejectApi({applicationId, userId, reason});
+            const response = await guideRejectApi({ applicationId, userId, reason });
             return response;
         } catch (error: any) {
             console.log('Error on Rejects as guide', error.message);
@@ -138,15 +155,15 @@ export const RejectAsGuide = ({applicationId, userId, reason}: guideRejection) =
 }
 
 export const createDestination = (formData: FormData) => {
-  return async () => {
-    try {
-      const response = await createDestinationApi(formData);
-      return response;
-    } catch (error: any) {
-      console.error('Error On Create Destination:', error.response?.data?.message || error.message);
-      throw error;
-    }
-  };
+    return async () => {
+        try {
+            const response = await createDestinationApi(formData);
+            return response;
+        } catch (error: any) {
+            console.error('Error On Create Destination:', error.response?.data?.message || error.message);
+            throw error;
+        }
+    };
 };
 
 export const getAllDestinations = () => {
@@ -163,7 +180,7 @@ export const getAllDestinations = () => {
 
 
 export const getAllPaginatedDesti = (page = 1, limit = 9, search = "", attraction = "") => {
-    return async() => {
+    return async () => {
         try {
             const response = await pageinatedDestinations(page, limit, search, attraction);
             return response.data
@@ -176,7 +193,7 @@ export const getAllPaginatedDesti = (page = 1, limit = 9, search = "", attractio
 
 
 export const deleteDestinationThunk = (destinationId: string) => {
-    return async() => {
+    return async () => {
         try {
             const response = await deleteDestinationApi(destinationId);
             return response.data;
@@ -189,12 +206,12 @@ export const deleteDestinationThunk = (destinationId: string) => {
 
 
 export const getDestinationByIdThunk = (destinationId: string) => {
-    return async() => {
+    return async () => {
         try {
             const data = await getDestinationById(destinationId);
             return data.data
         } catch (error: unknown) {
-            if(error instanceof Error){
+            if (error instanceof Error) {
                 console.log(error.message);
                 throw error
             } else {
@@ -207,7 +224,7 @@ export const getDestinationByIdThunk = (destinationId: string) => {
 
 
 export const updateDestinationThunk = (id: string, formData: FormData) => {
-    return async() => {
+    return async () => {
         try {
             const response = await updateDestinationApi(id, formData);
             return response.data

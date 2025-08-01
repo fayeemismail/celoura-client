@@ -62,7 +62,6 @@ export default function AdminSidebar({ sidebarOpen, toggleSidebar }: SidebarProp
         ))}
       </nav>
 
-      {/* Admin Info */}
       <div className="border-t p-4" style={{ borderColor: ADMIN_COLORS.border, color: ADMIN_COLORS.secondaryText }}>
         <div className="flex items-center">
           <div style={{ backgroundColor: ADMIN_COLORS.accent }} className="h-8 w-8 rounded-full flex items-center justify-center">
@@ -91,7 +90,6 @@ export default function AdminSidebar({ sidebarOpen, toggleSidebar }: SidebarProp
         )}
       </div>
 
-      {/* Sidebar Toggle */}
       <button
         onClick={toggleSidebar}
         style={{ backgroundColor: ADMIN_COLORS.hoverBg, color: ADMIN_COLORS.secondaryText }}

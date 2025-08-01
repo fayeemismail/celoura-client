@@ -162,7 +162,7 @@ export default function GuideListing() {
 
                   {/* View Profile Button */}
                   <button
-                    onClick={() => navigate(`/guide/${guide._id}`)}
+                    onClick={() => navigate(`/guide-profile/${guide._id}`)}
                     className="w-full mt-4 py-2 rounded-md font-medium text-white transition-colors"
                     style={{ backgroundColor: COLORS.accent }}
                   >

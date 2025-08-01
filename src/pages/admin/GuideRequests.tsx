@@ -12,7 +12,7 @@ import AdminHeader from "../../components/admin/home/AdminHeader";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../../components/common/ConfirmationDialog";
 
-interface requests {
+interface Request {
   _id: string;
   fullName: string;
   phone: string;
@@ -25,15 +25,18 @@ interface requests {
   idFileUrl: string;
   basedOn: string;
   userId: string;
+  rejectReason?: string;
+  re_apply?: number;
+  createdAt: string;
 }
 
 export default function GuideRequests() {
-  const [guideApplies, setGuideApplies] = useState<requests[]>([]);
+  const [guideApplies, setGuideApplies] = useState<Request[]>([]);
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
-  const [selectedApplication, setSelectedApplication] = useState<requests | null>(null);
+  const [selectedApplication, setSelectedApplication] = useState<Request | null>(null);
   const [approveDialogOpen, setApproveDialogOpen] = useState(false);
-  const [approveApplication, setApproveApplication] = useState<requests | null>(null);
+  const [approveApplication, setApproveApplication] = useState<Request | null>(null);
   const [rejectionReason, setRejectionReason] = useState("");
   const [showReasonModal, setShowReasonModal] = useState(false);
 
@@ -51,6 +54,7 @@ export default function GuideRequests() {
       setCurrentPage(response.page);
     } catch (error) {
       console.error("Error fetching guide applications", error);
+      toast.error("Failed to load applications");
     }
   };
 
@@ -60,12 +64,12 @@ export default function GuideRequests() {
     }
   };
 
-  const confirmReject = (application: requests) => {
+  const confirmReject = (application: Request) => {
     setSelectedApplication(application);
     setConfirmDialogOpen(true);
   };
 
-  const confirmApprove = (application: requests) => {
+  const confirmApprove = (application: Request) => {
     setApproveApplication(application);
     setApproveDialogOpen(true);
   };
@@ -90,13 +94,18 @@ export default function GuideRequests() {
       }));
       setGuideApplies((prev) =>
         prev?.map((app) =>
-          app._id === selectedApplication._id ? { ...app, status: "rejected" } : app
+          app._id === selectedApplication._id ? { 
+            ...app, 
+            status: "rejected",
+            rejectReason: rejectionReason,
+            re_apply: (app.re_apply || 0) + 1
+          } : app
         )
       );
-      toast.success("Rejected Guide Application successfully");
+      toast.success("Application rejected successfully");
     } catch (error) {
       console.error(error);
-      toast.error("Error on Rejecting the guide");
+      toast.error("Error rejecting the application");
     } finally {
       setShowReasonModal(false);
       setSelectedApplication(null);
@@ -113,7 +122,7 @@ export default function GuideRequests() {
           app._id === approveApplication._id ? { ...app, status: "approved" } : app
         )
       );
-      toast.success("Approved as guide successfully");
+      toast.success("Guide approved successfully");
     } catch (error) {
       console.error(error);
       toast.error("Error approving the guide");
@@ -123,120 +132,158 @@ export default function GuideRequests() {
     }
   };
 
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    });
+  };
+
   useEffect(() => {
     getGuideApplies(1);
   }, []);
 
   return (
-    <div className="min-h-screen bg-[#1A1F2C] flex">
+    <div className="min-h-screen bg-[#061223] flex">
       <AdminSidebar sidebarOpen={sidebarOpen} toggleSidebar={() => setSidebarOpen(!sidebarOpen)} />
+      
       <div className={`flex-1 flex flex-col transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
         <AdminHeader />
-        <div className="flex-1 p-4 overflow-y-auto">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {guideApplies?.map((Application) => (
-              <div
-                key={Application._id}
-                className="bg-[#1D2436] border border-[#2D3345] rounded-xl shadow-sm p-6 hover:shadow-md transition flex flex-col"
+        
+        <div className="flex-1 p-6 overflow-y-auto">
+          <h1 className="text-2xl font-bold text-[#d9dfea] mb-6">Guide Applications</h1>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {guideApplies?.map((application) => (
+              <div 
+                key={application._id}
+                className="bg-[#0e0b406b] rounded-xl shadow-sm overflow-hidden border border-[#0d0948] hover:shadow-md transition-all"
               >
-                <div className="mb-4 flex justify-center">
-                  <div className="w-full h-48 rounded-lg overflow-hidden border border-[#2D3345]">
-                    <img
-                      src={Application.idFileUrl}
-                      alt={`${Application.fullName}'s ID`}
-                      className="w-full h-full object-cover"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.onerror = null;
-                        target.src = "https://via.placeholder.com/300x200?text=ID+Not+Available";
-                      }}
-                    />
-                  </div>
+                <div className="relative h-48 bg-[#f3f4f6] overflow-hidden">
+                  <img
+                    src={application.idFileUrl}
+                    alt={`${application.fullName}'s ID`}
+                    className="w-full h-full object-cover transition-transform hover:scale-105 duration-300"
+                    onError={(e) => {
+                      const target = e.target as HTMLImageElement;
+                      target.onerror = null;
+                      target.src = "https://via.placeholder.com/300x200?text=ID+Not+Available";
+                    }}
+                  />
+                  {application.re_apply && application.re_apply > 0 && (
+                    <div className="absolute top-2 right-2 bg-[#fef3c7] text-[#92400e] text-xs font-bold px-2 py-1 rounded-full">
+                      Re-applied {application.re_apply > 1 ? `(${application.re_apply})` : ''}
+                    </div>
+                  )}
                 </div>
-                <div className="space-y-2 text-sm text-gray-200 flex-grow">
-                  <p><span className="font-medium text-white">Name:</span> {Application.fullName}</p>
-                  <p><span className="font-medium text-white">Email:</span> {Application.email}</p>
-                  <p><span className="font-medium text-white">Phone:</span> {Application.phone}</p>
-                  <p><span className="font-medium text-white">Experience:</span> {Application.experience}</p>
-                  <p><span className="font-medium text-white">Expertise:</span> {Application.expertise}</p>
-                  <p><span className="font-medium text-white">Address:</span> {Application.address}</p>
-                  <p><span className="font-medium text-white">Based On:</span> {Application.basedOn}</p>
-                  
-                  <p>
-                    <span className="font-medium text-white">Status:</span>{" "}
-                    <span className={`inline-block px-2 py-1 rounded-md text-xs font-semibold ${
-                      Application.status === "approved"
-                        ? "bg-green-200 text-green-800"
-                        : Application.status === "rejected"
-                        ? "bg-red-200 text-red-800"
-                        : "bg-yellow-200 text-yellow-800"
+                
+                <div className="p-5">
+                  <div className="flex justify-between items-start mb-3">
+                    <h3 className="text-lg font-semibold text-[#dfe2e9]">{application.fullName}</h3>
+                    <span className={`px-2 py-1 rounded-md text-xs font-semibold ${
+                      application.status === "approved"
+                        ? "bg-[#dcfce7] text-[#166534]"
+                        : application.status === "rejected"
+                        ? "bg-[#fee2e2] text-[#991b1b]"
+                        : "bg-[#dbeafe] text-[#18338d]"
                     }`}>
-                      {Application.status.toUpperCase()}
+                      {application.status.toUpperCase()}
                     </span>
-                  </p>
-                </div>
-                <div className="flex gap-3 mt-4 justify-end">
-                  {Application.status === "pending" && (
-                    <>
+                  </div>
+                  
+                  <div className="space-y-2 text-sm text-[#dee4ec] mb-4">
+                    <p><span className="font-medium text-[#dee4ec]">Email:</span> {application.email}</p>
+                    <p><span className="font-medium text-[#dee4ec]">Phone:</span> {application.phone}</p>
+                    <p><span className="font-medium text-[#dee4ec]">Expertise:</span> {application.expertise}</p>
+                    <p><span className="font-medium text-[#dee4ec]">Applied:</span> {formatDate(application.createdAt)}</p>
+                  </div>
+
+                  {application.status === 'rejected' && application.rejectReason && (
+                    <div className="mt-3 p-3 bg-[#fef2f2] rounded-lg border border-[#fecaca]">
+                      <p className="text-xs font-medium text-[#b91c1c]">Rejection Reason:</p>
+                      <p className="text-xs text-[#dc2626] mt-1">{application.rejectReason}</p>
+                    </div>
+                  )}
+
+                  <div className="flex justify-end mt-4 gap-2">
+                    {application.status === "pending" && (
+                      <>
+                        <button
+                          onClick={() => confirmApprove(application)}
+                          className="px-3 py-1.5 rounded-md bg-[#16a34a] text-white text-sm font-medium hover:bg-[#15803d] transition-colors"
+                        >
+                          Approve
+                        </button>
+                        <button
+                          onClick={() => confirmReject(application)}
+                          className="px-3 py-1.5 rounded-md bg-[#dc2626] text-white text-sm font-medium hover:bg-[#b91c1c] transition-colors"
+                        >
+                          Reject
+                        </button>
+                      </>
+                    )}
+                    {application.status === "approved" && (
                       <button
-                        onClick={() => confirmApprove(Application)}
-                        className="px-4 py-2 rounded-md bg-green-600 text-white text-sm font-medium hover:bg-green-700 transition"
+                        onClick={() => confirmReject(application)}
+                        className="px-3 py-1.5 rounded-md bg-[#dc2626] text-white text-sm font-medium hover:bg-[#b91c1c] transition-colors"
+                      >
+                        Revoke
+                      </button>
+                    )}
+                    {application.status === "rejected" && (
+                      <button
+                        onClick={() => confirmApprove(application)}
+                        className="px-3 py-1.5 rounded-md bg-[#16a34a] text-white text-sm font-medium hover:bg-[#15803d] transition-colors"
                       >
                         Approve
                       </button>
-                      <button
-                        onClick={() => confirmReject(Application)}
-                        className="px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition"
-                      >
-                        Reject
-                      </button>
-                    </>
-                  )}
-                  {Application.status === "approved" && (
-                    <button
-                      onClick={() => confirmReject(Application)}
-                      className="px-4 py-2 rounded-md bg-red-600 text-white text-sm font-medium hover:bg-red-700 transition"
-                    >
-                      Reject
-                    </button>
-                  )}
+                    )}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Pagination Controls */}
-          <div className="flex justify-center mt-8 space-x-2 text-white">
-            <button
-              onClick={() => handlePageChange(currentPage - 1)}
-              disabled={currentPage === 1}
-              className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
-            >
-              Prev
-            </button>
-            {[...Array(totalPages)].map((_, index) => (
-              <button
-                key={index}
-                onClick={() => handlePageChange(index + 1)}
-                className={`px-3 py-1 rounded ${
-                  currentPage === index + 1 ? "bg-blue-600" : "bg-gray-700"
-                } hover:bg-gray-600`}
-              >
-                {index + 1}
-              </button>
-            ))}
-            <button
-              onClick={() => handlePageChange(currentPage + 1)}
-              disabled={currentPage === totalPages}
-              className="px-3 py-1 rounded bg-gray-700 hover:bg-gray-600 disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
+          {/* Pagination */}
+          {totalPages > 1 && (
+            <div className="flex justify-center mt-8">
+              <nav className="flex items-center gap-1">
+                <button
+                  onClick={() => handlePageChange(currentPage - 1)}
+                  disabled={currentPage === 1}
+                  className="p-2 rounded-md bg-[#e5e7eb] text-[#4b5563] hover:bg-[#d1d5db] disabled:opacity-50 transition-colors"
+                >
+                  &larr;
+                </button>
+                
+                {[...Array(totalPages)].map((_, index) => (
+                  <button
+                    key={index}
+                    onClick={() => handlePageChange(index + 1)}
+                    className={`w-10 h-10 rounded-md flex items-center justify-center ${
+                      currentPage === index + 1 ? 'bg-[#3b82f6] text-white' : 'bg-[#e5e7eb] text-[#4b5563] hover:bg-[#d1d5db]'
+                    } transition-colors`}
+                  >
+                    {index + 1}
+                  </button>
+                ))}
+                
+                <button
+                  onClick={() => handlePageChange(currentPage + 1)}
+                  disabled={currentPage === totalPages}
+                  className="p-2 rounded-md bg-[#e5e7eb] text-[#4b5563] hover:bg-[#d1d5db] disabled:opacity-50 transition-colors"
+                >
+                  &rarr;
+                </button>
+              </nav>
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Reject Confirmation */}
+      {/* Reject Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={confirmDialogOpen}
         message="Are you sure you want to reject this application?"
@@ -247,30 +294,30 @@ export default function GuideRequests() {
 
       {/* Rejection Reason Modal */}
       {showReasonModal && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-[#1D2436] border border-[#2D3345] rounded-lg p-6 max-w-md w-full">
-            <h3 className="text-lg font-medium mb-2 text-white">Rejection Reason</h3>
-            <p className="mb-4 text-gray-300">Please provide the reason for rejection:</p>
+        <div className="fixed inset-0 bg-[#00000080] backdrop-blur-sm flex items-center justify-center z-50">
+          <div className="bg-[#ffffff] rounded-xl shadow-xl p-6 max-w-md w-full mx-4 border border-[#e5e7eb]">
+            <h3 className="text-xl font-semibold text-[#111827] mb-3">Rejection Reason</h3>
+            <p className="mb-4 text-[#4b5563]">Please provide a clear reason for rejection:</p>
             <textarea
-              className="w-full mt-3 p-2 border border-[#2D3345] rounded-md text-white bg-[#1A1F2C]"
-              rows={3}
-              placeholder="Enter rejection reason..."
+              className="w-full p-3 border border-[#e5e7eb] rounded-lg text-[#111827] bg-[#f9fafb] focus:ring-2 focus:ring-[#3b82f6] focus:border-transparent"
+              rows={4}
+              placeholder="Example: Your experience doesn't meet our requirements..."
               value={rejectionReason}
               onChange={(e) => setRejectionReason(e.target.value)}
             />
-            <div className="flex justify-end space-x-3 mt-4">
+            <div className="flex justify-end gap-3 mt-6">
               <button
                 onClick={() => {
                   setShowReasonModal(false);
                   setRejectionReason("");
                 }}
-                className="px-4 py-2 rounded-md bg-gray-600 text-white hover:bg-gray-700"
+                className="px-4 py-2 rounded-md bg-[#e5e7eb] text-[#374151] hover:bg-[#d1d5db] transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={submitRejectionWithReason}
-                className="px-4 py-2 rounded-md bg-red-600 text-white hover:bg-red-700"
+                className="px-4 py-2 rounded-md bg-[#dc2626] text-white hover:bg-[#b91c1c] transition-colors"
               >
                 Submit Rejection
               </button>
@@ -279,7 +326,7 @@ export default function GuideRequests() {
         </div>
       )}
 
-      {/* Approve Confirmation */}
+      {/* Approve Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={approveDialogOpen}
         message="Are you sure you want to approve this application?"

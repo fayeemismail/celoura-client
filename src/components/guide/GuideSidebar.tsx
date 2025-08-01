@@ -10,7 +10,7 @@ import { handleGuideLogout } from "../../redux/guide/authThunks";
 interface SidebarProps {
   sidebarOpen: boolean;
   toggleSidebar: () => void;
-}
+};
 
 const Sidebar = ({ sidebarOpen, toggleSidebar }: SidebarProps) => {
   const navigate = useNavigate();
@@ -61,7 +61,6 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }: SidebarProps) => {
         ))}
       </nav>
 
-      {/* Guide Info */}
       <div className="border-t border-[#222] p-4 text-gray-300">
         <div className="flex items-center">
           <div className="h-8 w-8 rounded-full flex items-center justify-center bg-[#09b86c]">
@@ -89,7 +88,6 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }: SidebarProps) => {
         )}
       </div>
 
-      {/* Sidebar Toggle */}
       <button
         onClick={toggleSidebar}
         className="absolute -right-3 top-20 h-6 w-6 rounded-full flex items-center justify-center border border-[#333] bg-[#222] text-white"

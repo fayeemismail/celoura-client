@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/guide/GuideSidebar";
 import GuideNavbar from "../../components/guide/GuideNavbar";
@@ -16,6 +16,7 @@ type Destination = {
 };
 
 const GuideDestinations = () => {
+  const { isAuthenticated } = useSelector((state:RootState) => state.guide)
   const [sidebarOpen, setSidebarOpen] = useState(true);
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [loading, setLoading] = useState(false);
@@ -44,6 +45,7 @@ const GuideDestinations = () => {
   };
 
   useEffect(() => {
+    if(!isAuthenticated) navigate('/guide/login')
     fetchDestinations();
   }, [page, search, attractionFilter]);
 
