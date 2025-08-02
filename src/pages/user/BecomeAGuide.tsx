@@ -45,7 +45,7 @@ type GuideApplicationData = {
 };
 
 const experienceOptions = ["0-1 years", "1-2 years", "2-3 years", "3+ years"];
-const expertiseOptions = ["Historical Tours", "Adventure", "Food Tours", "Nature"];
+const expertiseOptions = ["Historical Tours", "Adventure", "Food Tours", "Nature", "City"];
 
 export default function BecomeAGuide() {
   const { currentUser, isAuthenticated } = useSelector((state: RootState) => state.user);

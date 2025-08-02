@@ -159,7 +159,7 @@ export default function GuideRequests() {
             {guideApplies?.map((application) => (
               <div 
                 key={application._id}
-                className="bg-[#0e0b406b] rounded-xl shadow-sm overflow-hidden border border-[#0d0948] hover:shadow-md transition-all"
+                className="bg-[#0e0b406b] rounded-xl shadow-sm overflow-hidden border border-[#0d0948] hover:shadow-md transition-all flex flex-col h-full"
               >
                 <div className="relative h-48 bg-[#f3f4f6] overflow-hidden">
                   <img
@@ -179,74 +179,86 @@ export default function GuideRequests() {
                   )}
                 </div>
                 
-                <div className="p-5">
-                  <div className="flex justify-between items-start mb-3">
-                    <h3 className="text-lg font-semibold text-[#dfe2e9]">{application.fullName}</h3>
-                    <span className={`px-2 py-1 rounded-md text-xs font-semibold ${
-                      application.status === "approved"
-                        ? "bg-[#dcfce7] text-[#166534]"
-                        : application.status === "rejected"
-                        ? "bg-[#fee2e2] text-[#991b1b]"
-                        : "bg-[#dbeafe] text-[#18338d]"
-                    }`}>
-                      {application.status.toUpperCase()}
-                    </span>
-                  </div>
-                  
-                  <div className="space-y-2 text-sm text-[#dee4ec] mb-4">
-                    <p><span className="font-medium text-[#dee4ec]">Email:</span> {application.email}</p>
-                    <p><span className="font-medium text-[#dee4ec]">Phone:</span> {application.phone}</p>
-                    <p><span className="font-medium text-[#dee4ec]">Expertise:</span> {application.expertise}</p>
-                    <p><span className="font-medium text-[#dee4ec]">Applied:</span> {formatDate(application.createdAt)}</p>
-                  </div>
-
-                  {application.status === 'rejected' && application.rejectReason && (
-                    <div className="mt-3 p-3 bg-[#fef2f2] rounded-lg border border-[#fecaca]">
-                      <p className="text-xs font-medium text-[#b91c1c]">Rejection Reason:</p>
-                      <p className="text-xs text-[#dc2626] mt-1">{application.rejectReason}</p>
+                <div className="p-5 flex flex-col flex-1">
+                  <div className="flex-1">
+                    <div className="flex justify-between items-start mb-3">
+                      <h3 className="text-lg font-semibold text-[#dfe2e9]">{application.fullName}</h3>
+                      <span className={`px-2 py-1 rounded-md text-xs font-semibold ${
+                        application.status === "approved"
+                          ? "bg-[#dcfce7] text-[#166534]"
+                          : application.status === "rejected"
+                          ? "bg-[#fee2e2] text-[#991b1b]"
+                          : "bg-[#dbeafe] text-[#18338d]"
+                      }`}>
+                        {application.status.toUpperCase()}
+                      </span>
                     </div>
-                  )}
+                    
+                    <div className="space-y-2 text-sm text-[#dee4ec] mb-4">
+                      <p><span className="font-medium text-[#dee4ec]">Email:</span> {application.email}</p>
+                      <p><span className="font-medium text-[#dee4ec]">Phone:</span> {application.phone}</p>
+                      <p><span className="font-medium text-[#dee4ec]">Expertise:</span> {application.expertise}</p>
+                      <p><span className="font-medium text-[#dee4ec]">Applied:</span> {formatDate(application.createdAt)}</p>
+                    </div>
 
-                  <div className="flex justify-end mt-4 gap-2">
-                    {application.status === "pending" && (
-                      <>
+                    {application.status === 'rejected' && application.rejectReason && (
+                      <div className="mt-3 p-3 bg-[#fef2f2] rounded-lg border border-[#fecaca]">
+                        <p className="text-xs font-medium text-[#b91c1c]">Rejection Reason:</p>
+                        <p className="text-xs text-[#dc2626] mt-1">{application.rejectReason}</p>
+                      </div>
+                    )}
+
+                    {application.re_apply !== undefined && application.re_apply > 0 && application.status === 'pending' && (
+                      <div className="mt-3 p-3 bg-[#fffbeb] rounded-lg border border-[#fde68a]">
+                        <p className="text-xs font-medium text-[#92400e]">Previous Rejection Reason:</p>
+                        <p className="text-xs text-[#92400e] mt-1">
+                          {application.rejectReason || "No reason provided"}
+                        </p>
+                      </div>
+                    )}
+                  </div>
+
+                  <div className="mt-4 pt-4 border-t border-[#1e1e4e]">
+                    <div className="flex justify-end gap-2">
+                      {application.status === "pending" && (
+                        <>
+                          <button
+                            onClick={() => confirmApprove(application)}
+                            className="px-3 py-1.5 rounded-md bg-[#16a34a] text-white text-sm font-medium hover:bg-[#15803d] transition-colors"
+                          >
+                            Approve
+                          </button>
+                          <button
+                            onClick={() => confirmReject(application)}
+                            className="px-3 py-1.5 rounded-md bg-[#dc2626] text-white text-sm font-medium hover:bg-[#b91c1c] transition-colors"
+                          >
+                            Reject
+                          </button>
+                        </>
+                      )}
+                      {application.status === "approved" && (
+                        <button
+                          onClick={() => confirmReject(application)}
+                          className="px-3 py-1.5 rounded-md bg-[#dc2626] text-white text-sm font-medium hover:bg-[#b91c1c] transition-colors"
+                        >
+                          Revoke
+                        </button>
+                      )}
+                      {application.status === "rejected" && (
                         <button
                           onClick={() => confirmApprove(application)}
                           className="px-3 py-1.5 rounded-md bg-[#16a34a] text-white text-sm font-medium hover:bg-[#15803d] transition-colors"
                         >
                           Approve
                         </button>
-                        <button
-                          onClick={() => confirmReject(application)}
-                          className="px-3 py-1.5 rounded-md bg-[#dc2626] text-white text-sm font-medium hover:bg-[#b91c1c] transition-colors"
-                        >
-                          Reject
-                        </button>
-                      </>
-                    )}
-                    {application.status === "approved" && (
-                      <button
-                        onClick={() => confirmReject(application)}
-                        className="px-3 py-1.5 rounded-md bg-[#dc2626] text-white text-sm font-medium hover:bg-[#b91c1c] transition-colors"
-                      >
-                        Revoke
-                      </button>
-                    )}
-                    {application.status === "rejected" && (
-                      <button
-                        onClick={() => confirmApprove(application)}
-                        className="px-3 py-1.5 rounded-md bg-[#16a34a] text-white text-sm font-medium hover:bg-[#15803d] transition-colors"
-                      >
-                        Approve
-                      </button>
-                    )}
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
             ))}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex justify-center mt-8">
               <nav className="flex items-center gap-1">
@@ -283,7 +295,6 @@ export default function GuideRequests() {
         </div>
       </div>
 
-      {/* Reject Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={confirmDialogOpen}
         message="Are you sure you want to reject this application?"
@@ -292,7 +303,6 @@ export default function GuideRequests() {
         onCancel={() => setConfirmDialogOpen(false)}
       />
 
-      {/* Rejection Reason Modal */}
       {showReasonModal && (
         <div className="fixed inset-0 bg-[#00000080] backdrop-blur-sm flex items-center justify-center z-50">
           <div className="bg-[#ffffff] rounded-xl shadow-xl p-6 max-w-md w-full mx-4 border border-[#e5e7eb]">
@@ -326,7 +336,6 @@ export default function GuideRequests() {
         </div>
       )}
 
-      {/* Approve Confirmation Dialog */}
       <ConfirmationDialog
         isOpen={approveDialogOpen}
         message="Are you sure you want to approve this application?"
