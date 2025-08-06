@@ -25,6 +25,7 @@ import CreatePost from '../pages/Guide/CreatePost';
 import GuideListing from '../pages/user/GuideListing';
 import GuideProfileUserView from '../pages/user/GuideProfile';
 import NotFound from '../pages/NotFoundPage';
+import GuideDestinationDetail from '../components/guide/GuideDetailedDestination';
 
 export default function AppRoutes() {
   return (
@@ -62,6 +63,7 @@ export default function AppRoutes() {
           <Route path='/guide/destinations' element={ <GuideDestinations /> } />
           <Route path='/guide/edit-profile' element={ <EditProfile /> } />
           <Route path='/guide/create-post' element={ <CreatePost /> } />;
+          <Route path='/guide/destination/:id' element={ <GuideDestinationDetail /> } />
 
         {/* 404 page */}
         <Route path='*' element={ <NotFound /> } />

@@ -3,6 +3,7 @@ import {
     commentPostApi,
     createNewPostApi,
     getdestinations,
+    getDetailedDestinationApi,
     getGuideAllPostApi,
     getMyDetails,
     getNewDestinationApi,
@@ -11,6 +12,7 @@ import {
     getSinglePostApi,
     guideRefreshAccessToken,
     likePostApi,
+    newAvailableDestinationGuideApi,
     replyCommentPostApi,
     unlikePostApi,
     updateProfileGuideApi
@@ -42,7 +44,6 @@ export const getPaginatedDestinationGuideThunk = (page: number, limit: number, s
     return async () => {
         try {
             const response = await getPaginatiedDestinationGuideAPI(page, limit, search, attraction);
-            console.log(response.data, 'this is data')
             return response.data
         } catch (error) {
             console.log(error)
@@ -238,7 +239,33 @@ export const addReplyCommentThunk = ({ postId, content, userId, parentId }: AddR
             const response = await replyCommentPostApi({ postId, content, userId, parentId });
             return response.data
         } catch (error) {
-
+            console.log(error);
+            throw error
         }
     }
-} 
+};
+
+
+export const getDestinationByIdThunk = (destinationId: string) => {
+    return async() => {
+        try {
+            const response = await getDetailedDestinationApi(destinationId);
+            return response.data
+        } catch (error) {
+            console.log(error);
+            throw error
+        }
+    }
+};
+
+export const addToAvailableDestinationThunk = (destinationId: string, guideId: string) => {
+    return async() => {
+        try {
+            const response = await newAvailableDestinationGuideApi(destinationId, guideId);
+            return response.data
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+}
