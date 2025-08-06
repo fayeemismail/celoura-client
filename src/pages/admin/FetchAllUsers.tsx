@@ -9,7 +9,7 @@ import AdminSidebar from "../../components/admin/home/AdminSidebar";
 import AdminHeader from "../../components/admin/home/AdminHeader";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import ConfirmationDialog from "../../components/common/ConfirmationDialog"; // ✅ Import here
+import ConfirmationDialog from "../../components/common/ConfirmationDialog"; 
 
 interface User {
   _id: string;

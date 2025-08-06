@@ -11,7 +11,9 @@ export const applyForGuide = (formData: FormData) => {
   });
 };
 
-
+export const hasRegistered = async(userId: string) => {
+  return axiosInstance.get(`/user/registerGuide/${userId}`)
+}
 
 export const editProfile = async (payload: Object) => {
     const response = await axiosInstance.put('/user/editProfile', payload);
@@ -43,7 +45,7 @@ export const getAllGuidesOnUserApi = async(page: number, limit: number, search: 
 };
 
 export const getGuideSingleDataApi = async(id: string) => {
-  return await axiosInstance.get(`/user/guide/${id}`);
+  return await axiosInstance.get(`/user/guide-data/${id}`);
 };
 
 export const getAllPostGuideApi = async(id: string) => {

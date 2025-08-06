@@ -6,17 +6,56 @@ import COLORS from "../../styles/theme";
 import Navbar from "../../components/user/home/Navbar";
 import { applyForGuide } from "../../api/userAPI";
 import { useNavigate } from "react-router-dom";
-import { useSelector } from "react-redux";
-import { RootState } from "../../redux/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../redux/store";
 import { toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useEffect, useState } from "react";
+import { hasRegisteredThunk } from "../../redux/user/userThunks";
+
+type GuideApplicationFormValues = {
+  fullName: string;
+  dob: string;
+  phone: string;
+  email: string;
+  address: string;
+  experience: string;
+  expertise: string;
+  idFile: File | null;
+  userId: string;
+  basedOn: string;
+};
+
+type GuideApplicationData = {
+  _id: string;
+  fullName: string;
+  dob: string;
+  phone: string;
+  email: string;
+  address: string;
+  experience: string;
+  expertise: string;
+  basedOn: string;
+  idFileUrl: string;
+  rejectReason?: string;
+  status: "pending" | "approved" | "rejected";
+  userId: string;
+  createdAt: string;
+  updatedAt: string;
+};
 
 const experienceOptions = ["0-1 years", "1-2 years", "2-3 years", "3+ years"];
-const expertiseOptions = ["Historical Tours", "Adventure", "Food Tours", "Nature"];
+const expertiseOptions = ["Historical Tours", "Adventure", "Food Tours", "Nature", "City"];
 
 export default function BecomeAGuide() {
-  const { currentUser } = useSelector((state: RootState) => state.user);
-  const initialValues = {
+  const { currentUser, isAuthenticated } = useSelector((state: RootState) => state.user);
+  const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
+
+  const [previousApplication, setPreviousApplication] = useState<GuideApplicationData | null>(null);
+  const [canReapply, setCanReapply] = useState(false);
+
+  const initialValues: GuideApplicationFormValues = {
     fullName: "",
     dob: "",
     phone: "",
@@ -25,13 +64,30 @@ export default function BecomeAGuide() {
     experience: "",
     expertise: "",
     idFile: null,
-    userId: currentUser?.id,
-    basedOn: '',
+    userId: currentUser?.id || "",
+    basedOn: "",
   };
-  console.log(currentUser?.id, 'this is currentUser.id');
-  const navigate = useNavigate();
 
-  const handleSubmit = async (values: any, { setSubmitting }: any) => {
+  const hasRegistered = async () => {
+    try {
+      const response = await dispatch(hasRegisteredThunk(currentUser?.id!));
+      setPreviousApplication(response);
+      
+      if (response?.createdAt) {
+        const applicationDate = new Date(response.createdAt);
+        const oneWeekAgo = new Date();
+        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+        setCanReapply(applicationDate < oneWeekAgo);
+      }
+    } catch (error) {
+      toast.error("An error occurred while checking registration.");
+    }
+  };
+
+  const handleSubmit = async (
+    values: GuideApplicationFormValues,
+    { setSubmitting }: { setSubmitting: (isSubmitting: boolean) => void }
+  ) => {
     try {
       const formData = new FormData();
       formData.append("fullName", values.fullName);
@@ -46,18 +102,144 @@ export default function BecomeAGuide() {
       if (values.idFile) {
         formData.append("idFile", values.idFile);
       }
-      console.log(formData, 'this is formData')
-      await applyForGuide(formData);
 
+      await applyForGuide(formData);
       toast.success("Application submitted successfully!");
       setTimeout(() => navigate("/"), 1500);
-    } catch (error: any) {
-      const message = error?.response?.data?.message || "Something went wrong.";
-      toast.error(message);
+    } catch (error: unknown) {
+      if (
+        typeof error === "object" &&
+        error !== null &&
+        "response" in error &&
+        typeof (error as any).response?.data?.message === "string"
+      ) {
+        toast.error((error as any).response.data.message);
+      } else {
+        toast.error("Something went wrong.");
+      }
     } finally {
       setSubmitting(false);
     }
   };
+
+  useEffect(() => {
+    if (!isAuthenticated) {
+      navigate("/login");
+    } else {
+      hasRegistered();
+    }
+  }, [isAuthenticated, navigate]);
+
+  if (previousApplication) {
+    if (previousApplication.status === "rejected" && previousApplication.rejectReason) {
+      return (
+        <div
+          className="min-h-screen flex flex-col justify-center items-center px-4"
+          style={{ backgroundColor: COLORS.bg }}
+        >
+          <Navbar />
+          <div
+            className="bg-white rounded-xl shadow-md p-6 max-w-xl text-center border"
+            style={{ borderColor: COLORS.border }}
+          >
+            <h2 className="text-2xl font-semibold text-red-600 mb-4">Application Rejected</h2>
+            <p className="text-gray-800 mb-6">{previousApplication.rejectReason}</p>
+
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <button
+                onClick={() => setPreviousApplication(null)}
+                style={{ backgroundColor: COLORS.accent }}
+                className="px-6 py-3 text-white rounded-lg font-medium hover:opacity-90"
+              >
+                Re-Apply
+              </button>
+              <button
+                onClick={() => navigate(-1)}
+                className="px-6 py-3 border rounded-lg font-medium hover:bg-gray-100"
+                style={{ borderColor: COLORS.border, color: COLORS.text }}
+              >
+                Go Back
+              </button>
+            </div>
+          </div>
+        </div>
+      );
+    }
+
+    if (previousApplication.status === "pending") {
+      return (
+        <div
+          className="min-h-screen flex flex-col justify-center items-center px-4"
+          style={{ backgroundColor: COLORS.bg }}
+        >
+          <Navbar />
+          <div
+            className="bg-white rounded-xl shadow-md p-6 max-w-xl text-center border"
+            style={{ borderColor: COLORS.border }}
+          >
+            <h2 className="text-2xl font-semibold text-blue-600 mb-4">Application Pending</h2>
+            <p className="text-gray-800 mb-6">
+              Your application is currently under review. Please wait for our team to process it.
+            </p>
+
+            {canReapply ? (
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <button
+                  onClick={() => setPreviousApplication(null)}
+                  style={{ backgroundColor: COLORS.accent }}
+                  className="px-6 py-3 text-white rounded-lg font-medium hover:opacity-90"
+                >
+                  Re-Apply
+                </button>
+                <button
+                  onClick={() => navigate("/")}
+                  className="px-6 py-3 border rounded-lg font-medium hover:bg-gray-100"
+                  style={{ borderColor: COLORS.border, color: COLORS.text }}
+                >
+                  Go Home
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => navigate("/")}
+                className="px-6 py-3 border rounded-lg font-medium hover:bg-gray-100"
+                style={{ borderColor: COLORS.border, color: COLORS.text }}
+              >
+                Go Home
+              </button>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    if (previousApplication.status === "approved") {
+      return (
+        <div
+          className="min-h-screen flex flex-col justify-center items-center px-4"
+          style={{ backgroundColor: COLORS.bg }}
+        >
+          <Navbar />
+          <div
+            className="bg-white rounded-xl shadow-md p-6 max-w-xl text-center border"
+            style={{ borderColor: COLORS.border }}
+          >
+            <h2 className="text-2xl font-semibold text-green-600 mb-4">Application Approved</h2>
+            <p className="text-gray-800 mb-6">
+              Congratulations! Your guide application has been approved.
+            </p>
+            <button
+              onClick={() => navigate("/")}
+              className="px-6 py-3 border rounded-lg font-medium hover:bg-gray-100"
+              style={{ borderColor: COLORS.border, color: COLORS.text }}
+            >
+              Go Home
+            </button>
+          </div>
+        </div>
+      );
+    }
+  }
 
   return (
     <div className="min-h-screen pt-28 pb-12" style={{ backgroundColor: COLORS.bg }}>
@@ -91,7 +273,6 @@ export default function BecomeAGuide() {
                     />
                     <ErrorMessage name="fullName" component="div" className="text-red-600 text-sm mt-1" />
                   </div>
-
                   <div>
                     <label className="block mb-2 font-medium" style={{ color: COLORS.text }}>
                       Date of Birth *
@@ -111,30 +292,38 @@ export default function BecomeAGuide() {
                     <label className="block mb-2 font-medium" style={{ color: COLORS.text }}>
                       Phone Number *
                     </label>
-                    <PhoneInput
-                      country="in"
-                      value={values.phone}
-                      onChange={(value) => setFieldValue("phone", value)}
-                      inputStyle={{
-                        width: "100%",
-                        padding: "0.75rem",
-                        borderColor: COLORS.border,
-                        borderRadius: "0.5rem",
-                      }}
-                      buttonStyle={{
-                        borderColor: COLORS.border,
-                        borderRadius: "0.5rem 0 0 0.5rem",
-                      }}
-                      dropdownStyle={{
-                        borderColor: COLORS.border,
-                      }}
-                      enableSearch
-                    />
+                    <div className="relative">
+                      <div className="border rounded-lg" style={{ borderColor: COLORS.border }}>
+                        <PhoneInput
+                          country="in"
+                          value={values.phone}
+                          onChange={(value) => setFieldValue("phone", value)}
+                          inputStyle={{
+                            width: "100%",
+                            padding: "0.75rem 0.75rem 0.75rem 60px",
+                            border: "none",
+                            borderRadius: "0.5rem",
+                            backgroundColor: "transparent",
+                          }}
+                          buttonStyle={{
+                            border: "none",
+                            backgroundColor: "transparent",
+                            padding: "0 10px 0 15px",
+                          }}
+                          dropdownStyle={{
+                            borderColor: COLORS.border,
+                          }}
+                          containerStyle={{
+                            padding: "0",
+                          }}
+                          enableSearch
+                        />
+                      </div>
+                    </div>
                     {touched.phone && errors.phone && (
                       <div className="text-red-600 text-sm mt-1">{errors.phone}</div>
                     )}
                   </div>
-
                   <div>
                     <label className="block mb-2 font-medium" style={{ color: COLORS.text }}>
                       Email *
@@ -227,8 +416,7 @@ export default function BecomeAGuide() {
                     Based On *
                   </label>
                   <Field
-                    as="input"  // Explicitly set as input
-                    type="text"  // Specify the input type
+                    type="text"
                     name="basedOn"
                     className="w-full p-3 border rounded-lg"
                     style={{ borderColor: COLORS.border }}

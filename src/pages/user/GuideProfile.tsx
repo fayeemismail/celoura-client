@@ -3,7 +3,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
 import Navbar from "../../components/user/home/Navbar";
 import { User, Heart, MessageCircle, Image as ImageIcon, X, ChevronLeft, ChevronRight, Bookmark, Send } from "lucide-react";
-import { getSinglePostThunk } from "../../redux/guide/authThunks";
 import { IPostSummary } from "../../types/IPostSummary";
 import { toast } from "react-toastify";
 import { useNavigate, useParams } from "react-router-dom";

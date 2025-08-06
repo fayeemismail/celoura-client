@@ -24,6 +24,8 @@ import EditProfile from '../pages/Guide/EditProfileGuide';
 import CreatePost from '../pages/Guide/CreatePost';
 import GuideListing from '../pages/user/GuideListing';
 import GuideProfileUserView from '../pages/user/GuideProfile';
+import NotFound from '../pages/NotFoundPage';
+import GuideDestinationDetail from '../components/guide/GuideDetailedDestination';
 
 export default function AppRoutes() {
   return (
@@ -42,26 +44,29 @@ export default function AppRoutes() {
           <Route path='/destinations' element={ <UserDestinations /> } />
           <Route path='/destination/:id' element={ <DestinationDetailPage /> } />
           <Route path='/guides' element={ <GuideListing /> } />
-          <Route path='/guide/:guideId' element={ <GuideProfileUserView /> } />;
+          <Route path='/guide-profile/:guideId' element={ <GuideProfileUserView /> } />;
         </Route>
 
         {/* Admin Routes */}
-        <Route path="/admin/login" element={<AdminLogin />} />
-        <Route path="/admin/home" element={<HomeAdmin />} />
-        <Route path='/admin/all-users' element={ <FetchAllUsers /> } />
-        <Route path='/admin/guide-requests' element={< GuideRequests /> } />
-        <Route path='/admin/destinations' element={ <DestinationPage /> } />
-        <Route path='/admin/create-destinations' element={ <CreateDestination /> } />
-        <Route path='/admin/edit-destination/:id' element={ <EditDestination /> } />
+          <Route path="/admin/login" element={<AdminLogin />} />
+          <Route path="/admin/home" element={<HomeAdmin />} />
+          <Route path='/admin/all-users' element={ <FetchAllUsers /> } />
+          <Route path='/admin/guide-requests' element={< GuideRequests /> } />
+          <Route path='/admin/destinations' element={ <DestinationPage /> } />
+          <Route path='/admin/create-destinations' element={ <CreateDestination /> } />
+          <Route path='/admin/edit-destination/:id' element={ <EditDestination /> } />
 
         {/* guide side */}
-        <Route path='/guide/login' element={ <GuideLogin /> } />
-        <Route path='/guide/home' element={ <GuideHome /> } />
-        <Route path='/guide/profile' element={ <GuideProfile /> } />
-        <Route path='/guide/destinations' element={ <GuideDestinations /> } />
-        <Route path='/guide/edit-profile' element={ <EditProfile /> } />
-        <Route path='/guide/create-post' element={ <CreatePost /> } />;
+          <Route path='/guide/login' element={ <GuideLogin /> } />
+          <Route path='/guide/home' element={ <GuideHome /> } />
+          <Route path='/guide/profile' element={ <GuideProfile /> } />
+          <Route path='/guide/destinations' element={ <GuideDestinations /> } />
+          <Route path='/guide/edit-profile' element={ <EditProfile /> } />
+          <Route path='/guide/create-post' element={ <CreatePost /> } />;
+          <Route path='/guide/destination/:id' element={ <GuideDestinationDetail /> } />
 
+        {/* 404 page */}
+        <Route path='*' element={ <NotFound /> } />
       </Routes>
     </BrowserRouter>
   );

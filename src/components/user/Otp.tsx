@@ -25,7 +25,7 @@ export default function Otp() {
 
     
     useEffect(() => {
-        const lastRequested = localStorage.getItem("otpRequestedAt");
+        const lastRequested = localStorage.getItem(`otpRequestedAt${email}`);
         if (lastRequested) {
             const elapsed = Math.floor((Date.now() - parseInt(lastRequested, 10)) / 1000);
 
@@ -54,6 +54,7 @@ export default function Otp() {
     const handleVerify = async () => {
         if (timeLeft <= 0) {
             setErrors("OTP expired. Please resend.");
+            localStorage.removeItem(`otpRequestedAt${email}`);
             return;
         }
 
@@ -61,6 +62,7 @@ export default function Otp() {
         setErrors("");
         try {
             const response = await axios.post(`${API_BASE_URL}/auth/verify-otp`, { email, otp });
+            localStorage.removeItem(`otpRequestedAt${email}`);
             console.log(response);
             navigate("/login");
         } catch (error: any) {
@@ -77,7 +79,7 @@ export default function Otp() {
         setErrors("");
         setIsDisabled(true);
         const now = Date.now();
-        localStorage.setItem("otpRequestedAt", now.toString());
+        localStorage.setItem(`otpRequestedAt${email}`, now.toString());
 
         try {
             await axios.post(`${API_BASE_URL}/auth/resend-otp`, { email });
@@ -90,6 +92,7 @@ export default function Otp() {
         } catch (error: any) {
             console.log(error.response?.data?.error);
             setErrors(error.response?.data?.error);
+            localStorage.removeItem(`otpRequestedAt${email}`);
             setIsDisabled(false);
         } finally {
             setLoading(false);

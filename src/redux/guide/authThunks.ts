@@ -1,12 +1,29 @@
 import { guideLogin, logoutGuide } from "../../api/auth";
-import { commentPostApi, createNewPostApi, getdestinations, getGuideAllPostApi, getMyDetails, getNewDestinationApi, getPaginatiedDestinationGuideAPI, getProfileDataAPI, getSinglePostApi, guideRefreshAccessToken, likePostApi, replyCommentPostApi, unlikePostApi, updateProfileGuideApi } from "../../api/guide/guideApi";
+import {
+    commentPostApi,
+    createNewPostApi,
+    getdestinations,
+    getDetailedDestinationApi,
+    getGuideAllPostApi,
+    getMyDetails,
+    getNewDestinationApi,
+    getPaginatiedDestinationGuideAPI,
+    getProfileDataAPI,
+    getSinglePostApi,
+    guideRefreshAccessToken,
+    likePostApi,
+    newAvailableDestinationGuideApi,
+    replyCommentPostApi,
+    unlikePostApi,
+    updateProfileGuideApi
+} from "../../api/guide/guideApi";
 import { AddCommentArgs, AddReplyComment } from "../../types/CommentReqSummary";
 import { signInFailure, signInPending, signInSuccess, signOut, updateGuidePending } from "./guideSlice"
 
 
 
 
-export const handleGuideLogin = ( formData: { email: string, password: string } ) => {
+export const handleGuideLogin = (formData: { email: string, password: string }) => {
     return async (dispatch: any) => {
         try {
             dispatch(signInPending());
@@ -24,10 +41,9 @@ export const handleGuideLogin = ( formData: { email: string, password: string } 
 
 
 export const getPaginatedDestinationGuideThunk = (page: number, limit: number, search: string, attraction: string) => {
-    return async() => {
+    return async () => {
         try {
             const response = await getPaginatiedDestinationGuideAPI(page, limit, search, attraction);
-            console.log(response.data, 'this is data')
             return response.data
         } catch (error) {
             console.log(error)
@@ -37,7 +53,7 @@ export const getPaginatedDestinationGuideThunk = (page: number, limit: number, s
 };
 
 export const getCompleteDesti = () => {
-    return async() => {
+    return async () => {
         try {
             const response = await getdestinations();
             return response
@@ -55,11 +71,11 @@ export const handleGuideTokenRefresh = (): any => {
             const state = getState();
             const currentGuide = state.guide?.currentGuide;
 
-            if(!currentGuide) {
+            if (!currentGuide) {
                 console.warn('No current guide found in Redux. Logging out...');
                 await logoutGuide();
                 dispatch(signOut());
-                return 
+                return
             }
 
             await guideRefreshAccessToken()
@@ -74,7 +90,7 @@ export const handleGuideTokenRefresh = (): any => {
 export const handleGuideLogout = () => {
     return async (dispatch: any) => {
         try {
-            
+
             await logoutGuide();
 
             dispatch(signOut());
@@ -101,7 +117,7 @@ export const getMe = (id: string) => {
 
 
 export const getNewDestinationsThunk = (limit: number) => {
-    return async() => {
+    return async () => {
         try {
             const res = await getNewDestinationApi(limit);
             return res.data
@@ -114,7 +130,7 @@ export const getNewDestinationsThunk = (limit: number) => {
 
 
 export const getProfileGuide = (id: string) => {
-    return async() => {
+    return async () => {
         try {
             const response = await getProfileDataAPI(id);
             return response.data
@@ -127,11 +143,11 @@ export const getProfileGuide = (id: string) => {
 
 
 export const updateProfileGuideThunk = (formData: FormData) => {
-    return async(dispatch: any) => {
+    return async (dispatch: any) => {
         dispatch(updateGuidePending());
         try {
             const response = await updateProfileGuideApi(formData);
-            console.log(response.data , 'this is response Data');
+            console.log(response.data, 'this is response Data');
             return response.data
         } catch (error) {
             console.log(error);
@@ -142,7 +158,7 @@ export const updateProfileGuideThunk = (formData: FormData) => {
 
 
 export const createNewPostThunk = (formdata: FormData) => {
-    return async() => {
+    return async () => {
         try {
             const response = await createNewPostApi(formdata);
             console.log(response);
@@ -156,7 +172,7 @@ export const createNewPostThunk = (formdata: FormData) => {
 
 
 export const getGuideAllPosts = (id: string) => {
-    return async() => {
+    return async () => {
         try {
             const response = await getGuideAllPostApi(id);
             return response.data;
@@ -168,7 +184,7 @@ export const getGuideAllPosts = (id: string) => {
 };
 
 export const getSinglePostThunk = (id: string) => {
-    return async() => {
+    return async () => {
         try {
             const response = await getSinglePostApi(id);
             return response.data;
@@ -180,7 +196,7 @@ export const getSinglePostThunk = (id: string) => {
 }
 
 export const likePostThunk = (id: string, userId: string) => {
-    return async() => {
+    return async () => {
         try {
             const response = await likePostApi(id, userId);
             return response
@@ -206,24 +222,50 @@ export const unlikePostThunk = (id: string, userId: string) => {
 
 
 export const addCommentThunk = ({ postId, content, userId }: AddCommentArgs) => {
-  return async () => {
-   try {
-    const response = await commentPostApi({postId, content, userId});
-    return response.data;
-   } catch (error) {
-    console.log(error, 'this is error on commenting');
-    throw error
-   }
-  };
+    return async () => {
+        try {
+            const response = await commentPostApi({ postId, content, userId });
+            return response.data;
+        } catch (error) {
+            console.log(error, 'this is error on commenting');
+            throw error
+        }
+    };
 };
 
 export const addReplyCommentThunk = ({ postId, content, userId, parentId }: AddReplyComment) => {
-    return async() => {
+    return async () => {
         try {
-            const response = await replyCommentPostApi({postId, content, userId, parentId});
+            const response = await replyCommentPostApi({ postId, content, userId, parentId });
             return response.data
         } catch (error) {
-            
+            console.log(error);
+            throw error
         }
     }
-} 
+};
+
+
+export const getDestinationByIdThunk = (destinationId: string) => {
+    return async() => {
+        try {
+            const response = await getDetailedDestinationApi(destinationId);
+            return response.data
+        } catch (error) {
+            console.log(error);
+            throw error
+        }
+    }
+};
+
+export const addToAvailableDestinationThunk = (destinationId: string, guideId: string) => {
+    return async() => {
+        try {
+            const response = await newAvailableDestinationGuideApi(destinationId, guideId);
+            return response.data
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+}

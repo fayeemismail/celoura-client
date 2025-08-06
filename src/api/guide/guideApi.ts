@@ -25,7 +25,7 @@ export const getNewDestinationApi = async(limit: number) => {
 
 
 export const getdestinations = async() => {
-    return await guideInstance.get('/user/destinations')
+    return await guideInstance.get('/guide/destinations')
 };
 
 export const getProfileDataAPI = async(id: string) => {
@@ -69,4 +69,11 @@ export const commentPostApi = async({postId, content, userId}: AddCommentArgs) =
 export const replyCommentPostApi = async({ postId, content, userId, parentId }: AddReplyComment) => {
     return await guideInstance.post('/guide/reply-comment', { postId, content, userId, parentId });
 }
-// export const replyCommentPostApi = async({  }: AddReplyComment)
+
+export const getDetailedDestinationApi = async(destinationId: string) => {
+    return await guideInstance.get(`/guide/get-destination/${destinationId}`);
+};
+
+export const newAvailableDestinationGuideApi = async(destinationId: string, guideId: string) => {
+    return await guideInstance.put(`/guide/add-availableDestination/${destinationId}/${guideId}`)
+}

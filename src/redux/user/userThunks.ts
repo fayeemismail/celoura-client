@@ -1,5 +1,23 @@
 // /redux/user/userThunks.ts
-import { commentOnGuidePostApi, editProfile, followGuideApi, getAllGuidesOnUserApi, getAllPostGuideApi, getCurrentMe, getDestinationsApi, getGuideSingleDataApi, getGuideSinglePostApi, getNewDestinationApi, likePostUserApi, pageinatedDestiUserApi, replyCommentOnGuidePostApi, singleSpotApi, unfollowGuideApi, unLikePostUserApi } from "../../api/userAPI";
+import {
+  commentOnGuidePostApi,
+  editProfile,
+  followGuideApi,
+  getAllGuidesOnUserApi,
+  getAllPostGuideApi,
+  getCurrentMe,
+  getDestinationsApi,
+  getGuideSingleDataApi,
+  getGuideSinglePostApi,
+  getNewDestinationApi,
+  hasRegistered,
+  likePostUserApi,
+  pageinatedDestiUserApi,
+  replyCommentOnGuidePostApi,
+  singleSpotApi,
+  unfollowGuideApi,
+  unLikePostUserApi
+} from "../../api/userAPI";
 import { AddCommentArgs, AddReplyComment } from "../../types/CommentReqSummary";
 import { UpdateProfilePayload } from "../../types/user";
 import { AppDispatch } from "../store";
@@ -27,10 +45,22 @@ export const handleUpdateProfile = (payload: UpdateProfilePayload) => {
       };
 
       dispatch(updateUserFailure(message));
-      throw new Error(message); 
+      throw new Error(message);
     }
   };
 };
+
+export const hasRegisteredThunk = (userId: string) => {
+  return async () => {
+    try {
+      const response = await hasRegistered(userId);
+      return response.data;
+    } catch (error) {
+      console.log(error, 'this is error');
+      throw error
+    }
+  }
+}
 
 
 export const GetAllDestinations = () => {
@@ -47,7 +77,7 @@ export const GetAllDestinations = () => {
 
 
 export const GetSingleDestination = (id: string) => {
-  return async() => {
+  return async () => {
     try {
       const response = await singleSpotApi(id);
       return response.data
@@ -59,19 +89,19 @@ export const GetSingleDestination = (id: string) => {
 }
 
 export const getAllPaginatedDestiUser = (page = 1, limit = 9, search = "", attraction = "") => {
-    return async() => {
-        try {
-            const response = await pageinatedDestiUserApi(page, limit, search, attraction);
-            return response.data
-        } catch (error: any) {
-            console.error('Error on Getting paginated: ', error.message);
-            throw error
-        }
+  return async () => {
+    try {
+      const response = await pageinatedDestiUserApi(page, limit, search, attraction);
+      return response.data
+    } catch (error: any) {
+      console.error('Error on Getting paginated: ', error.message);
+      throw error
     }
+  }
 }
 
 export const getNewDestinationsThunk = (limit: number) => {
-  return async() => {
+  return async () => {
     try {
       const response = await getNewDestinationApi(limit);
       return response
@@ -85,7 +115,7 @@ export const getNewDestinationsThunk = (limit: number) => {
 
 
 export const getCurrentMeThunk = (id: string) => {
-  return async() => {
+  return async () => {
     try {
       const response = await getCurrentMe(id);
       return response
@@ -97,7 +127,7 @@ export const getCurrentMeThunk = (id: string) => {
 }
 
 export const getAllGuidesOnUserThunk = (page: number, limit: number, search: string, category: string) => {
-  return async() => {
+  return async () => {
     try {
       const response = await getAllGuidesOnUserApi(page, limit, search, category);
       return response.data
@@ -111,7 +141,7 @@ export const getAllGuidesOnUserThunk = (page: number, limit: number, search: str
 
 
 export const getGuideSingleDataThunk = (id: string) => {
-  return async() => {
+  return async () => {
     try {
       const response = await getGuideSingleDataApi(id);
       return response.data
@@ -123,7 +153,7 @@ export const getGuideSingleDataThunk = (id: string) => {
 };
 
 export const getAllPostGUideThunk = (id: string) => {
-  return async() => {
+  return async () => {
     try {
       const response = await getAllPostGuideApi(id);
       return response.data
@@ -135,7 +165,7 @@ export const getAllPostGUideThunk = (id: string) => {
 };
 
 export const getGuideSinglePostThunk = (postId: string) => {
-  return async() => {
+  return async () => {
     try {
       const response = await getGuideSinglePostApi(postId);
       return response.data;
@@ -148,7 +178,7 @@ export const getGuideSinglePostThunk = (postId: string) => {
 
 
 export const likePostThunkUser = (postId: string, userId: string) => {
-  return async() => {
+  return async () => {
     try {
       console.log(postId, 'postId', userId, 'UserId')
       const response = await likePostUserApi(postId, userId);
@@ -161,7 +191,7 @@ export const likePostThunkUser = (postId: string, userId: string) => {
 };
 
 export const unLikePostThunkUser = (postId: string, userId: string) => {
-  return async() => {
+  return async () => {
     try {
       const response = await unLikePostUserApi(postId, userId);
       return response;
@@ -172,10 +202,10 @@ export const unLikePostThunkUser = (postId: string, userId: string) => {
   }
 };
 
-export const addCommentOnGuidePostThunk = ({postId, content, userId}: AddCommentArgs) => {
-  return async() => {
+export const addCommentOnGuidePostThunk = ({ postId, content, userId }: AddCommentArgs) => {
+  return async () => {
     try {
-      const response = await commentOnGuidePostApi({postId, content, userId});
+      const response = await commentOnGuidePostApi({ postId, content, userId });
       return response.data;
     } catch (error) {
       console.log(error, 'erro on add cooment');
@@ -184,8 +214,8 @@ export const addCommentOnGuidePostThunk = ({postId, content, userId}: AddComment
   }
 };
 
-export const addReplyCommentOnGuidePostThunk = ({postId, content, userId, parentId}: AddReplyComment) => {
-  return async() => {
+export const addReplyCommentOnGuidePostThunk = ({ postId, content, userId, parentId }: AddReplyComment) => {
+  return async () => {
     try {
       const response = await replyCommentOnGuidePostApi({ postId, content, userId, parentId });
       return response.data;
@@ -198,7 +228,7 @@ export const addReplyCommentOnGuidePostThunk = ({postId, content, userId, parent
 
 
 export const followGuideThunk = (guideId: string, requesterId: string) => {
-  return async() => {
+  return async () => {
     try {
       const response = await followGuideApi(guideId, requesterId);
       return response.data;
@@ -210,7 +240,7 @@ export const followGuideThunk = (guideId: string, requesterId: string) => {
 };
 
 export const unfollowGuideThunk = (guideId: string, requesterId: string) => {
-  return async() => {
+  return async () => {
     try {
       const response = await unfollowGuideApi(guideId, requesterId);
       return response.data;
