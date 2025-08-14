@@ -9,7 +9,7 @@ import {
   getProfileGuide,
   updateProfileGuideThunk,
 } from "../../redux/guide/authThunks";
-import { Eye, EyeOff, User } from "lucide-react";
+import { Eye, EyeOff, User, X } from "lucide-react";
 
 export default function EditProfile() {
   const { isAuthenticated, currentGuide } = useSelector(
@@ -23,6 +23,8 @@ export default function EditProfile() {
   const [bio, setBio] = useState("");
   const [profilePic, setProfilePic] = useState<File | null>(null);
   const [existingProfilePicUrl, setExistingProfilePicUrl] = useState("");
+  const [availableDestinations, setAvailableDestinations] = useState<string[]>([]);
+  const [newDestination, setNewDestination] = useState("");
 
   const [changePassword, setChangePassword] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
@@ -37,6 +39,7 @@ export default function EditProfile() {
     name: "",
     bio: "",
     profilePic: "",
+    availableDestinations: [] as string[],
   });
 
   const [errors, setErrors] = useState({
@@ -45,6 +48,7 @@ export default function EditProfile() {
     currentPassword: "",
     newPassword: "",
     confirmPassword: "",
+    newDestination: "",
   });
 
   const fetchGuide = async () => {
@@ -53,17 +57,17 @@ export default function EditProfile() {
       setName(data.name || "");
       setBio(data.bio || "");
       setExistingProfilePicUrl(data.profilePic || "");
+      setAvailableDestinations(data.availableDestinations || []);
       setInitialData({
         name: data.name || "",
         bio: data.bio || "",
         profilePic: data.profilePic || "",
+        availableDestinations: data.availableDestinations || [],
       });
     } catch (error) {
-      console.log(error)
       toast.error("Failed to load profile");
     }
   };
-
 
   useEffect(() => {
     if (!isAuthenticated) navigate("/guide/login");
@@ -82,6 +86,7 @@ export default function EditProfile() {
       currentPassword: "",
       newPassword: "",
       confirmPassword: "",
+      newDestination: "",
     };
 
     if (!trimmedName) {
@@ -142,6 +147,8 @@ export default function EditProfile() {
 
     const nameChanged = trimmedName && trimmedName !== initialName;
     const bioChanged = bio !== initialData.bio;
+    const destinationsChanged = 
+      JSON.stringify(availableDestinations) !== JSON.stringify(initialData.availableDestinations);
 
     const profilePicChanged = !!profilePic;
     const profilePicRemoved =
@@ -158,6 +165,7 @@ export default function EditProfile() {
     return (
       nameChanged ||
       bioChanged ||
+      destinationsChanged ||
       profilePicChanged ||
       profilePicRemoved ||
       passwordChanged
@@ -165,6 +173,7 @@ export default function EditProfile() {
   }, [
     name,
     bio,
+    availableDestinations,
     profilePic,
     existingProfilePicUrl,
     changePassword,
@@ -191,6 +200,10 @@ export default function EditProfile() {
       formData.append("bio", bio.trim());
     }
 
+    if (JSON.stringify(availableDestinations) !== JSON.stringify(initialData.availableDestinations)) {
+      formData.append("availableDestinations", JSON.stringify(availableDestinations));
+    }
+
     if (profilePic) {
       formData.append("profilePic", profilePic);
     }
@@ -210,7 +223,6 @@ export default function EditProfile() {
       toast.success("Profile updated!");
       navigate("/guide/profile");
     } catch (err: any) {
-      console.log(err?.response?.data?.message);
       toast.error(err?.response?.data?.message || "Update failed");
     }
   };
@@ -227,6 +239,29 @@ export default function EditProfile() {
       setProfilePic(e.dataTransfer.files[0]);
     }
   };
+
+  const addDestination = () => {
+    if (!newDestination.trim()) {
+      setErrors({...errors, newDestination: "Destination cannot be empty"});
+      return;
+    }
+    
+    if (availableDestinations.includes(newDestination.trim())) {
+      setErrors({...errors, newDestination: "Destination already exists"});
+      return;
+    }
+    
+    setAvailableDestinations([...availableDestinations, newDestination.trim()]);
+    setNewDestination("");
+    setErrors({...errors, newDestination: ""});
+  };
+
+  const removeDestination = (index: number) => {
+    const updatedDestinations = [...availableDestinations];
+    updatedDestinations.splice(index, 1);
+    setAvailableDestinations(updatedDestinations);
+  };
+
   return (
     <div className="min-h-screen flex bg-black text-white">
       <GuideSidebar
@@ -328,6 +363,49 @@ export default function EditProfile() {
                 {errors.bio && (
                   <p className="text-red-500 text-xs mt-1">{errors.bio}</p>
                 )}
+              </div>
+
+              {/* Available Destinations */}
+              <div>
+                <label className="block text-sm mb-1">Available Destinations</label>
+                <div className="flex gap-2 mb-2">
+                  <input
+                    type="text"
+                    value={newDestination}
+                    onChange={(e) => setNewDestination(e.target.value)}
+                    className={`flex-1 bg-[#222] border rounded-lg px-4 py-2 ${errors.newDestination ? "border-red-500" : "border-gray-600"
+                      }`}
+                    placeholder="Add new destination"
+                  />
+                  <button
+                    type="button"
+                    onClick={addDestination}
+                    className="bg-green-600 hover:bg-green-700 px-4 py-2 rounded-lg"
+                  >
+                    Add
+                  </button>
+                </div>
+                {errors.newDestination && (
+                  <p className="text-red-500 text-xs mt-1">{errors.newDestination}</p>
+                )}
+                
+                <div className="flex flex-wrap gap-2">
+                  {availableDestinations.map((destination, index) => (
+                    <div 
+                      key={index} 
+                      className="flex items-center bg-gray-700 rounded-full px-3 py-1"
+                    >
+                      <span>{destination}</span>
+                      <button
+                        type="button"
+                        onClick={() => removeDestination(index)}
+                        className="ml-2 text-gray-300 hover:text-white"
+                      >
+                        <X size={16} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Change Password */}

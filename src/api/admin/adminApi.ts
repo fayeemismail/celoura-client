@@ -41,9 +41,19 @@ export const guideRejectApi = async ({applicationId, userId, reason}: guideRejec
     return await adminInstance.patch(`/admin/users/rejectAsGuide`, { applicationId, userId, reason })
 };
 
-export const createDestinationApi = async(formData: FormData) => {
-    return await adminInstance.post('/admin/destination/create-destination', formData)
+
+export const uploadDestinationPhotosApi = async(count: number) => {
+    return await adminInstance.get(`/admin/destination/generate-signed-urls`, {
+        params: {count}
+    })
+}
+
+export const createDestinationApi = async (formData: Record<string, any>) => {
+  return await adminInstance.post("/admin/destination/create-destination", formData, {
+    headers: { "Content-Type": "application/json" }, 
+  });
 };
+
 
 export const getDestinationsApi = async () => {
     return await adminInstance.get('/admin/destinations');

@@ -1,5 +1,6 @@
 // /redux/user/userThunks.ts
 import {
+  bookGuideApi,
   commentOnGuidePostApi,
   editProfile,
   followGuideApi,
@@ -7,8 +8,10 @@ import {
   getAllPostGuideApi,
   getCurrentMe,
   getDestinationsApi,
+  getGuideDataInBookingApi,
   getGuideSingleDataApi,
   getGuideSinglePostApi,
+  getGuideWDestinationApi,
   getNewDestinationApi,
   hasRegistered,
   likePostUserApi,
@@ -246,6 +249,43 @@ export const unfollowGuideThunk = (guideId: string, requesterId: string) => {
       return response.data;
     } catch (error) {
       console.log(error, 'Error on unfollow');
+      throw error;
+    }
+  }
+};
+
+export const getGuideWDestinationThunk = (destinationId: string) => {
+  return async() => {
+    try {
+      const response = await getGuideWDestinationApi(destinationId);
+      // console.log(response.data);
+      return response.data
+    } catch (error) {
+      console.log(error);
+      throw error
+    }
+  }
+};
+
+export const getGuideDataOnBookingThunk = (guideId: string) => {
+  return async() => {
+    try {
+      const response = await getGuideDataInBookingApi(guideId);
+      return response.data
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
+  }
+};
+
+export const bookGuideThunk = (data: any, guideId: string, userId: string) => {
+  return async() => {
+    try {
+      const response = await bookGuideApi(data, guideId, userId);
+      return response.data
+    } catch (error) {
+      console.log(error);
       throw error;
     }
   }

@@ -1,3 +1,4 @@
+// src/pages/admin/CreateDestination.tsx
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import AdminSidebar from "../../components/admin/home/AdminSidebar";
@@ -5,8 +6,8 @@ import AdminHeader from "../../components/admin/home/AdminHeader";
 import { toast } from "react-toastify";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../redux/store";
-import { createDestination } from "../../redux/admin/authThunks";
 import ImageUploader from "../../components/common/ImageUploader";
+import { createDestination, uploadDestinationPhotos } from "../../redux/admin/authThunks";
 
 export default function CreateDestination() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -34,17 +35,17 @@ export default function CreateDestination() {
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
-    setErrors(prev => ({ ...prev, [name]: "" }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" }));
   };
 
   const handleImageChange = (file: File, index: number) => {
-    setFormData(prev => {
+    setFormData((prev) => {
       const newPhotos = [...prev.photos];
       newPhotos[index] = file;
       return { ...prev, photos: newPhotos };
     });
-    setErrors(prev => ({ ...prev, photos: "" }));
+    setErrors((prev) => ({ ...prev, photos: "" }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -57,7 +58,7 @@ export default function CreateDestination() {
     const country = formData.country.trim();
     const features = formData.featureInput
       .split(",")
-      .map(f => f.trim())
+      .map((f) => f.trim())
       .filter(Boolean);
     const validPhotos = formData.photos.filter((file): file is File => file !== null);
 
@@ -77,21 +78,23 @@ export default function CreateDestination() {
       return;
     }
 
-    const formPayload = new FormData();
-    formPayload.append("name", name);
-    formPayload.append("description", description);
-    formPayload.append("location", location);
-    formPayload.append("country", country);
-    formPayload.append("features", JSON.stringify(features));
-    validPhotos.forEach(photo => formPayload.append("photos", photo));
-
     try {
-      await dispatch(createDestination(formPayload));
+      const uploadedPhotoUrls = await dispatch(uploadDestinationPhotos(validPhotos))
+
+      // 2. Create destination with the photo URLs
+      await dispatch(createDestination({
+        name,
+        description,
+        location,
+        country,
+        features,
+        photos: uploadedPhotoUrls
+      }))
+
       toast.success("Destination created!");
       navigate("/admin/destinations");
     } catch (err: any) {
-      const backendMessage =
-        err?.response?.data?.message || err?.message || "Something went wrong!";
+      const backendMessage = err.payload || err.message || "Something went wrong!";
       toast.error(backendMessage);
     } finally {
       setLoading(false);
@@ -106,7 +109,7 @@ export default function CreateDestination() {
     formData.photos.some((file) => file !== null) &&
     formData.featureInput
       .split(",")
-      .map(f => f.trim())
+      .map((f) => f.trim())
       .filter(Boolean).length > 0;
 
   return (
@@ -146,7 +149,9 @@ export default function CreateDestination() {
                   placeholder="Destination Name"
                   value={formData.name}
                   onChange={handleChange}
-                  className={`w-full p-2 rounded bg-[#1A1F2C] border ${errors.name ? "border-red-500" : "border-gray-600"}`}
+                  className={`w-full p-2 rounded bg-[#1A1F2C] border ${
+                    errors.name ? "border-red-500" : "border-gray-600"
+                  }`}
                 />
                 {errors.name && <p className="text-red-500 text-sm mt-1">{errors.name}</p>}
               </div>
@@ -157,9 +162,13 @@ export default function CreateDestination() {
                   placeholder="Description"
                   value={formData.description}
                   onChange={handleChange}
-                  className={`w-full p-2 h-28 rounded bg-[#1A1F2C] border ${errors.description ? "border-red-500" : "border-gray-600"}`}
+                  className={`w-full p-2 h-28 rounded bg-[#1A1F2C] border ${
+                    errors.description ? "border-red-500" : "border-gray-600"
+                  }`}
                 />
-                {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
+                {errors.description && (
+                  <p className="text-red-500 text-sm mt-1">{errors.description}</p>
+                )}
               </div>
 
               <div>
@@ -169,7 +178,9 @@ export default function CreateDestination() {
                   placeholder="Location"
                   value={formData.location}
                   onChange={handleChange}
-                  className={`w-full p-2 rounded bg-[#1A1F2C] border ${errors.location ? "border-red-500" : "border-gray-600"}`}
+                  className={`w-full p-2 rounded bg-[#1A1F2C] border ${
+                    errors.location ? "border-red-500" : "border-gray-600"
+                  }`}
                 />
                 {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
               </div>
@@ -181,7 +192,9 @@ export default function CreateDestination() {
                   placeholder="Country"
                   value={formData.country}
                   onChange={handleChange}
-                  className={`w-full p-2 rounded bg-[#1A1F2C] border ${errors.country ? "border-red-500" : "border-gray-600"}`}
+                  className={`w-full p-2 rounded bg-[#1A1F2C] border ${
+                    errors.country ? "border-red-500" : "border-gray-600"
+                  }`}
                 />
                 {errors.country && <p className="text-red-500 text-sm mt-1">{errors.country}</p>}
               </div>
@@ -193,7 +206,9 @@ export default function CreateDestination() {
                   placeholder="Features (comma separated)"
                   value={formData.featureInput}
                   onChange={handleChange}
-                  className={`w-full p-2 rounded bg-[#1A1F2C] border ${errors.features ? "border-red-500" : "border-gray-600"}`}
+                  className={`w-full p-2 rounded bg-[#1A1F2C] border ${
+                    errors.features ? "border-red-500" : "border-gray-600"
+                  }`}
                 />
                 {errors.features && <p className="text-red-500 text-sm mt-1">{errors.features}</p>}
               </div>

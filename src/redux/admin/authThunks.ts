@@ -1,3 +1,4 @@
+import axios from "axios";
 import {
     adminRefreshAccessToken,
     BlockUser,
@@ -12,11 +13,13 @@ import {
     guideRejectApi,
     pageinatedDestinations,
     unBlockUser,
-    updateDestinationApi
+    updateDestinationApi,
+    uploadDestinationPhotosApi
 } from "../../api/admin/adminApi";
 import { adminLogin, logoutAdmin } from "../../api/auth";
 import { guideRejection } from "../../types/Guide";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./adminSlice";
+import { _AWS_REGION, _S3_BUCKET } from "../../config/constants";
 
 
 export const handleAdminLogin = (formData: { email: string, password: string }) => {
@@ -152,15 +155,48 @@ export const RejectAsGuide = ({ applicationId, userId, reason }: guideRejection)
             throw error
         }
     }
-}
+};
 
-export const createDestination = (formData: FormData) => {
+export const uploadDestinationPhotos = (files: File[]) => {
+  return async () => {
+    try {
+      const response = await uploadDestinationPhotosApi(files.length);
+      const signedUrls = response.data.signedUrls;
+
+      // 2. Upload photos to S3
+      const uploadedPhotoUrls: string[] = [];
+      for (let i = 0; i < files.length; i++) {
+        const { url, key } = signedUrls[i];
+        await axios.put(url, files[i], {
+          headers: { "Content-Type": files[i].type },
+        });
+        uploadedPhotoUrls.push(`https://${_S3_BUCKET}.s3.${_AWS_REGION}.amazonaws.com/${key}`);
+      }
+
+      return uploadedPhotoUrls;
+    } catch (error: any) {
+      console.log(error);
+      throw error;
+    }
+  };
+};
+
+
+export const createDestination = (destinationData: {
+  name: string;
+  description: string;
+  location: string;
+  country: string;
+  features: string[];
+  photos: string[]; // Assuming these are URLs from the upload
+}) => {
     return async () => {
         try {
-            const response = await createDestinationApi(formData);
+            // const formDataObj = Object.fromEntries(destinationData.entries());
+            const response = await createDestinationApi(destinationData);
             return response;
         } catch (error: any) {
-            console.error('Error On Create Destination:', error.response?.data?.message || error.message);
+            console.error("Error On Create Destination:", error.response?.data?.message || error.message);
             throw error;
         }
     };
@@ -176,7 +212,7 @@ export const getAllDestinations = () => {
             throw error
         }
     }
-}
+};
 
 
 export const getAllPaginatedDesti = (page = 1, limit = 9, search = "", attraction = "") => {
@@ -184,8 +220,8 @@ export const getAllPaginatedDesti = (page = 1, limit = 9, search = "", attractio
         try {
             const response = await pageinatedDestinations(page, limit, search, attraction);
             return response.data
-        } catch (error: any) {
-            console.error('Error on Getting paginated: ', error.message);
+        } catch (error) {
+            console.error('Error on Getting paginated: ', error);
             throw error
         }
     }

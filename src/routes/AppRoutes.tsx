@@ -26,6 +26,7 @@ import GuideListing from '../pages/user/GuideListing';
 import GuideProfileUserView from '../pages/user/GuideProfile';
 import NotFound from '../pages/NotFoundPage';
 import GuideDestinationDetail from '../components/guide/GuideDetailedDestination';
+import BookGuidePage from '../pages/user/BookGuidePage';
 
 export default function AppRoutes() {
   return (
@@ -45,6 +46,7 @@ export default function AppRoutes() {
           <Route path='/destination/:id' element={ <DestinationDetailPage /> } />
           <Route path='/guides' element={ <GuideListing /> } />
           <Route path='/guide-profile/:guideId' element={ <GuideProfileUserView /> } />;
+          <Route path='/book-guide/:guideId' element={ <BookGuidePage /> } />
         </Route>
 
         {/* Admin Routes */}
