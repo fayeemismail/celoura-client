@@ -8,6 +8,7 @@ import { deleteDestinationThunk, getAllPaginatedDesti } from "../../redux/admin/
 import { Pencil, Trash2 } from "lucide-react";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../../components/common/ConfirmationDialog"; // 👈 import your component
+import { useDebounce } from "../../hooks/useDebounce";
 
 export default function DestinationPage() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -19,15 +20,17 @@ export default function DestinationPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  const [showConfirm, setShowConfirm] = useState(false); // 👈 modal visibility
-  const [selectedId, setSelectedId] = useState<string | null>(null); // 👈 destination to delete
+  const [showConfirm, setShowConfirm] = useState(false); 
+  const [selectedId, setSelectedId] = useState<string | null>(null); 
 
   const navigate = useNavigate();
   const { isAuthenticated } = useSelector((state: RootState) => state.admin);
   const dispatch = useDispatch<AppDispatch>();
+  const debouncedSearch = useDebounce(search, 400);
 
   const handleDeleteDestination = async (destinationId: string) => {
     try {
+      console.log(destinationId);
       const response = await dispatch(deleteDestinationThunk(destinationId));
       console.log("Deleting destination:", response);
       toast.success("Deleted successfully");
@@ -43,7 +46,7 @@ export default function DestinationPage() {
     setLoading(true);
     try {
       const response = await dispatch(
-        getAllPaginatedDesti(page, limit, search, AttractionFilter)
+        getAllPaginatedDesti(page, limit, debouncedSearch, AttractionFilter)
       );
       setDestinations(response.data || []);
       setTotalPages(response.pagination?.totalPages || 1);
@@ -60,7 +63,7 @@ export default function DestinationPage() {
     } else {
       getDestinations();
     }
-  }, [isAuthenticated, navigate, page, search, AttractionFilter]);
+  }, [isAuthenticated, navigate, page, debouncedSearch, AttractionFilter]);
 
   return (
     <div className="flex min-h-screen text-white bg-[rgb(8,16,40)]">
