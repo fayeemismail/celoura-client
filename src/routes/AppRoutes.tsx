@@ -27,6 +27,7 @@ import GuideProfileUserView from '../pages/user/GuideProfile';
 import NotFound from '../pages/NotFoundPage';
 import GuideDestinationDetail from '../components/guide/GuideDetailedDestination';
 import BookGuidePage from '../pages/user/BookGuidePage';
+import BookingPageOnGuide from '../pages/Guide/BookingPageGuide';
 
 export default function AppRoutes() {
   return (
@@ -46,7 +47,7 @@ export default function AppRoutes() {
           <Route path='/destination/:id' element={ <DestinationDetailPage /> } />
           <Route path='/guides' element={ <GuideListing /> } />
           <Route path='/guide-profile/:guideId' element={ <GuideProfileUserView /> } />;
-          <Route path='/book-guide/:guideId' element={ <BookGuidePage /> } />
+          <Route path='/book-guide/:destinationId/:guideId' element={ <BookGuidePage /> } />
         </Route>
 
         {/* Admin Routes */}
@@ -66,6 +67,7 @@ export default function AppRoutes() {
           <Route path='/guide/edit-profile' element={ <EditProfile /> } />
           <Route path='/guide/create-post' element={ <CreatePost /> } />;
           <Route path='/guide/destination/:id' element={ <GuideDestinationDetail /> } />
+          <Route path='/guide/booking' element={ <BookingPageOnGuide /> } />
 
         {/* 404 page */}
         <Route path='*' element={ <NotFound /> } />

@@ -71,7 +71,7 @@ export default function DestinationDetailPage() {
 
   const handleBookGuide = (guideId: string) => {
     if (id) {
-      navigate(`/book-guide/${guideId}`, {
+      navigate(`/book-guide/${id}/${guideId}`, {
         state: { destinationId: id },
       });
     }

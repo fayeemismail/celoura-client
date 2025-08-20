@@ -89,6 +89,6 @@ export const getGuideDataInBookingApi = async(guideId: string) => {
   return await axiosInstance.get(`/user/book-guide/${guideId}`)
 };
 
-export const bookGuideApi = async(data: any, guideId: string, userId: string) => {
-  return await axiosInstance.post(`/user/guide/book/${guideId}/${userId}`, data) 
+export const bookGuideApi = async(destintionId: string, data: FormData, guideId: string, userId: string) => {
+  return await axiosInstance.post(`/user/guide/book/${guideId}/${userId}/${destintionId}`, data) 
 }

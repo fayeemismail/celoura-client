@@ -279,10 +279,10 @@ export const getGuideDataOnBookingThunk = (guideId: string) => {
   }
 };
 
-export const bookGuideThunk = (data: any, guideId: string, userId: string) => {
+export const bookGuideThunk = (destinationId: string, data: FormData, guideId: string, userId: string) => {
   return async() => {
     try {
-      const response = await bookGuideApi(data, guideId, userId);
+      const response = await bookGuideApi(destinationId, data, guideId, userId);
       return response.data
     } catch (error) {
       console.log(error);

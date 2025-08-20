@@ -76,4 +76,10 @@ export const getDetailedDestinationApi = async(destinationId: string) => {
 
 export const newAvailableDestinationGuideApi = async(destinationId: string, guideId: string) => {
     return await guideInstance.put(`/guide/add-availableDestination/${destinationId}/${guideId}`)
+};
+
+export const fetchBookingsOnGuideApi = async(guideId: string, page: number, limit: number, search: string, status: string) => {
+    return await guideInstance.get(`/guide/fetch-bookings/${guideId}`, {
+        params: { page, limit, search, status }
+    });
 }

@@ -25,7 +25,6 @@ export default function UserDestinations() {
   const [searchParams] = useSearchParams();
   
   const [destinations, setDestinations] = useState<Destination[]>([]);
-  // const [category, setCategory] = useState(searchParams.get("category") || "");
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [limit] = useState(9);
