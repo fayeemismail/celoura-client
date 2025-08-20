@@ -9,7 +9,8 @@ import AdminSidebar from "../../components/admin/home/AdminSidebar";
 import AdminHeader from "../../components/admin/home/AdminHeader";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import ConfirmationDialog from "../../components/common/ConfirmationDialog"; 
+import ConfirmationDialog from "../../components/common/ConfirmationDialog";
+import { useDebounce } from "../../hooks/useDebounce";
 
 interface User {
   _id: string;
@@ -32,6 +33,10 @@ export default function AllUsersPage() {
   const [limit] = useState(10);
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
+
+
+  const debouncedSearch = useDebounce(search, 400);
+
   const { isAuthenticated } = useSelector((state: RootState) => state.admin);
   const navigate = useNavigate();
 
@@ -41,7 +46,9 @@ export default function AllUsersPage() {
 
   const fetchUsers = async () => {
     try {
-      const response = await dispatch(GetAllUsersData(page, limit, filterRole, search));
+      const response = await dispatch(
+        GetAllUsersData(page, limit, filterRole, debouncedSearch)
+      );
       const data = response?.data || [];
       const pagination = response?.pagination;
       setUsers(data);
@@ -55,15 +62,21 @@ export default function AllUsersPage() {
     if (!selectedUser) return;
 
     try {
-      await dispatch(handleUserBlockUnblock(selectedUser._id, selectedUser.blocked));
+      await dispatch(
+        handleUserBlockUnblock(selectedUser._id, selectedUser.blocked)
+      );
 
       setUsers((prevUsers) =>
         prevUsers.map((user) =>
-          user._id === selectedUser._id ? { ...user, blocked: !selectedUser.blocked } : user
+          user._id === selectedUser._id
+            ? { ...user, blocked: !selectedUser.blocked }
+            : user
         )
       );
 
-      toast.success(`User ${selectedUser.blocked ? "unblocked" : "blocked"} successfully`);
+      toast.success(
+        `User ${selectedUser.blocked ? "unblocked" : "blocked"} successfully`
+      );
     } catch (error: any) {
       console.error("Unexpected Error", error.message);
       toast.error("Something went wrong. Please try again.");
@@ -81,7 +94,7 @@ export default function AllUsersPage() {
   useEffect(() => {
     if (!isAuthenticated) navigate("/admin/login");
     fetchUsers();
-  }, [filterRole, page, search]);
+  }, [filterRole, page, debouncedSearch]);
 
   return (
     <div style={{ backgroundColor: "#1A1F2C" }} className="flex min-h-screen">
@@ -90,19 +103,30 @@ export default function AllUsersPage() {
         toggleSidebar={() => setSidebarOpen(!sidebarOpen)}
       />
 
-      <main className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"}`}>
+      <main
+        className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"
+          }`}
+      >
         <AdminHeader />
         <div className="p-6">
-          <div style={{ backgroundColor: "#242A38" }} className="rounded-lg shadow-md p-6">
+          <div
+            style={{ backgroundColor: "#242A38" }}
+            className="rounded-lg shadow-md p-6"
+          >
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold text-[#fff]">User Management</h2>
+              <h2 className="text-xl font-semibold text-[#fff]">
+                User Management
+              </h2>
               <div className="space-x-2">
                 <button
                   onClick={() => {
                     setFilterRole("user");
                     setPage(1);
                   }}
-                  className={`px-4 py-2 rounded ${filterRole === "user" ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-800"}`}
+                  className={`px-4 py-2 rounded ${filterRole === "user"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-300 text-gray-800"
+                    }`}
                 >
                   All Users
                 </button>
@@ -111,7 +135,10 @@ export default function AllUsersPage() {
                     setFilterRole("guide");
                     setPage(1);
                   }}
-                  className={`px-4 py-2 rounded ${filterRole === "guide" ? "bg-blue-600 text-white" : "bg-gray-300 text-gray-800"}`}
+                  className={`px-4 py-2 rounded ${filterRole === "guide"
+                      ? "bg-blue-600 text-white"
+                      : "bg-gray-300 text-gray-800"
+                    }`}
                 >
                   All Guides
                 </button>
@@ -149,24 +176,29 @@ export default function AllUsersPage() {
                     <th className="py-3 px-4">Action</th>
                   </tr>
                 </thead>
-                <tbody style={{ backgroundColor: "rgb(29 36 54)", color: "#F2F0EF" }}>
+                <tbody
+                  style={{ backgroundColor: "rgb(29 36 54)", color: "#F2F0EF" }}
+                >
                   {users.length > 0 ? (
                     users.map((user) => (
                       <tr key={user._id} className="border-t border-gray-300">
                         <td className="py-3 px-4">{user.name}</td>
                         <td className="py-3 px-4">{user.email}</td>
                         <td className="py-3 px-4 capitalize">{user.role}</td>
-                        <td className="py-3 px-4">{user.blocked ? "Yes" : "No"}</td>
-                        <td className="py-3 px-4">{user.googleUser ? "Yes" : "No"}</td>
+                        <td className="py-3 px-4">
+                          {user.blocked ? "Yes" : "No"}
+                        </td>
+                        <td className="py-3 px-4">
+                          {user.googleUser ? "Yes" : "No"}
+                        </td>
                         <td className="py-3 px-4">
                           {new Date(user.createdAt).toLocaleDateString("in")}
                         </td>
                         <td className="py-3 px-4">
                           <button
                             onClick={() => openConfirmDialog(user)}
-                            className={`px-3 py-1 cursor-pointer rounded text-white ${
-                              user.blocked ? "bg-green-600" : "bg-red-600"
-                            }`}
+                            className={`px-3 py-1 cursor-pointer rounded text-white ${user.blocked ? "bg-green-600" : "bg-red-600"
+                              }`}
                           >
                             {user.blocked ? "Unblock" : "Block"}
                           </button>
@@ -210,7 +242,8 @@ export default function AllUsersPage() {
       <ConfirmationDialog
         isOpen={confirmDialogOpen}
         title="Confirm Action"
-        message={`Are you sure you want to ${selectedUser?.blocked ? "unblock" : "block"} this user?`}
+        message={`Are you sure you want to ${selectedUser?.blocked ? "unblock" : "block"
+          } this user?`}
         color={selectedUser?.blocked ? "#16a34a" : "#dc2626"}
         onConfirm={handleBlockUnblockConfirmed}
         onCancel={() => setConfirmDialogOpen(false)}

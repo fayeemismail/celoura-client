@@ -49,6 +49,7 @@ export default function GuideRequests() {
   const getGuideApplies = async (page: number) => {
     try {
       const response = await dispatch(GetAllGuideApplications(page, limit));
+      // console.log(response.data)
       setGuideApplies(response.data);
       setTotalPages(response.totalPages);
       setCurrentPage(response.page);

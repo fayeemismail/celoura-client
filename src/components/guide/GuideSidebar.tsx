@@ -22,7 +22,7 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }: SidebarProps) => {
     { href: "/guide/destinations", label: "Destinations", icon: <Map /> },
     { href: "/guide/explore", label: "Explore", icon: <Compass /> },
     { href: "/guide/messages", label: "Messages", icon: <MessageSquare /> },
-    { href: "/guide/bookings", label: "Bookings", icon: <CalendarDays /> },
+    { href: "/guide/booking", label: "Bookings", icon: <CalendarDays /> },
     { href: "/guide/profile", label: "Profile", icon: <UserIcon /> },
   ];
 

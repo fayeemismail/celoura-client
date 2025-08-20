@@ -40,6 +40,7 @@ const GuideProfileUserView = () => {
   const handleProfile = async (id: string) => {
     try {
       const response = await dispatch(getGuideSingleDataThunk(id));
+      // console.log(guide)
       setGuideProfile(response);
     } catch (error) {
       console.error("Failed to fetch guide profile", error);

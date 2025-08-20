@@ -6,6 +6,7 @@ export interface Guide {
   _id?: string;
   user: string;
   name: string;
+  email: string;
   destinations: string[];
   happyCustomers: string[];
   followers: string[];
@@ -14,6 +15,7 @@ export interface Guide {
   posts: string[];
   createdAt?: string;
   updatedAt?: string;
+  basedOn?: string;
 };
 
 

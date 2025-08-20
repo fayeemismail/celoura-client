@@ -79,3 +79,16 @@ export const followGuideApi = async(guideId: string, requesterId: string) => {
 export const unfollowGuideApi = async(guideId: string, requesterId: string) => {
   return await axiosInstance.delete(`/user/unfollow/${guideId}/${requesterId}`);
 };
+
+
+export const getGuideWDestinationApi = async(destinationId: string) => {
+  return await axiosInstance.get(`/user/guideWDestination/${destinationId}`);
+};
+
+export const getGuideDataInBookingApi = async(guideId: string) => {
+  return await axiosInstance.get(`/user/book-guide/${guideId}`)
+};
+
+export const bookGuideApi = async(destintionId: string, data: FormData, guideId: string, userId: string) => {
+  return await axiosInstance.post(`/user/guide/book/${guideId}/${userId}/${destintionId}`, data) 
+}

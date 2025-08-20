@@ -2,6 +2,7 @@ import { guideLogin, logoutGuide } from "../../api/auth";
 import {
     commentPostApi,
     createNewPostApi,
+    fetchBookingsOnGuideApi,
     getdestinations,
     getDetailedDestinationApi,
     getGuideAllPostApi,
@@ -263,6 +264,19 @@ export const addToAvailableDestinationThunk = (destinationId: string, guideId: s
         try {
             const response = await newAvailableDestinationGuideApi(destinationId, guideId);
             return response.data
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+};
+
+
+export const fetchBookingsOnGuideThunk = (guideId: string, page : number, limit: number, search: string, status: string) => {
+    return async() => {
+        try {
+            const response = await fetchBookingsOnGuideApi(guideId, page, limit, search, status);
+            return response.data;
         } catch (error) {
             console.log(error);
             throw error;

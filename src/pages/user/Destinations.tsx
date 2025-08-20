@@ -3,9 +3,10 @@ import COLORS from "../../styles/theme";
 import Navbar from "../../components/user/home/Navbar";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../redux/store";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { getAllPaginatedDestiUser } from "../../redux/user/userThunks";
+import { useDebounce } from "../../hooks/useDebounce";
 
 type Destination = {
   _id: string;
@@ -21,21 +22,23 @@ export default function UserDestinations() {
   const { isAuthenticated } = useSelector((state: RootState) => state.user);
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
-
+  const [searchParams] = useSearchParams();
+  
   const [destinations, setDestinations] = useState<Destination[]>([]);
   const [loading, setLoading] = useState(false);
   const [page, setPage] = useState(1);
   const [limit] = useState(9);
   const [totalPages, setTotalPages] = useState(1);
-
-  const [search, setSearch] = useState("");
+  
+  const [search, setSearch] = useState(searchParams.get("search") || "");
   const [category, setCategory] = useState("");
-
+  const debouncedSearch = useDebounce(search, 400)
+  
   const getDestinations = async () => {
     setLoading(true);
     try {
       const response = await dispatch(
-        getAllPaginatedDestiUser(page, limit, search, category)
+        getAllPaginatedDestiUser(page, limit, debouncedSearch, category)
       );
       setDestinations(response.data || []);
       setTotalPages(response.pagination?.totalPages || 1);
@@ -49,7 +52,7 @@ export default function UserDestinations() {
   useEffect(() => {
     if (!isAuthenticated) navigate("/login");
     else getDestinations();
-  }, [isAuthenticated, navigate, page, search, category]);
+  }, [isAuthenticated, navigate, page, debouncedSearch, category]);
 
   return (
     <>
