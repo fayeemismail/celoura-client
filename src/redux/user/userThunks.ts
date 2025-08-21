@@ -1,8 +1,11 @@
 // /redux/user/userThunks.ts
 import {
   bookGuideApi,
+  cancelBookingAPI,
   commentOnGuidePostApi,
   editProfile,
+  fetchUserBookingsAPI,
+  fetchUserBookingsDetailsAPI,
   followGuideApi,
   getAllGuidesOnUserApi,
   getAllPostGuideApi,
@@ -289,4 +292,41 @@ export const bookGuideThunk = (destinationId: string, data: FormData, guideId: s
       throw error;
     }
   }
-}
+};
+
+export const fetchUserBookingsThunk = (userId: string) => {
+  return async() => {
+    try {
+      const response = await fetchUserBookingsAPI(userId);
+      return response.data
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
+  }
+};
+
+
+export const fetchUserBookingDetailsThunk = (bookingId: string) => {
+  return async() => {
+    try {
+      const response = await fetchUserBookingsDetailsAPI(bookingId);
+      return response.data
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
+  }
+};
+
+export const cancelBookingThunk = (bookingId: string) => {
+  return async() => {
+    try {
+      const response = await cancelBookingAPI(bookingId);
+      return response.data
+    } catch (error) {
+      console.log(error)
+      throw error
+    }
+  }
+};

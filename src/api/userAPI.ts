@@ -91,4 +91,17 @@ export const getGuideDataInBookingApi = async(guideId: string) => {
 
 export const bookGuideApi = async(destintionId: string, data: FormData, guideId: string, userId: string) => {
   return await axiosInstance.post(`/user/guide/book/${guideId}/${userId}/${destintionId}`, data) 
+};
+
+
+export const fetchUserBookingsAPI = async(userId: string) => {
+  return await axiosInstance.get(`/user/bookings/${userId}`)
+};
+
+export const fetchUserBookingsDetailsAPI = async(bookingId: string) => {
+  return await axiosInstance.get(`/user/booking-details/${bookingId}`)
+};
+
+export const cancelBookingAPI = async(bookingId: string) => {
+  return await axiosInstance.put(`/user/cancel-booking/${bookingId}`);
 }

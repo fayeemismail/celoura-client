@@ -170,7 +170,7 @@ export default function GuideRequests() {
                     onError={(e) => {
                       const target = e.target as HTMLImageElement;
                       target.onerror = null;
-                      target.src = "https://via.placeholder.com/300x200?text=ID+Not+Available";
+                      // target.src = "https://via.placeholder.com/300x200?text=ID+Not+Available";
                     }}
                   />
                   {application.re_apply && application.re_apply > 0 && (
