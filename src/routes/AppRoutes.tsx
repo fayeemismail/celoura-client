@@ -31,6 +31,7 @@ import BookingPageOnGuide from '../pages/Guide/BookingPageGuide';
 import BookingDetails from '../components/guide/BookingDetails';
 import BookingsUser from '../pages/user/UserBookings';
 import BookingDetailsPage from '../components/user/Guide/BookingDetails';
+import BookingsOnAdmin from '../pages/admin/BookingsAdmin';
 
 export default function AppRoutes() {
   return (
@@ -63,6 +64,8 @@ export default function AppRoutes() {
           <Route path='/admin/destinations' element={ <DestinationPage /> } />
           <Route path='/admin/create-destinations' element={ <CreateDestination /> } />
           <Route path='/admin/edit-destination/:id' element={ <EditDestination /> } />
+          <Route path='/admin/bookings' element={ <BookingsOnAdmin /> } />
+
 
         {/* guide side */}
           <Route path='/guide/login' element={ <GuideLogin /> } />

@@ -11,6 +11,7 @@ import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import ConfirmationDialog from "../../components/common/ConfirmationDialog";
 import { useDebounce } from "../../hooks/useDebounce";
+import Table, { Column } from "../../components/common/Table";
 
 interface User {
   _id: string;
@@ -34,8 +35,7 @@ export default function AllUsersPage() {
   const [totalPages, setTotalPages] = useState(1);
   const [search, setSearch] = useState("");
 
-
-  const debouncedSearch = useDebounce(search, 400);
+  const debouncedSearch = useDebounce(search, 500);
 
   const { isAuthenticated } = useSelector((state: RootState) => state.admin);
   const navigate = useNavigate();
@@ -96,6 +96,31 @@ export default function AllUsersPage() {
     fetchUsers();
   }, [filterRole, page, debouncedSearch]);
 
+  const columns: Column<User>[] = [
+    { header: "Name", accessor: (u) => u.name },
+    { header: "Email", accessor: (u) => u.email },
+    { header: "Role", accessor: (u) => u.role },
+    { header: "Blocked", accessor: (u) => (u.blocked ? "Yes" : "No") },
+    { header: "Google", accessor: (u) => (u.googleUser ? "Yes" : "No") },
+    {
+      header: "Joined At",
+      accessor: (u) => new Date(u.createdAt).toLocaleDateString("in"),
+    },
+    {
+      header: "Action",
+      accessor: (u) => (
+        <button
+          onClick={() => openConfirmDialog(u)}
+          className={`px-3 py-1 cursor-pointer rounded text-white ${
+            u.blocked ? "bg-green-600" : "bg-red-600"
+          }`}
+        >
+          {u.blocked ? "Unblock" : "Block"}
+        </button>
+      ),
+    },
+  ]; 
+
   return (
     <div style={{ backgroundColor: "#1A1F2C" }} className="flex min-h-screen">
       <AdminSidebar
@@ -104,8 +129,9 @@ export default function AllUsersPage() {
       />
 
       <main
-        className={`flex-1 transition-all duration-300 ${sidebarOpen ? "ml-64" : "ml-20"
-          }`}
+        className={`flex-1 transition-all duration-300 ${
+          sidebarOpen ? "ml-64" : "ml-20"
+        }`}
       >
         <AdminHeader />
         <div className="p-6">
@@ -123,10 +149,11 @@ export default function AllUsersPage() {
                     setFilterRole("user");
                     setPage(1);
                   }}
-                  className={`px-4 py-2 rounded ${filterRole === "user"
+                  className={`px-4 py-2 rounded ${
+                    filterRole === "user"
                       ? "bg-blue-600 text-white"
                       : "bg-gray-300 text-gray-800"
-                    }`}
+                  }`}
                 >
                   All Users
                 </button>
@@ -135,10 +162,11 @@ export default function AllUsersPage() {
                     setFilterRole("guide");
                     setPage(1);
                   }}
-                  className={`px-4 py-2 rounded ${filterRole === "guide"
+                  className={`px-4 py-2 rounded ${
+                    filterRole === "guide"
                       ? "bg-blue-600 text-white"
                       : "bg-gray-300 text-gray-800"
-                    }`}
+                  }`}
                 >
                   All Guides
                 </button>
@@ -159,62 +187,8 @@ export default function AllUsersPage() {
               />
             </div>
 
-            {/* 🧾 Table */}
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm text-left">
-                <thead
-                  style={{ backgroundColor: "#1A1F2C" }}
-                  className="text-white uppercase tracking-wider"
-                >
-                  <tr>
-                    <th className="py-3 px-4">Name</th>
-                    <th className="py-3 px-4">Email</th>
-                    <th className="py-3 px-4">Role</th>
-                    <th className="py-3 px-4">Blocked</th>
-                    <th className="py-3 px-4">Google</th>
-                    <th className="py-3 px-4">Joined At</th>
-                    <th className="py-3 px-4">Action</th>
-                  </tr>
-                </thead>
-                <tbody
-                  style={{ backgroundColor: "rgb(29 36 54)", color: "#F2F0EF" }}
-                >
-                  {users.length > 0 ? (
-                    users.map((user) => (
-                      <tr key={user._id} className="border-t border-gray-300">
-                        <td className="py-3 px-4">{user.name}</td>
-                        <td className="py-3 px-4">{user.email}</td>
-                        <td className="py-3 px-4 capitalize">{user.role}</td>
-                        <td className="py-3 px-4">
-                          {user.blocked ? "Yes" : "No"}
-                        </td>
-                        <td className="py-3 px-4">
-                          {user.googleUser ? "Yes" : "No"}
-                        </td>
-                        <td className="py-3 px-4">
-                          {new Date(user.createdAt).toLocaleDateString("in")}
-                        </td>
-                        <td className="py-3 px-4">
-                          <button
-                            onClick={() => openConfirmDialog(user)}
-                            className={`px-3 py-1 cursor-pointer rounded text-white ${user.blocked ? "bg-green-600" : "bg-red-600"
-                              }`}
-                          >
-                            {user.blocked ? "Unblock" : "Block"}
-                          </button>
-                        </td>
-                      </tr>
-                    ))
-                  ) : (
-                    <tr>
-                      <td className="py-4 px-4 text-center" colSpan={8}>
-                        No users found.
-                      </td>
-                    </tr>
-                  )}
-                </tbody>
-              </table>
-            </div>
+            {/* 🧾 Reusable Table */}
+            <Table<User> data={users} columns={columns} />
 
             {/* 📄 Pagination */}
             <div className="flex justify-center mt-6 space-x-4">
@@ -242,8 +216,9 @@ export default function AllUsersPage() {
       <ConfirmationDialog
         isOpen={confirmDialogOpen}
         title="Confirm Action"
-        message={`Are you sure you want to ${selectedUser?.blocked ? "unblock" : "block"
-          } this user?`}
+        message={`Are you sure you want to ${
+          selectedUser?.blocked ? "unblock" : "block"
+        } this user?`}
         color={selectedUser?.blocked ? "#16a34a" : "#dc2626"}
         onConfirm={handleBlockUnblockConfirmed}
         onCancel={() => setConfirmDialogOpen(false)}

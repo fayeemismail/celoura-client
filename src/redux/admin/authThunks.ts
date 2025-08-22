@@ -272,10 +272,10 @@ export const updateDestinationThunk = (id: string, formData: FormData) => {
     }
 };
 
-export const fetchAllBookingsThunk = () => {
+export const fetchAllBookingsThunk = (page: number, limit: number) => {
     return async() => {
         try {
-            const response = await fetchAllBookingsApi();
+            const response = await fetchAllBookingsApi(page, limit);
             return response.data;
         } catch (error) {
             console.log(error);

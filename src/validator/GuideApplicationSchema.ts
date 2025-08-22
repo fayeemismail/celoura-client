@@ -11,6 +11,10 @@ export const guideApplicationSchema = Yup.object().shape({
     .test("is-18", "You must be at least 18 years old", function (value) {
       if (!value) return false;
       return differenceInYears(new Date(), new Date(value)) >= 18;
+    })
+    .test("is-60", "Age cannot be more than 60 years", function (value) {
+      if (!value) return false;
+      return differenceInYears(new Date(), new Date(value)) <= 60;
     }),
   phone: Yup.string().required("Phone number is required"),
   email: Yup.string().email("Invalid email").required("Email is required"),
