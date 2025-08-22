@@ -82,4 +82,16 @@ export const fetchBookingsOnGuideApi = async(guideId: string, page: number, limi
     return await guideInstance.get(`/guide/fetch-bookings/${guideId}`, {
         params: { page, limit, search, status }
     });
-}
+};
+
+export const fetchBookingDetailsAPI = async(bookingId: string) => {
+    return await guideInstance.get(`/guide/fetch-booking-details/${bookingId}`)
+};
+
+export const acceptBookingAPI = async(bookingId: string, budget: number) => {
+    return await guideInstance.put(`/guide/accept-booking/${bookingId}`, {budget})
+};
+
+export const rejectBookingAPI = async(bookingId: string, reason: string) => {
+    return await guideInstance.put(`/guide/reject-booking/${bookingId}`, {reason})
+};

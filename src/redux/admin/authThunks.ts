@@ -4,6 +4,7 @@ import {
     BlockUser,
     createDestinationApi,
     deleteDestinationApi,
+    fetchAllBookingsApi,
     getAllCount,
     getAllUsers,
     getAppliesGuide,
@@ -267,6 +268,18 @@ export const updateDestinationThunk = (id: string, formData: FormData) => {
         } catch (error) {
             console.log(error)
             throw error
+        }
+    }
+};
+
+export const fetchAllBookingsThunk = (page: number, limit: number) => {
+    return async() => {
+        try {
+            const response = await fetchAllBookingsApi(page, limit);
+            return response.data;
+        } catch (error) {
+            console.log(error);
+            throw error;
         }
     }
 }

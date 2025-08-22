@@ -35,7 +35,7 @@ export default function Navbar() {
           <a  style={{ color: COLORS.accent }} onClick={() => navigate('/')} className="font-medium cursor-pointer">Home</a>
           <a  style={{ color: COLORS.secondaryText }} onClick={() => navigate('/destinations')} className="font-medium cursor-pointer hover:text-accent">Destinations</a>
           <a  style={{ color: COLORS.secondaryText }} onClick={() => navigate('/guides')} className="font-medium cursor-pointer hover:text-accent">Guides</a>
-          <a  style={{ color: COLORS.secondaryText }} className="font-medium cursor-pointer hover:text-accent">Saved</a>
+          <a  style={{ color: COLORS.secondaryText }} onClick={() => navigate('/booking')} className="font-medium cursor-pointer hover:text-accent">Bookings</a>
         </nav>
 
         {/* User Profile/Actions */}

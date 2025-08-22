@@ -18,7 +18,6 @@ import {
   validateEmail,
   validatePhone,
   validateAddress,
-  validateBudget,
   validateDates,
 } from "../../components/user/Destination/Validation";
 import { toast } from "react-toastify";
@@ -52,7 +51,6 @@ export default function BookGuidePage() {
     startDate: "",
     endDate: "",
     days: 1,
-    budget: 1000,
     specialRequests: "",
     selectedDestinations: [] as string[],
   });
@@ -63,7 +61,6 @@ export default function BookGuidePage() {
     address: "",
     startDate: "",
     endDate: "",
-    budget: "",
     selectedDestinations: "",
   });
 
@@ -77,7 +74,6 @@ export default function BookGuidePage() {
     try {
       if (guideId) {
         const data = await dispatch(getGuideDataOnBookingThunk(guideId));
-        // console.log(data)
         setGuide(data);
 
         if (location.state?.destinationName) {
@@ -141,16 +137,6 @@ export default function BookGuidePage() {
     const { name, value } = e.target;
     const numValue = parseInt(value) || 0;
 
-    if (name === "budget") {
-      if (!validateBudget(numValue)) {
-        setErrors((prev) => ({ ...prev, budget: "Minimum budget is $1000" }));
-      } else {
-        setErrors((prev) => ({ ...prev, budget: "" }));
-      }
-      setFormData((prev) => ({ ...prev, [name]: numValue }));
-      return;
-    }
-
     if (name === "days" && numValue < 1) return;
 
     setFormData((prev) => ({ ...prev, [name]: numValue }));
@@ -206,7 +192,6 @@ export default function BookGuidePage() {
     const emailValid = validateEmail(formData.email);
     const phoneValid = validatePhone(formData.phone);
     const addressValid = validateAddress(formData.address);
-    const budgetValid = validateBudget(formData.budget);
     const datesCheck = validateDates(formData.startDate, formData.endDate);
     const destinationsValid = formData.selectedDestinations.length > 0;
 
@@ -217,7 +202,6 @@ export default function BookGuidePage() {
         ? ""
         : "Phone number must be at least 10 digits and contain only numbers",
       address: addressValid ? "" : "Address must be at least 10 characters",
-      budget: budgetValid ? "" : "Minimum budget is $1000",
       startDate: formData.startDate ? "" : "Start date is required",
       endDate: datesCheck.valid ? "" : datesCheck.error,
       selectedDestinations: destinationsValid
@@ -230,7 +214,6 @@ export default function BookGuidePage() {
       emailValid &&
       phoneValid &&
       addressValid &&
-      budgetValid &&
       datesCheck.valid &&
       destinationsValid
     );
@@ -248,7 +231,6 @@ export default function BookGuidePage() {
     data.append("startDate", formData.startDate);
     data.append("endDate", formData.endDate);
     data.append("days", formData.days.toString());
-    data.append("budget", formData.budget.toString());
     data.append("specialRequests", formData.specialRequests);
     formData.selectedDestinations.forEach((dest) => {
       data.append("selectedDestinations", dest);
@@ -259,16 +241,16 @@ export default function BookGuidePage() {
         bookGuideThunk(destinationId!, data, guide?._id!, currentUser?.id!)
       );
       toast.success("Guide Booked");
-      navigate(-1)
+      navigate(-1);
     } catch (error) {
       if (error instanceof AxiosError) {
         toast.error(error.response?.data);
         console.error(error.response?.data ?? error.message);
       } else {
-        toast.error("Cannot Book the guide")
+        toast.error("Cannot Book the guide");
         console.error("Unexpected error:", error);
       }
-    };
+    }
   };
 
   // -------------------------------

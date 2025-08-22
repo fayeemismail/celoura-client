@@ -1,7 +1,9 @@
 import { guideLogin, logoutGuide } from "../../api/auth";
 import {
+    acceptBookingAPI,
     commentPostApi,
     createNewPostApi,
+    fetchBookingDetailsAPI,
     fetchBookingsOnGuideApi,
     getdestinations,
     getDetailedDestinationApi,
@@ -14,6 +16,7 @@ import {
     guideRefreshAccessToken,
     likePostApi,
     newAvailableDestinationGuideApi,
+    rejectBookingAPI,
     replyCommentPostApi,
     unlikePostApi,
     updateProfileGuideApi
@@ -280,6 +283,42 @@ export const fetchBookingsOnGuideThunk = (guideId: string, page : number, limit:
         } catch (error) {
             console.log(error);
             throw error;
+        }
+    }
+};
+
+export const fetchBookingDetailsThunk = (bookingId: string) => {
+    return async() => {
+        try {
+            const response = await fetchBookingDetailsAPI(bookingId);
+            return response
+        } catch (error) {
+            console.log(error);
+            throw error
+        }
+    }
+};
+
+export const acceptBookingThunk = ( bookingId: string, budget: number ) => {
+    return async() => {
+        try {
+            const response = await acceptBookingAPI(bookingId, budget);
+            return response
+        } catch (error) {
+            console.log(error);
+            throw error
+        }
+    }
+};
+
+export const rejectBookingThunk = ( bookingId: string, reason: string ) => {
+    return async() => {
+        try {
+            const response = await rejectBookingAPI(bookingId, reason);
+            return response
+        } catch (error) {
+            console.log(error);
+            throw error
         }
     }
 }

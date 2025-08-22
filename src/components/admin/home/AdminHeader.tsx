@@ -4,20 +4,20 @@ import { Search, Bell } from "lucide-react";
 export default function AdminHeader() {
   return (
     <header 
-      style={{ backgroundColor: '#081028', borderColor: ADMIN_COLORS.border }} 
-      className="flex h-16 items-center justify-between border-b px-6"
+      // style={{ backgroundColor: '#081028', borderColor: ADMIN_COLORS.border }} 
+      className="flex h-16 items-center justify-between border-b px-6  from-slate-900 via-slate-800 to-slate-900"
     >
       <h1 style={{ color: ADMIN_COLORS.text }} className="text-xl font-semibold">Dashboard</h1>
 
       <div className="flex items-center space-x-4">
         {/* Search */}
         <div 
-          style={{ backgroundColor: "#081028", borderColor: ADMIN_COLORS.border }} 
-          className="relative hidden md:block"
+          // style={{ backgroundColor: "#081028", borderColor: ADMIN_COLORS.border }} 
+          className="relative hidden md:block  from-slate-900 via-slate-800 to-slate-900"
         >
           <Search 
-            style={{ color: ADMIN_COLORS.secondaryText }} 
-            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2" 
+            // style={{ color: ADMIN_COLORS.secondaryText }} 
+            className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2  from-slate-900 via-slate-800 to-slate-900" 
           />
           <input
             type="text"

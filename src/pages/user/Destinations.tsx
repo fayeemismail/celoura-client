@@ -32,7 +32,7 @@ export default function UserDestinations() {
   
   const [search, setSearch] = useState(searchParams.get("search") || "");
   const [category, setCategory] = useState("");
-  const debouncedSearch = useDebounce(search, 400)
+  const debouncedSearch = useDebounce(search, 400);
   
   const getDestinations = async () => {
     setLoading(true);

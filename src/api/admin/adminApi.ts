@@ -76,3 +76,7 @@ export const getDestinationById = async(id: string) => {
 export const updateDestinationApi = async(id: string, formData: FormData) => {
     return await adminInstance.put(`/admin/destination/edit-destination/${id}`, formData)
 };
+
+export const fetchAllBookingsApi = async(page: number, limit: number) => {
+    return await adminInstance.get(`/admin/bookings?page=${page}&limit=${limit}`)
+}

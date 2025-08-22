@@ -35,7 +35,7 @@ export default function AdminSidebar({ sidebarOpen, toggleSidebar }: SidebarProp
   return (
     <aside
       style={{ borderColor: '#081028' }}
-      className={`fixed inset-y-0 left-0 z-10 flex flex-col bg-[#081028] border-r transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}
+      className={`fixed inset-y-0 left-0 z-10 flex flex-col   from-slate-900 via-slate-800 to-slate-900 border-r transition-all duration-300 ${sidebarOpen ? 'w-64' : 'w-20'}`}
     >
       <div className="flex h-16 items-center justify-center border-b px-4" style={{ borderColor: ADMIN_COLORS.border }}>
         <div className="flex items-center">

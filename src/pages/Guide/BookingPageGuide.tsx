@@ -4,17 +4,21 @@ import { AppDispatch, RootState } from "../../redux/store";
 import { useNavigate } from "react-router-dom";
 import Sidebar from "../../components/guide/GuideSidebar";
 import GuideNavbar from "../../components/guide/GuideNavbar";
-import { fetchBookingsOnGuideThunk } from "../../redux/guide/authThunks";
+import { fetchBookingsOnGuideThunk, acceptBookingThunk, rejectBookingThunk } from "../../redux/guide/authThunks";
 import { useDebounce } from "../../hooks/useDebounce";
+import { toast } from "react-toastify";
+import BudgetModal from "../../components/common/BudgetModal";
+import RejectModal from "../../components/common/RejectModal";
 
 type Booking = {
   _id: string;
-  budget: string;
   durationInDays: string;
   startDate: string;
   endDate: string;
-  status: "pending" | "confirmed" | "completed" | "cancelled";
+  status: "pending" | "confirmed" | "completed" | "cancelled" | "accepted";
   guideAccepted: boolean;
+  rejected: boolean;
+  rejectedReason: string;
   locations: string[];
   specialRequests: string;
   user: {
@@ -39,6 +43,11 @@ const GuideBookings = () => {
   const [limit] = useState(9);
   const [totalPages, setTotalPages] = useState(1);
   const [totalBookings, setTotalBookings] = useState(0);
+  const [processing, setProcessing] = useState(false);
+  const [selectedBooking, setSelectedBooking] = useState<Booking | null>(null);
+  const [showBudgetModal, setShowBudgetModal] = useState(false);
+  const [showRejectModal, setShowRejectModal] = useState(false);
+  
   const navigate = useNavigate();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -75,6 +84,42 @@ const GuideBookings = () => {
     }
   }, [isAuthenticated, currentGuide, page, debouncedSearch, statusFilter]);
 
+  // Accept with budget
+  const handleAcceptBooking = async (budget: number) => {
+    if (!selectedBooking) return;
+    setProcessing(true);
+    try {
+      await dispatch(acceptBookingThunk(selectedBooking._id, budget));
+      setShowBudgetModal(false);
+      toast.success('Booking Accepted');
+      getBookings(); // Refresh the bookings list
+    } catch (error) {
+      toast.error("Cannot Accept Booking");
+      console.log(error);
+    } finally {
+      setProcessing(false);
+      setSelectedBooking(null);
+    }
+  };
+
+  // Reject with reason
+  const handleRejectBooking = async (reason: string) => {
+    if (!selectedBooking) return;
+    setProcessing(true);
+    try {
+      await dispatch(rejectBookingThunk(selectedBooking._id, reason));
+      toast.success("Booking Rejected Successfully");
+      setShowRejectModal(false);
+      getBookings(); // Refresh the bookings list
+    } catch (error) {
+      toast.error("Something went wrong Cannot Reject the Booking");
+      console.log(error);
+    } finally {
+      setProcessing(false);
+      setSelectedBooking(null);
+    }
+  };
+
   const toggleSidebar = () => setSidebarOpen(!sidebarOpen);
 
   const handlePageChange = (newPage: number) => {
@@ -85,14 +130,16 @@ const GuideBookings = () => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
-      case "confirmed":
-        return "bg-green-500";
+      case "cancelled":
+        return "bg-red-400";
       case "pending":
         return "bg-yellow-500";
-      case "completed":
+      case "accepted":
         return "bg-blue-500";
-      case "cancelled":
+      case "rejected":
         return "bg-red-500";
+      case "completed": 
+        return "bg-blue-500";
       default:
         return "bg-gray-500";
     }
@@ -122,7 +169,8 @@ const GuideBookings = () => {
               My Bookings
             </h1>
             <div className="text-sm text-gray-400">
-              Showing {(page - 1) * limit + 1} - {Math.min(page * limit, totalBookings)} of {totalBookings} bookings
+              Showing {(page - 1) * limit + 1} -{" "}
+              {Math.min(page * limit, totalBookings)} of {totalBookings} bookings
             </div>
           </div>
 
@@ -134,7 +182,7 @@ const GuideBookings = () => {
               value={search}
               onChange={(e) => {
                 setSearch(e.target.value);
-                setPage(1); // Reset to first page when searching
+                setPage(1);
               }}
               className="w-full sm:w-1/2 px-4 py-2 rounded-xl bg-[#1a1f2e]/70 border border-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none transition"
             />
@@ -144,12 +192,13 @@ const GuideBookings = () => {
                 value={statusFilter}
                 onChange={(e) => {
                   setStatusFilter(e.target.value);
-                  setPage(1); // Reset to first page when filtering
+                  setPage(1);
                 }}
                 className="w-full appearance-none px-4 py-2 pr-10 rounded-xl bg-[#1a1f2e]/70 border border-gray-700 focus:ring-2 focus:ring-indigo-500 outline-none transition"
               >
                 <option value="all">All Status</option>
                 <option value="pending">Pending</option>
+                <option value="accepted">Accepted</option>
                 <option value="confirmed">Confirmed</option>
                 <option value="completed">Completed</option>
                 <option value="cancelled">Cancelled</option>
@@ -186,29 +235,23 @@ const GuideBookings = () => {
                             {booking.status.charAt(0).toUpperCase() +
                               booking.status.slice(1)}
                           </span>
-                          {!booking.guideAccepted && (
-                            <span className="px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-orange-500 to-yellow-500 text-black shadow-md">
-                              Action Required
-                            </span>
-                          )}
+                          {!booking.guideAccepted &&
+                            !booking.rejected &&
+                            booking.status === "pending" && (
+                              <span className="px-3 py-1 rounded-full text-xs font-medium bg-gradient-to-r from-orange-500 to-yellow-500 text-black shadow-md">
+                                Action Required
+                              </span>
+                            )}
                         </div>
 
                         {/* Booking Details */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-6">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
                           <div className="p-3 rounded-xl bg-[#1a1f2e]/60 border border-gray-700">
                             <p className="text-xs uppercase text-gray-400 tracking-wide">
                               Duration
                             </p>
                             <p className="text-lg font-semibold">
                               {booking.durationInDays} days
-                            </p>
-                          </div>
-                          <div className="p-3 rounded-xl bg-[#1a1f2e]/60 border border-gray-700">
-                            <p className="text-xs uppercase text-gray-400 tracking-wide">
-                              Budget
-                            </p>
-                            <p className="text-lg font-semibold">
-                              ${booking.budget}
                             </p>
                           </div>
                           <div className="p-3 rounded-xl bg-[#1a1f2e]/60 border border-gray-700">
@@ -258,6 +301,18 @@ const GuideBookings = () => {
                             </p>
                           </div>
                         )}
+
+                        {/* Show Reject Reason if rejected */}
+                        {booking.rejected && (
+                          <div className="p-4 rounded-xl bg-red-900/40 border border-red-700 mt-4">
+                            <p className="text-xs uppercase text-red-300 tracking-wide">
+                              Rejected Reason
+                            </p>
+                            <p className="text-base mt-2">
+                              {booking.rejectedReason || "Not specified"}
+                            </p>
+                          </div>
+                        )}
                       </div>
 
                       {/* Right Content (Actions) */}
@@ -270,11 +325,30 @@ const GuideBookings = () => {
                         >
                           View Details
                         </button>
+
                         {booking.status === "pending" &&
-                          !booking.guideAccepted && (
-                            <button className="px-5 py-2 rounded-lg font-medium bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 transition-all shadow-md">
-                              Accept Booking
-                            </button>
+                          !booking.guideAccepted &&
+                          !booking.rejected && (
+                            <>
+                              <button 
+                                onClick={() => {
+                                  setSelectedBooking(booking);
+                                  setShowBudgetModal(true);
+                                }}
+                                className="px-5 py-2 rounded-lg font-medium bg-gradient-to-r from-green-500 to-emerald-600 hover:opacity-90 transition-all shadow-md"
+                              >
+                                Accept Booking
+                              </button>
+                              <button 
+                                onClick={() => {
+                                  setSelectedBooking(booking);
+                                  setShowRejectModal(true);
+                                }}
+                                className="px-5 py-2 rounded-lg font-medium bg-gradient-to-r from-red-500 to-pink-600 hover:opacity-90 transition-all shadow-md"
+                              >
+                                Reject Booking
+                              </button>
+                            </>
                           )}
                       </div>
                     </div>
@@ -333,6 +407,26 @@ const GuideBookings = () => {
             </p>
           )}
         </main>
+
+        {/* Modals */}
+        <BudgetModal
+          isOpen={showBudgetModal}
+          onClose={() => {
+            setShowBudgetModal(false);
+            setSelectedBooking(null);
+          }}
+          onConfirm={handleAcceptBooking}
+          processing={processing}
+        />
+        <RejectModal
+          isOpen={showRejectModal}
+          onClose={() => {
+            setShowRejectModal(false);
+            setSelectedBooking(null);
+          }}
+          onConfirm={handleRejectBooking}
+          processing={processing}
+        />
       </div>
     </div>
   );
