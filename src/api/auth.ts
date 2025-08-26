@@ -89,4 +89,20 @@ export const logoutAdmin = async () => {
 
 export const logoutGuide = async () => {
     return axiosInstance.post('/auth/guide/logout')
-} 
+};
+
+export const forgotPasswordRequestAPI = async(email: string) => {
+    return await axiosInstance.post(`/auth/forgot-password-email`, { email });
+};
+
+export const forgotPassVerifyOTPAPI = async(email: string, otp: string) => {
+    return await axiosInstance.post('/auth/forgot-password/verifytp', { email, otp })
+};
+
+export const resentForgotPasswordOtpAPI = async(email: string) => {
+    return await axiosInstance.put('/auth/forgotpassword/resendOtp', { email })
+};
+
+export const changeForgotPasswordAPI = async(email: string, newPassword: string) => {
+    return await axiosInstance.put(`/auth/changePassword`, { email, newPassword });
+};

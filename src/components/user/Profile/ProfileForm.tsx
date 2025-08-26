@@ -88,31 +88,41 @@ export default function ProfileForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {formError && (
-        <div className="mb-4 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700">
-          {formError}
+    <div className="p-6">
+      <h2 className="text-2xl font-semibold text-gray-800 mb-6">Edit Profile</h2>
+      
+      <form onSubmit={handleSubmit} className="bg-white rounded-lg p-6 border border-[#e0d8c3] shadow-sm">
+        {formError && (
+          <div className="mb-6 p-3 rounded-lg bg-red-100 border border-red-300 text-red-700">
+            {formError}
+          </div>
+        )}
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <div className="col-span-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Name</label>
+            <NameField value={name} onChange={setName} />
+          </div>
+          
+          <div className="col-span-1">
+            <label className="block text-sm font-medium text-gray-700 mb-2">Email address</label>
+            <div className="text-base text-gray-800 px-4 py-3 border border-gray-300 rounded-md bg-gray-50">
+              {currentUser?.email}
+            </div>
+          </div>
         </div>
-      )}
 
-      <label className="block text-sm font-medium text-gray-700 mb-1">Name</label>
-      <NameField value={name} onChange={setName} />
+        <PasswordSection
+          passwordData={passwordData}
+          setPasswordData={setPasswordData}
+          showPasswordFields={showPasswordFields}
+          setShowPasswordFields={setShowPasswordFields}
+        />
 
-      <div>
-        <label className="block text-sm font-medium text-gray-700 mb-1">Email address</label>
-        <p className="text-base text-gray-800 px-3 py-2 border border-gray-300 rounded-md bg-gray-100">
-          {currentUser?.email}
-        </p>
-      </div>
-
-      <PasswordSection
-        passwordData={passwordData}
-        setPasswordData={setPasswordData}
-        showPasswordFields={showPasswordFields}
-        setShowPasswordFields={setShowPasswordFields}
-      />
-
-      <SubmitButton loading={loading} />
-    </form>
+        <div className="mt-8 pt-6 border-t border-gray-200">
+          <SubmitButton loading={loading} />
+        </div>
+      </form>
+    </div>
   );
 }
