@@ -157,6 +157,16 @@ export default function LoginPage() {
                 )}
               </div>
             </div>
+            <div className="text-right mb-4">
+              <a
+                onClick={() => navigate("/forgot-password")}
+                className="cursor-pointer text-sm font-medium hover:underline"
+                style={{ color: COLORS.accent }}
+              >
+                Forgot Password?
+              </a>
+            </div>
+
 
             <button
               type="submit"

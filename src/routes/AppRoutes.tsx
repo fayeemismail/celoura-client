@@ -32,6 +32,8 @@ import BookingDetails from '../components/guide/BookingDetails';
 import BookingsUser from '../pages/user/UserBookings';
 import BookingDetailsPage from '../components/user/Guide/BookingDetails';
 import BookingsOnAdmin from '../pages/admin/BookingsAdmin';
+import ForgotPassword from '../pages/user/ForgotPassword';
+// import ForgotPasswordWrapper from '../pages/user/ForgotPasswordWrapper';
 
 export default function AppRoutes() {
   return (
@@ -41,6 +43,7 @@ export default function AppRoutes() {
         <Route path="/login" element={<Login />} />
         <Route path="/signup" element={<Signup />} />
         <Route path="/verify-otp" element={<Otp />} />
+        <Route path='/forgot-password' element={ <ForgotPassword /> } />;
 
         {/* Protected User Routes */}
         <Route element={<ProtectedRoute />}>

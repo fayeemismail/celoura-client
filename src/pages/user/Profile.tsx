@@ -1,17 +1,23 @@
-// /pages/user/Profile.tsx
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../redux/store";
 import { handleSignout } from "../../redux/user/authThunks";
-import COLORS from "../../styles/theme";
-import ProfileNavbar from "../../components/user/Profile/ProfileNavbar";
+import ProfileSidebar from "../../components/user/Profile/ProfileSidebar";
+import ProfileOverview from "../../components/user/Profile/ProfileOverview";
 import ProfileForm from "../../components/user/Profile/ProfileForm";
+import ProfileBookingsPage from "../../components/user/Profile/BookingOnProfile";
+import ProfileAddressesPage from "../../components/user/Profile/ProfileAddressPage";
+import ProfileFollowedGuidesPage from "../../components/user/Profile/ProfileFollowedPage";
+import ProfileLikedPostsPage from "../../components/user/Profile/ProfileLikePage";
+import ProfileNavbar from "../../components/user/Profile/ProfileNavbar";
 
 export default function Profile() {
   const { currentUser } = useSelector((state: RootState) => state.user);
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+
+  const [activePage, setActivePage] = useState("overview"); 
 
   useEffect(() => {
     if (!currentUser) {
@@ -20,18 +26,36 @@ export default function Profile() {
     }
   }, [currentUser, dispatch, navigate]);
 
+  const renderContent = () => {
+    switch (activePage) {
+      case "overview":
+        return <ProfileOverview />;
+      case "bookings":
+        return <ProfileBookingsPage />;
+      case "edit-profile":
+        return <ProfileForm />;
+      case "addresses":
+        return <ProfileAddressesPage />;
+      case "followed-guides":
+        return <ProfileFollowedGuidesPage />;
+      case "liked-posts":
+        return <ProfileLikedPostsPage />;
+      default:
+        return <ProfileOverview />;
+    }
+  };
+
   return (
-    <div
-      style={{ backgroundColor: COLORS.bg, minHeight: "100vh", paddingTop: "80px" }}
-      className="flex items-center justify-center p-4"
-    >
-      <div
-        style={{ backgroundColor: COLORS.cardBg, borderColor: COLORS.border }}
-        className="w-full max-w-md rounded-lg border shadow-xl"
-      >
-        <ProfileNavbar />
-        <div className="p-6">
-          <ProfileForm />
+    <div className="bg-[#f8f5ef] min-h-screen pt-20 p-4">
+      <ProfileNavbar />
+      <div className="max-w-6xl mx-auto flex gap-6">
+        <ProfileSidebar 
+          active={activePage} 
+          setActive={setActivePage} 
+          user={currentUser}
+        />
+        <div className="flex-1 bg-white border border-[#e0d8c3] rounded-lg shadow-xl">
+          {renderContent()}
         </div>
       </div>
     </div>

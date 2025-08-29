@@ -108,14 +108,24 @@ export default function CreateDestination() {
         country,
         features,
         photos: uploadedPhotoUrls
-      }))
+      }));
 
       toast.success("Destination created!");
       navigate("/admin/destinations");
-    } catch (err: any) {
-      const backendMessage = err.payload || err.message || "Something went wrong!";
-      toast.error(backendMessage);
-    } finally {
+    } catch (err: unknown) {
+  if (err instanceof Error) {
+    // Check if it's an Axios-like error with response.data.message
+    const maybeAxiosError = err as { response?: { data?: { message?: string } } };
+
+    if (maybeAxiosError.response?.data?.message) {
+      toast.error(maybeAxiosError.response.data.message);
+    } else {
+      toast.error(err.message); // fallback to generic Error message
+    }
+  } else {
+    toast.error("An unexpected error occurred.");
+  }
+} finally {
       setLoading(false);
     }
   };

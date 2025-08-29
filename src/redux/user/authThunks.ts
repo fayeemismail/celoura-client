@@ -1,4 +1,4 @@
-import {  login, logoutUser, refreshAccessToken } from "../../api/auth";
+import {  changeForgotPasswordAPI, forgotPassVerifyOTPAPI, forgotPasswordRequestAPI, login, logoutUser, refreshAccessToken, resentForgotPasswordOtpAPI } from "../../api/auth";
 import { signInFailure, signInPending, signInSuccess, signOut } from "./userSlice";
 
 
@@ -60,5 +60,51 @@ export const handleTokenRefresh = (): any => {
 }
 
 
+export const forgotPasswordRequest = (email: string) => {
+    return async() => {
+        try {
+            const response = await forgotPasswordRequestAPI(email);
+            return response.data
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+} ;
+
+export const forgotPassVerifyOtp = (email: string, otp: string) => {
+    return async() => {
+        try {
+            const response = await forgotPassVerifyOTPAPI(email, otp);
+            return response.data
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+};
 
 
+export const resentForgotPasswordOtpThunk = (email: string) => {
+    return async() => {
+        try {
+            const response = await resentForgotPasswordOtpAPI(email);
+            return response.data
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+};
+
+export const changeForgotPasswordThunk = (email: string, newPassword: string) => {
+    return async() => {
+        try {
+            const response = await changeForgotPasswordAPI(email, newPassword);
+            return response.data
+        } catch (error) {
+            console.log(error);
+            throw error;
+        }
+    }
+}

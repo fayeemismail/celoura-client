@@ -104,4 +104,16 @@ export const fetchUserBookingsDetailsAPI = async(bookingId: string) => {
 
 export const cancelBookingAPI = async(bookingId: string) => {
   return await axiosInstance.put(`/user/cancel-booking/${bookingId}`);
-}
+};
+
+export const addNewAddress = async(formData: FormData) => {
+  return await axiosInstance.post(`/user/add-new-address`, formData, {
+    headers: {
+      "Content-Type" : "multipart/formData"
+    }
+  });
+};
+
+export const getUserAddressesAPI = async (userId: string) => {
+  return await axiosInstance.get(`/user/get-address/${userId}`);
+};
