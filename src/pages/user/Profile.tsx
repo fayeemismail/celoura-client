@@ -1,13 +1,16 @@
-// /pages/user/Profile.tsx
 import { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { AppDispatch, RootState } from "../../redux/store";
 import { handleSignout } from "../../redux/user/authThunks";
-import ProfileNavbar from "../../components/user/Profile/ProfileNavbar";
 import ProfileSidebar from "../../components/user/Profile/ProfileSidebar";
 import ProfileOverview from "../../components/user/Profile/ProfileOverview";
 import ProfileForm from "../../components/user/Profile/ProfileForm";
+import ProfileBookingsPage from "../../components/user/Profile/BookingOnProfile";
+import ProfileAddressesPage from "../../components/user/Profile/ProfileAddressPage";
+import ProfileFollowedGuidesPage from "../../components/user/Profile/ProfileFollowedPage";
+import ProfileLikedPostsPage from "../../components/user/Profile/ProfileLikePage";
+import ProfileNavbar from "../../components/user/Profile/ProfileNavbar";
 
 export default function Profile() {
   const { currentUser } = useSelector((state: RootState) => state.user);
@@ -28,15 +31,15 @@ export default function Profile() {
       case "overview":
         return <ProfileOverview />;
       case "bookings":
-        return <div className="p-6">Bookings Page</div>;
+        return <ProfileBookingsPage />;
       case "edit-profile":
         return <ProfileForm />;
       case "addresses":
-        return <div className="p-6">Manage Addresses</div>;
+        return <ProfileAddressesPage />;
       case "followed-guides":
-        return <div className="p-6">Followed Guides</div>;
+        return <ProfileFollowedGuidesPage />;
       case "liked-posts":
-        return <div className="p-6">Liked Posts</div>;
+        return <ProfileLikedPostsPage />;
       default:
         return <ProfileOverview />;
     }
@@ -44,10 +47,14 @@ export default function Profile() {
 
   return (
     <div className="bg-[#f8f5ef] min-h-screen pt-20 p-4">
-      <div className="max-w-5xl mx-auto bg-white border border-[#e0d8c3] rounded-lg shadow-xl flex">
-        <ProfileSidebar active={activePage} setActive={setActivePage} />
-        <div className="flex-1">
-          <ProfileNavbar />
+      <ProfileNavbar />
+      <div className="max-w-6xl mx-auto flex gap-6">
+        <ProfileSidebar 
+          active={activePage} 
+          setActive={setActivePage} 
+          user={currentUser}
+        />
+        <div className="flex-1 bg-white border border-[#e0d8c3] rounded-lg shadow-xl">
           {renderContent()}
         </div>
       </div>

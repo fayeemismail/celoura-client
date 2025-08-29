@@ -1,5 +1,6 @@
 // /redux/user/userThunks.ts
 import {
+  addNewAddress,
   bookGuideApi,
   cancelBookingAPI,
   commentOnGuidePostApi,
@@ -16,6 +17,7 @@ import {
   getGuideSinglePostApi,
   getGuideWDestinationApi,
   getNewDestinationApi,
+  getUserAddressesAPI,
   hasRegistered,
   likePostUserApi,
   pageinatedDestiUserApi,
@@ -330,3 +332,28 @@ export const cancelBookingThunk = (bookingId: string) => {
     }
   }
 };
+
+
+export const addNewAddressThunk = (formData: FormData) => {
+  return async() => {
+    try {
+      const response = await addNewAddress(formData);
+      return response.data
+    } catch (error) {
+      console.log(error);
+      throw error
+    }
+  }
+};
+
+export const getUserAddressesThunk = (userId: string) => {
+  return async() =>{
+    try {
+      const response = await getUserAddressesAPI(userId);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error
+    }
+  }
+}

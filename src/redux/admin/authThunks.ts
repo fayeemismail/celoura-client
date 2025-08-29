@@ -196,8 +196,8 @@ export const createDestination = (destinationData: {
             // const formDataObj = Object.fromEntries(destinationData.entries());
             const response = await createDestinationApi(destinationData);
             return response;
-        } catch (error: any) {
-            console.error("Error On Create Destination:", error.response?.data?.message || error.message);
+        } catch (error) {
+            console.error("Error On Create Destination:", error);
             throw error;
         }
     };
