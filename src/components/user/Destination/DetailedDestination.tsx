@@ -40,7 +40,7 @@ export default function DestinationDetailPage() {
   const [loading, setLoading] = useState(false);
 
   const { isAuthenticated, error } = useSelector(
-    (state: RootState) => state.admin
+    (state: RootState) => state.user
   );
 
   const getSingleSpot = async () => {
@@ -48,7 +48,6 @@ export default function DestinationDetailPage() {
     try {
       if (id) {
         const data = await dispatch(getGuideWDestinationThunk(id));
-        // console.log(data.guide)
         setDestination(data.destination);
         setGuides(data.guide || []);
         setActivePhoto(data.destination.photos?.[0] || "");

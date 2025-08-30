@@ -1,61 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import {
-    FaArrowLeft,
-    FaCalendarAlt,
-    FaMapMarkerAlt,
-    FaClock,
-    FaTimesCircle,
-    FaCheckCircle,
-    FaExclamationCircle,
-    FaMoneyBillWave,
-    FaUser,
-    FaPhone,
-    FaEnvelope,
-    FaHome,
-    FaInfoCircle,
-    FaHandshake
-} from "react-icons/fa";
+import { FaArrowLeft, FaCalendarAlt, FaMapMarkerAlt, FaClock,
+         FaTimesCircle, FaCheckCircle, FaExclamationCircle, FaMoneyBillWave,
+         FaUser, FaPhone, FaEnvelope, FaHome, FaInfoCircle, FaHandshake } from "react-icons/fa";
 import { AppDispatch, RootState } from "../../../redux/store";
 import Navbar from "../home/Navbar";
 import { cancelBookingThunk, fetchUserBookingDetailsThunk } from "../../../redux/user/userThunks";
 import ConfirmationDialog from "../../common/ConfirmationDialog";
-
-interface BookingDetails {
-    _id: string;
-    createdAt: string;
-    durationInDays: string;
-    endDate: string;
-    guide: {
-        id: string;
-        name: string;
-        email: string;
-        profilePic?: string;
-        basedOn?: string;
-        bio?: string;
-    };
-    guideAccepted: boolean;
-    locations: string[];
-    paymentStatus: string;
-    rejected: boolean;
-    rejectedReason?: string;
-    specialRequests: string;
-    startDate: string;
-    status: string;
-    updatedAt: string;
-    user: {
-        id: string;
-        name: string;
-        email: string;
-        phone: string;
-        address: string;
-    };
-    totalAmount?: number;
-    paymentMethod?: string;
-    bookingReference?: string;
-    paymentDeadline?: string;
-}
+import { BookingDetails } from "../../../types/user/booking/BookingDetails";
 
 export default function BookingDetailsPage() {
     const dispatch = useDispatch<AppDispatch>();
@@ -71,6 +24,7 @@ export default function BookingDetailsPage() {
             setLoading(true);
             if (bookingId) {
                 const response = await dispatch(fetchUserBookingDetailsThunk(bookingId));
+                console.log(response)
                 setBooking(response as BookingDetails);
             }
         } catch (error) {
@@ -138,12 +92,13 @@ export default function BookingDetailsPage() {
     };
 
     const formatDeadline = (dateString: string) => {
-        return new Date(dateString).toLocaleString('en-US', {
+        return new Date(dateString).toLocaleString('en-IN', {
             year: 'numeric',
             month: 'long',
             day: 'numeric',
             hour: '2-digit',
-            minute: '2-digit'
+            minute: '2-digit',
+            timeZone: 'Asia/Kolkata'
         });
     };
 
@@ -468,9 +423,13 @@ export default function BookingDetailsPage() {
                                     <p className="text-sm text-gray-500">Address</p>
                                     <p className="font-medium flex items-center">
                                         <FaHome className="text-[#9B8759] mr-2" />
-                                        {booking.user.address}
+                                        {booking.user.address.line1}, {booking.user.address.city}, {booking.user.address.state}
+                                    </p>
+                                    <p className="text-gray-600 text-sm ml-6">
+                                        {booking.user.address.country} - {booking.user.address.postalCode}
                                     </p>
                                 </div>
+
                             </div>
                         </div>
 
@@ -487,7 +446,7 @@ export default function BookingDetailsPage() {
                                     Request Changes
                                 </button>
                                 {booking.status !== 'cancelled' && (
-                                    <button 
+                                    <button
                                         onClick={() => setShowCancelModal(true)}
                                         className="w-full bg-red-100 hover:bg-red-200 text-red-800 font-medium py-2 px-4 rounded-lg transition duration-300"
                                     >

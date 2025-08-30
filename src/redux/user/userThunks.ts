@@ -4,7 +4,9 @@ import {
   bookGuideApi,
   cancelBookingAPI,
   commentOnGuidePostApi,
+  deleteUserAddressAPI,
   editProfile,
+  editUserAddressAPI,
   fetchUserBookingsAPI,
   fetchUserBookingsDetailsAPI,
   followGuideApi,
@@ -350,6 +352,30 @@ export const getUserAddressesThunk = (userId: string) => {
   return async() =>{
     try {
       const response = await getUserAddressesAPI(userId);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error
+    }
+  }
+}
+
+export const editUserAddressThunk = (addressId: string, formdData: FormData) => {
+  return async() =>{
+    try {
+      const response = await editUserAddressAPI(addressId, formdData);
+      return response.data;
+    } catch (error) {
+      console.log(error);
+      throw error
+    }
+  }
+}
+
+export const deleteUserAddress = (addressId: string) => {
+  return async() =>{
+    try {
+      const response = await deleteUserAddressAPI(addressId);
       return response.data;
     } catch (error) {
       console.log(error);
