@@ -7,6 +7,7 @@ import Navbar from "../../components/user/home/Navbar";
 import {
   bookGuideThunk,
   getGuideDataOnBookingThunk,
+  getUserAddressesThunk,
 } from "../../redux/user/userThunks";
 
 import GuideInfo from "../../components/user/Destination/GuideInfo";
@@ -22,6 +23,7 @@ import {
 } from "../../components/user/Destination/Validation";
 import { toast } from "react-toastify";
 import { AxiosError } from "axios";
+import AddressModal, { Address } from "../../components/user/Destination/AddressModal";
 
 type Guide = {
   _id: string;
@@ -43,11 +45,14 @@ export default function BookGuidePage() {
 
   const [guide, setGuide] = useState<Guide | null>(null);
   const [loading, setLoading] = useState(false);
+  const [addresses, setAddresses] = useState<Address[]>([]);
+  const [showAddressModal, setShowAddressModal] = useState(false);
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     phone: "",
     address: "",
+    addressId: "",
     startDate: "",
     endDate: "",
     days: 1,
@@ -68,7 +73,28 @@ export default function BookGuidePage() {
     (state: RootState) => state.user
   );
 
-  // Fetch guide details
+  const getUserAddresses = async () => {
+    try {
+      const response = await dispatch(getUserAddressesThunk(currentUser?.id!));
+      setAddresses(response);
+      
+      if (response.length > 0) {
+        const firstAddress = response[0];
+        const fullAddress = `${firstAddress.line1}${firstAddress.line2 ? ', ' + firstAddress.line2 : ''}, ${firstAddress.city}, ${firstAddress.state}, ${firstAddress.country}, ${firstAddress.postalCode}`;
+        
+        setFormData(prev => ({
+          ...prev,
+          address: fullAddress,
+          addressId: firstAddress._id,
+          name: firstAddress.name,
+          phone: firstAddress.phone
+        }));
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
   const getGuideDetails = async () => {
     setLoading(true);
     try {
@@ -93,13 +119,11 @@ export default function BookGuidePage() {
   useEffect(() => {
     if (!isAuthenticated) navigate("/login");
     getGuideDetails();
+    getUserAddresses();
   }, [isAuthenticated, guideId]);
 
-  // -------------------------------
-  // Handlers
-  // -------------------------------
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -130,6 +154,23 @@ export default function BookGuidePage() {
           ? ""
           : "Name must be between 3 and 45 characters",
       }));
+    } else if (name === "selectedAddress") {
+      if (value === "new") {
+        setShowAddressModal(true);
+      } else {
+        const selectedAddress = addresses.find(addr => addr._id === value);
+        if (selectedAddress) {
+          const fullAddress = `${selectedAddress.line1}${selectedAddress.line2 ? ', ' + selectedAddress.line2 : ''}, ${selectedAddress.city}, ${selectedAddress.state}, ${selectedAddress.country}, ${selectedAddress.postalCode}`;
+          
+          setFormData(prev => ({
+            ...prev,
+            address: fullAddress,
+            addressId: selectedAddress._id,
+            name: selectedAddress.name,
+            phone: selectedAddress.phone
+          }));
+        }
+      }
     }
   };
 
@@ -184,9 +225,6 @@ export default function BookGuidePage() {
     setErrors((prev) => ({ ...prev, selectedDestinations: "" }));
   };
 
-  // -------------------------------
-  // Validation before submit
-  // -------------------------------
   const validateForm = () => {
     const nameValid = validateName(formData.name);
     const emailValid = validateEmail(formData.email);
@@ -227,7 +265,7 @@ export default function BookGuidePage() {
     data.append("name", formData.name);
     data.append("email", formData.email);
     data.append("phone", formData.phone);
-    data.append("address", formData.address);
+    data.append("addressId", formData.addressId);
     data.append("startDate", formData.startDate);
     data.append("endDate", formData.endDate);
     data.append("days", formData.days.toString());
@@ -244,8 +282,8 @@ export default function BookGuidePage() {
       navigate(-1);
     } catch (error) {
       if (error instanceof AxiosError) {
-        toast.error(error.response?.data);
-        console.error(error.response?.data ?? error.message);
+        toast.error(error.response?.data.message);
+        console.error(error.response?.data.message);
       } else {
         toast.error("Cannot Book the guide");
         console.error("Unexpected error:", error);
@@ -253,9 +291,25 @@ export default function BookGuidePage() {
     }
   };
 
-  // -------------------------------
-  // UI
-  // -------------------------------
+  const handleNewAddressCreated = async () => {
+    await getUserAddresses();
+    
+    if (addresses.length > 0) {
+      const latestAddress = addresses[addresses.length - 1];
+      const fullAddress = `${latestAddress.line1}${latestAddress.line2 ? ', ' + latestAddress.line2 : ''}, ${latestAddress.city}, ${latestAddress.state}, ${latestAddress.country}, ${latestAddress.postalCode}`;
+      
+      setFormData(prev => ({
+        ...prev,
+        address: fullAddress,
+        addressId: latestAddress._id,
+        name: latestAddress.name,
+        phone: latestAddress.phone
+      }));
+    }
+    
+    setShowAddressModal(false);
+  };
+
   return (
     <>
       <Navbar />
@@ -282,6 +336,35 @@ export default function BookGuidePage() {
               onSelect={handleDestinationSelect}
               error={errors.selectedDestinations}
             />
+            
+            {/* Address Selector */}
+            <div className="p-6 border-b">
+              <h3 className="text-lg font-semibold mb-4">Select Address</h3>
+              <div className="mb-4">
+                <select
+                  name="selectedAddress"
+                  value={formData.addressId || ""}
+                  onChange={handleInputChange}
+                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#9B8759] focus:border-[#9B8759]"
+                >
+                  <option value="">Select an address</option>
+                  {addresses.map(address => (
+                    <option key={address._id} value={address._id}>
+                      {address.name} - {address.line1}, {address.city}
+                    </option>
+                  ))}
+                  <option value="new">+ Create new address</option>
+                </select>
+              </div>
+              
+              {formData.address && (
+                <div className="bg-gray-50 p-4 rounded-lg">
+                  <p className="font-medium">Selected Address:</p>
+                  <p>{formData.address}</p>
+                </div>
+              )}
+            </div>
+            
             <BookingForm
               formData={formData}
               errors={errors}
@@ -293,6 +376,15 @@ export default function BookGuidePage() {
           </div>
         ) : (
           <p className="text-center">Guide not found.</p>
+        )}
+        
+        {/* Address Modal */}
+        {showAddressModal && (
+          <AddressModal
+            userId={currentUser?.id!}
+            onClose={() => setShowAddressModal(false)}
+            onAddressCreated={handleNewAddressCreated}
+          />
         )}
       </section>
     </>

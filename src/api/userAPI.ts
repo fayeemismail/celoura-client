@@ -117,3 +117,15 @@ export const addNewAddress = async(formData: FormData) => {
 export const getUserAddressesAPI = async (userId: string) => {
   return await axiosInstance.get(`/user/get-address/${userId}`);
 };
+
+export const editUserAddressAPI = async(addressId: string, formData: FormData) => {
+  return await axiosInstance.put(`/user/edit-address/${addressId}`, formData, {
+    headers: {
+      "Content-Type" : "multipart/formData"
+    }
+  });
+};
+
+export const deleteUserAddressAPI = async(addressId: string) => {
+  return await axiosInstance.delete(`/user/address/delete/${addressId}`);
+};

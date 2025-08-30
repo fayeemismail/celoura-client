@@ -6,7 +6,6 @@ import { handleSignout } from "../../redux/user/authThunks";
 import ProfileSidebar from "../../components/user/Profile/ProfileSidebar";
 import ProfileOverview from "../../components/user/Profile/ProfileOverview";
 import ProfileForm from "../../components/user/Profile/ProfileForm";
-import ProfileBookingsPage from "../../components/user/Profile/BookingOnProfile";
 import ProfileAddressesPage from "../../components/user/Profile/ProfileAddressPage";
 import ProfileFollowedGuidesPage from "../../components/user/Profile/ProfileFollowedPage";
 import ProfileLikedPostsPage from "../../components/user/Profile/ProfileLikePage";
@@ -30,8 +29,6 @@ export default function Profile() {
     switch (activePage) {
       case "overview":
         return <ProfileOverview />;
-      case "bookings":
-        return <ProfileBookingsPage />;
       case "edit-profile":
         return <ProfileForm />;
       case "addresses":
@@ -48,7 +45,7 @@ export default function Profile() {
   return (
     <div className="bg-[#f8f5ef] min-h-screen pt-20 p-4">
       <ProfileNavbar />
-      <div className="max-w-6xl mx-auto flex gap-6">
+      <div className="max-w-7x mx-auto flex gap-2">
         <ProfileSidebar 
           active={activePage} 
           setActive={setActivePage} 

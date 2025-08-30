@@ -69,11 +69,13 @@ const Sidebar = ({ sidebarOpen, toggleSidebar }: SidebarProps) => {
             </span>
           </div>
           {sidebarOpen && (
-            <div className="ml-3">
-              <p className="text-sm font-medium text-white">
+            <div className="ml-3 min-w-0 flex-1"> {/* Added min-w-0 and flex-1 for proper truncation */}
+              <p className="text-sm font-medium text-white truncate"> {/* Added truncate class */}
                 {currentGuide?.name || "Guide User"}
               </p>
-              <p className="text-xs">{currentGuide?.email || "guide@example.com"}</p>
+              <p className="text-xs truncate"> {/* Added truncate class */}
+                {currentGuide?.email || "guide@example.com"}
+              </p>
             </div>
           )}
         </div>

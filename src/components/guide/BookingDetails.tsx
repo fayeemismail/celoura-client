@@ -24,7 +24,15 @@ type Booking = {
     name: string;
     email: string;
     phone: string;
-    address: string;
+    address: {
+            _id: string;
+            line1: string;
+            line2?: string;
+            city: string;
+            state: string;
+            country: string;
+            postalCode: string;
+        };
   };
   createdAt: string;
   paymentStatus: string;
@@ -283,7 +291,7 @@ const BookingDetails = () => {
                   <p className="text-xs uppercase text-gray-400 tracking-wide mb-2">
                     Address
                   </p>
-                  <p className="text-lg font-semibold">{booking.user.address}</p>
+                  <p className="text-lg font-semibold">{`${booking.user.address.line1 }, ${booking.user.address.city}, ${booking.user.address.state}`}</p>
                 </div>
               </div>
             </div>
